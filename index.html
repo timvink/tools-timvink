@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>tools.timvink.nl</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--bg: #f6f8fb;
+			--fg: #0f172a;
+			--muted: #475569;
+			--card-bg: #ffffff;
+			--accent: #6366f1;
+			--accent-light: #eef2ff;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			background: var(--bg);
+			color: var(--fg);
+			line-height: 1.6;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+		}
+
+		header {
+			padding: 1.5rem clamp(1.25rem, 4vw, 3rem);
+		}
+
+		.brand {
+			font-size: 1.1rem;
+			font-weight: 600;
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
+			color: var(--muted);
+		}
+
+		main {
+			flex: 1;
+			padding: 0 clamp(1.25rem, 4vw, 3rem) 3rem;
+		}
+
+		.hero {
+			max-width: 48rem;
+			margin-bottom: 2.5rem;
+		}
+
+		.hero h1 {
+			font-size: clamp(2rem, 6vw, 3.25rem);
+			line-height: 1.2;
+			margin: 0 0 1rem;
+		}
+
+		.hero p {
+			margin: 0;
+			font-size: 1.05rem;
+			color: var(--muted);
+		}
+
+		.tool-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+			gap: 1.5rem;
+		}
+
+		.tool-card {
+			background: var(--card-bg);
+			border-radius: 1.25rem;
+			padding: 1.75rem;
+			box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+			border: 1px solid rgba(99, 102, 241, 0.12);
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.tool-label {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.4rem;
+			font-size: 0.85rem;
+			font-weight: 600;
+			color: var(--accent);
+			background: var(--accent-light);
+			padding: 0.3rem 0.75rem;
+			border-radius: 999px;
+		}
+
+		.tool-card h2 {
+			margin: 0;
+			font-size: 1.35rem;
+		}
+
+		.tool-card p {
+			margin: 0;
+			color: var(--muted);
+		}
+
+		.tool-meta {
+			font-size: 0.9rem;
+			color: var(--muted);
+		}
+
+		.tool-link {
+			margin-top: auto;
+			align-self: flex-start;
+			text-decoration: none;
+			font-weight: 600;
+			color: var(--card-bg);
+		}
+
+		.tool-link span {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.35rem;
+			padding: 0.65rem 1.1rem;
+			border-radius: 999px;
+			background: var(--accent);
+			color: #fff;
+			transition: transform 0.15s ease;
+		}
+
+		.tool-link span:hover,
+		.tool-link span:focus-visible {
+			transform: translateX(2px);
+		}
+
+		footer {
+			padding: 1.5rem clamp(1.25rem, 4vw, 3rem) 2rem;
+			font-size: 0.9rem;
+			color: var(--muted);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			:root {
+				color-scheme: dark;
+				--bg: #0f172a;
+				--fg: #f8fafc;
+				--muted: #e2e8f0;
+				--card-bg: #111827;
+				--accent-light: rgba(99, 102, 241, 0.14);
+			}
+
+			.tool-card {
+				box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+				border-color: rgba(99, 102, 241, 0.26);
+			}
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<div class="brand">tools.timvink.nl</div>
+	</header>
+
+	<main>
+		<section class="hero">
+			<h1>Small, purposeful tools built for the web.</h1>
+			<p>Hand-crafted experiments, self-hosted where possible, always mobile-friendly. Everything below is a single static HTML file.</p>
+		</section>
+
+		<section class="tool-grid" aria-label="Tool list">
+			<article class="tool-card">
+				<span class="tool-label">Self-test</span>
+				<div>
+					<h2>One-Minute ADHD Test</h2>
+					<p>Interactive ASRS-5 screener that walks you through six research-backed questions with instant scoring and guidance.</p>
+				</div>
+				<div class="tool-meta">Updated Nov 2025 · Standalone HTML</div>
+				<a class="tool-link" href="adhd-self-test.html">
+					<span>Open tool →</span>
+				</a>
+			</article>
+		</section>
+	</main>
+
+	<footer>
+		Created by Tim Vink · Feedback welcome via GitHub.
+	</footer>
+</body>
+</html>
