@@ -200,15 +200,23 @@
             stepIndicator.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
 
             let optionsHtml = options.map((opt, idx) => `
-                <button onclick="handleAnswer(${opt.score})" 
+                <button onclick="handleAnswer(${opt.score})"
                     class="group w-full text-left p-4 rounded-xl border-2 border-slate-100 hover:border-indigo-600 hover:bg-indigo-50 transition-all duration-200 flex items-center justify-between mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1">
                     <span class="font-medium text-slate-700 group-hover:text-indigo-900">${opt.label}</span>
                     <span class="w-5 h-5 rounded-full border-2 border-slate-300 group-hover:border-indigo-600 group-hover:bg-indigo-600 transition-colors"></span>
                 </button>
             `).join('');
 
+            const backButtonHtml = currentQuestionIndex > 0 ? `
+                <button onclick="goBack()" class="text-slate-500 hover:text-slate-800 font-medium transition-colors text-sm flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-1 rounded px-2 py-1 -ml-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    Back
+                </button>
+            ` : '';
+
             const html = `
                 <div class="fade-enter-active">
+                    ${backButtonHtml}
                     <div class="mb-2">
                          <span class="text-xs font-bold tracking-wider text-indigo-600 uppercase bg-indigo-50 px-2 py-1 rounded">${question.category}</span>
                     </div>
@@ -224,8 +232,15 @@
         }
 
         function handleAnswer(score) {
-            totalScore += score;
-            answers.push(score);
+            // If we're replacing an existing answer, update it
+            if (answers[currentQuestionIndex] !== undefined) {
+                totalScore = totalScore - answers[currentQuestionIndex] + score;
+                answers[currentQuestionIndex] = score;
+            } else {
+                // New answer
+                totalScore += score;
+                answers.push(score);
+            }
 
             if (currentQuestionIndex < questions.length - 1) {
                 currentQuestionIndex++;
@@ -233,6 +248,13 @@
             } else {
                 progressBar.style.width = '100%';
                 showResults();
+            }
+        }
+
+        function goBack() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
             }
         }
 
