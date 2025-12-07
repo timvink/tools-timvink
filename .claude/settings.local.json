@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:altalpha.timvink.nl)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
