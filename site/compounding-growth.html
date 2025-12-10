@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compound Interest Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 { text-align: center; margin-bottom: 2rem; color: var(--primary); }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .field { display: flex; flex-direction: column; }
+        label { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+        
+        input {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .results {
+            background: #eff6ff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .final-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th { text-align: right; color: var(--primary); }
+        th:first-child, td:first-child { text-align: left; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Compound Interest Calculator</h1>
+
+    <div class="input-group">
+        <div class="field">
+            <label>Initial Principal (€)</label>
+            <input type="number" id="principal" value="10000" oninput="calculate()">
+        </div>
+        <div class="field">
+            <label>Annual Interest Rate (%)</label>
+            <input type="number" id="rate" value="10" step="0.1" oninput="calculate()">
+        </div>
+        <div class="field">
+            <label>Time Period (Years)</label>
+            <input type="number" id="years" value="30" oninput="calculate()">
+        </div>
+    </div>
+
+    <div class="results">
+        <div>Total Value after <span id="year-display">30</span> years:</div>
+        <div class="final-amount" id="final-amount">€0</div>
+        <div style="font-size: 0.9rem; color: #64748b">
+            Total Principal: <span id="total-principal">€0</span> | 
+            Total Interest: <span id="total-interest">€0</span>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="growthChart"></canvas>
+    </div>
+    
+    <details>
+        <summary style="cursor: pointer; margin-top: 1rem; color: var(--primary);">View Yearly Breakdown Table</summary>
+        <table id="breakdown-table">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Start Balance</th>
+                    <th>Interest Earned</th>
+                    <th>End Balance</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </details>
+</div>
+
+<script>
+    let chartInstance = null;
+
+    function formatMoney(number) {
+        return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' }).format(number);
+    }
+
+    function calculate() {
+        // 1. Get Inputs
+        const principal = parseFloat(document.getElementById('principal').value);
+        const rate = parseFloat(document.getElementById('rate').value) / 100;
+        const years = parseInt(document.getElementById('years').value);
+
+        // 2. Calculate Growth
+        let balance = principal;
+        const labels = [];
+        const dataPoints = [];
+        const tableBody = document.querySelector('#breakdown-table tbody');
+        tableBody.innerHTML = ''; // Clear table
+
+        // Initial point (Year 0)
+        labels.push('Start');
+        dataPoints.push(principal);
+
+        for (let i = 1; i <= years; i++) {
+            const startBalance = balance;
+            const interest = balance * rate;
+            balance += interest;
+
+            labels.push(`Year ${i}`);
+            dataPoints.push(balance);
+
+            // Add row to table
+            const row = `<tr>
+                <td>${i}</td>
+                <td>${formatMoney(startBalance)}</td>
+                <td>${formatMoney(interest)}</td>
+                <td><strong>${formatMoney(balance)}</strong></td>
+            </tr>`;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        }
+
+        // 3. Update Text Results
+        document.getElementById('year-display').textContent = years;
+        document.getElementById('final-amount').textContent = formatMoney(balance);
+        document.getElementById('total-principal').textContent = formatMoney(principal);
+        document.getElementById('total-interest').textContent = formatMoney(balance - principal);
+
+        // 4. Update Chart
+        updateChart(labels, dataPoints);
+    }
+
+    function updateChart(labels, data) {
+        const ctx = document.getElementById('growthChart').getContext('2d');
+
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Portfolio Value',
+                    data: data,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0 // Hides points for a cleaner look
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return formatMoney(context.raw);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function(value) {
+                                return '€' + (value / 1000) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Run once on load
+    calculate();
+</script>
+
+</body>
+</html>
