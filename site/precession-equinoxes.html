@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axial Precession & The Great Year</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap');
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .ancient-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+
+        /* Timeline Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #f59e0b; /* Amber 500 */
+            cursor: pointer;
+            margin-top: -10px;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 2px;
+        }
+        
+        /* Star Background Animation */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+        }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .play-btn {
+            transition: all 0.2s;
+        }
+        .play-btn:active {
+            transform: scale(0.95);
+        }
+        .play-btn.active {
+            background-color: #f59e0b;
+            color: white;
+            border-color: #f59e0b;
+        }
+
+        /* Constellation Wheel */
+        #zodiac-canvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <div class="stars"></div>
+
+    <!-- Header -->
+    <header class="p-6 text-center border-b border-slate-700 bg-slate-900/80 sticky top-0 z-20 backdrop-blur-md">
+        <h1 class="text-3xl md:text-5xl text-amber-500 font-bold mb-2">The Precession of the Equinoxes</h1>
+        <p class="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
+            Visualizing the 26,000-year cycle and the Babylonian Zodiacal Segments.
+        </p>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow container mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Left Col: Controls & Information -->
+        <div class="space-y-6">
+            
+            <!-- Controls Section -->
+            <div class="glass-panel p-6 rounded-xl shadow-2xl border-t-4 border-amber-500">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <h2 class="text-xl text-white font-bold ancient-font">Timeline Control</h2>
+                        <div class="flex items-center gap-2 mt-2">
+                            <button id="play-btn" onclick="togglePlay()" class="play-btn px-4 py-1 rounded border border-slate-500 text-slate-300 text-xs uppercase font-bold hover:bg-slate-700">
+                                ▶ Play Animation
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400 uppercase tracking-widest">Current Date</span>
+                        <div class="text-3xl font-mono text-amber-400" id="year-display">2025 AD</div>
+                    </div>
+                </div>
+
+                <input type="range" id="time-slider" min="-12000" max="4000" step="10" value="2025" class="mb-6">
+
+                <!-- Key Historical Markers -->
+                <div class="grid grid-cols-2 gap-2 md:grid-cols-4">
+                    <button onclick="setYear(-9600)" class="text-xs py-2 px-3 rounded bg-slate-700 hover:bg-slate-600 transition text-center border border-slate-600">
+                        <span class="block font-bold text-amber-500">Gobekli Tepe</span>
+                        <span class="opacity-60">~9600 BC</span>
+                    </button>
+                    <button onclick="setYear(-2500)" class="text-xs py-2 px-3 rounded bg-slate-700 hover:bg-slate-600 transition text-center border border-slate-600">
+                        <span class="block font-bold text-amber-500">Pyramids</span>
+                        <span class="opacity-60">~2500 BC</span>
+                    </button>
+                    <button onclick="setYear(1)" class="text-xs py-2 px-3 rounded bg-slate-700 hover:bg-slate-600 transition text-center border border-slate-600">
+                        <span class="block font-bold text-amber-500">Year Zero</span>
+                        <span class="opacity-60">1 AD</span>
+                    </button>
+                    <button onclick="setYear(2025)" class="text-xs py-2 px-3 rounded bg-slate-700 hover:bg-slate-600 transition text-center border border-slate-600">
+                        <span class="block font-bold text-amber-500">Now</span>
+                        <span class="opacity-60">2025 AD</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Concept: The Babylonian Grid -->
+            <div class="glass-panel p-6 rounded-xl">
+                <h3 class="text-xl text-indigo-300 font-bold mb-2 ancient-font">The 12 Babylonian Segments</h3>
+                <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                    Around 500 BC, Babylonian astronomers standardized the zodiac into 12 equal segments of 30° each. This created a mathematical grid (the <em>Signs</em>) separate from the irregular star groups (the <em>Constellations</em>).
+                </p>
+                <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                    <strong>How to read the Star Map:</strong>
+                </p>
+                <ul class="list-disc list-inside text-sm text-slate-400 space-y-2">
+                    <li><strong class="text-amber-500">The Sun Icon (Top):</strong> Represents the <em class="text-white">Vernal Equinox</em>. This is our fixed viewing window (March 21st).</li>
+                    <li><strong class="text-blue-300">The Rotating Wheel:</strong> Represents the background stars. Precession causes this background to drift.</li>
+                    <li><strong class="text-slate-300">The Wedge:</strong> The segment directly behind the Sun icon tells you the current "Astrological Age."</li>
+                </ul>
+            </div>
+
+            <!-- Interactive Explainer -->
+            <div class="glass-panel p-6 rounded-xl border-l-4 border-emerald-500">
+                <h3 class="text-lg text-emerald-400 font-bold mb-1 ancient-font" id="age-title">Age of Pisces</h3>
+                <p class="text-sm text-slate-300 italic mb-3" id="age-dates">~1 AD to ~2150 AD</p>
+                <p class="text-slate-300 text-sm" id="age-desc">
+                    The Vernal Equinox sun rises against the constellation of the Fishes.
+                </p>
+            </div>
+            
+             <!-- 3D Earth Container -->
+             <div class="glass-panel rounded-xl overflow-hidden shadow-xl relative h-64">
+                <div class="absolute top-3 left-3 z-10 bg-black/50 px-2 py-1 rounded text-[10px] text-amber-500 font-bold border border-amber-500/30">
+                    3D AXIS TILT VIEW
+                </div>
+                <div id="canvas-container" class="w-full h-full"></div>
+            </div>
+
+        </div>
+
+        <!-- Right Col: Visualizations -->
+        <div class="space-y-6 sticky top-24 h-fit">
+            
+            <!-- Zodiac Wheel Container -->
+            <div class="glass-panel p-1 rounded-xl flex flex-col items-center justify-center relative aspect-square">
+                <div class="absolute top-4 left-4 z-10 pointer-events-none">
+                    <span class="bg-black/60 px-3 py-1 rounded text-xs text-amber-400 font-bold border border-amber-500/30 backdrop-blur-sm">
+                        VIEW FROM EARTH (March 21st)
+                    </span>
+                </div>
+                
+                <canvas id="zodiac-canvas" width="600" height="600" class="w-full h-full rounded-lg"></canvas>
+                
+                <!-- Legend overlay -->
+                <div class="absolute bottom-4 right-4 text-[10px] text-slate-500 text-right pointer-events-none">
+                    <div class="flex items-center justify-end gap-2">
+                        <span>Ecliptic Path</span> <div class="w-4 h-0.5 bg-slate-600"></div>
+                    </div>
+                    <div class="flex items-center justify-end gap-2 mt-1">
+                        <span>Segment Boundary (30°)</span> <div class="w-4 h-px bg-indigo-500/50"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // === STATE MANAGEMENT ===
+        const state = {
+            year: 2025,
+            precessionPeriod: 25772, 
+            currentAge: '',
+            isPlaying: false,
+            animationId: null
+        };
+
+        const dom = {
+            yearDisplay: document.getElementById('year-display'),
+            slider: document.getElementById('time-slider'),
+            ageTitle: document.getElementById('age-title'),
+            ageDates: document.getElementById('age-dates'),
+            ageDesc: document.getElementById('age-desc'),
+            playBtn: document.getElementById('play-btn')
+        };
+
+        // === CONSTELLATION DATA ===
+        // "stars" are relative coordinates [x, y] inside a 30-degree wedge.
+        // x: -1 to 1 (width of wedge at radius), y: 0.5 to 1.0 (radius depth)
+        const zodiacData = [
+            { 
+                name: "Aries", 
+                symbol: "♈",
+                dates: "~2000 BC - 1 AD",
+                desc: "The Ram. Associated with the rise of Iron Age empires and sacrificial religions.",
+                stars: [[-0.2, 0.8], [0.1, 0.85], [0.3, 0.82]],
+                lines: [[0,1], [1,2]]
+            },
+            { 
+                name: "Pisces", 
+                symbol: "♓",
+                dates: "~1 AD - 2150 AD",
+                desc: "The Fishes. The era of Christianity (fish symbolism) and global maritime exploration.",
+                stars: [[-0.3, 0.9], [-0.1, 0.75], [0.2, 0.75], [0.4, 0.9], [0.0, 0.6]], // V shape
+                lines: [[0,1], [1,4], [4,2], [2,3]]
+            },
+            { 
+                name: "Aquarius", 
+                symbol: "♒",
+                dates: "~2150 AD - 4300 AD",
+                desc: "The Water Bearer. The coming age of information, space travel, and global consciousness.",
+                stars: [[-0.3, 0.85], [-0.1, 0.8], [0.1, 0.85], [0.3, 0.8], [-0.3, 0.75], [-0.1, 0.7], [0.1, 0.75], [0.3, 0.7]],
+                lines: [[0,1], [1,2], [2,3], [4,5], [5,6], [6,7]]
+            },
+            { 
+                name: "Capricorn", 
+                symbol: "♑",
+                dates: "Future",
+                desc: "The Sea Goat.",
+                stars: [[-0.3, 0.9], [0, 0.7], [0.3, 0.9], [0.2, 0.8]], // Triangle-ish
+                lines: [[0,1], [1,2], [2,3], [3,1]]
+            },
+            { 
+                name: "Sagittarius", 
+                symbol: "♐",
+                dates: "Future",
+                desc: "The Archer (Teapot shape).",
+                stars: [[-0.2, 0.7], [0.2, 0.7], [0, 0.9], [-0.3, 0.8], [0.3, 0.8]], 
+                lines: [[0,1], [1,4], [4,2], [2,3], [3,0]]
+            },
+            { 
+                name: "Scorpio", 
+                symbol: "♏",
+                dates: "Future",
+                desc: "The Scorpion. Distinctive hook shape.",
+                stars: [[-0.2, 0.9], [-0.1, 0.8], [0, 0.7], [0.1, 0.6], [0.3, 0.65], [0.4, 0.8]], 
+                lines: [[0,1], [1,2], [2,3], [3,4], [4,5]]
+            },
+            { 
+                name: "Libra", 
+                symbol: "♎",
+                dates: "~13000 BC",
+                desc: "The Scales.",
+                stars: [[0, 0.9], [-0.2, 0.7], [0.2, 0.7]], 
+                lines: [[0,1], [1,2], [2,0]]
+            },
+            { 
+                name: "Virgo", 
+                symbol: "♍",
+                dates: "~11000 BC",
+                desc: "The Maiden. Largest zodiac constellation.",
+                stars: [[0, 0.9], [-0.2, 0.8], [0.2, 0.8], [0, 0.6], [-0.3, 0.5]], 
+                lines: [[0,1], [0,2], [1,3], [2,3], [3,4]]
+            },
+            { 
+                name: "Leo", 
+                symbol: "♌",
+                dates: "~10500 BC - 8000 BC",
+                desc: "The Lion. Associated with the Sphinx and the end of the Ice Age.",
+                stars: [[0.3, 0.8], [0.1, 0.9], [-0.1, 0.85], [-0.1, 0.75], [0.3, 0.7], [0.4, 0.6]], // Sickle + triangle
+                lines: [[0,1], [1,2], [2,3], [3,4], [0,4], [4,5]]
+            },
+            { 
+                name: "Cancer", 
+                symbol: "♋",
+                dates: "~8000 BC - 6000 BC",
+                desc: "The Crab. Faint constellation.",
+                stars: [[0, 0.8], [-0.2, 0.7], [0.2, 0.7], [0, 0.6]], // Y shape
+                lines: [[0,1], [0,2], [0,3]]
+            },
+            { 
+                name: "Gemini", 
+                symbol: "♊",
+                dates: "~6000 BC - 4000 BC",
+                desc: "The Twins.",
+                stars: [[-0.2, 0.9], [-0.2, 0.6], [0.2, 0.9], [0.2, 0.6]], // Two lines
+                lines: [[0,1], [2,3]]
+            },
+            { 
+                name: "Taurus", 
+                symbol: "♉",
+                dates: "~4000 BC - 2000 BC",
+                desc: "The Bull. Era of Pyramids, Minoans, and cattle worship.",
+                stars: [[0, 0.6], [-0.2, 0.8], [0.2, 0.8], [-0.1, 0.85], [0.1, 0.85]], // V shape
+                lines: [[0,1], [0,2]] // The V
+            }
+        ];
+
+        // Logic Helper
+        function getZodiacAgeIndex(year) {
+            // 1 AD = Start of Pisces (Index 1).
+            // Rate: 360 deg / 25772 years.
+            // Direction: Retrograde (Aries -> Pisces -> Aquarius).
+            // In our array: Aries(0), Pisces(1), Aquarius(2).
+            // So we want Index to INCREASE as year increases.
+            
+            const deltaYears = year - 1; 
+            // 1 full cycle = 12 indices.
+            // Years per index = 25772 / 12 = ~2148
+            
+            const shifts = deltaYears / 2148;
+            
+            // Start at Index 1 (Pisces) at year 1.
+            let idx = 1 + shifts;
+            
+            // Normalize to 0-11
+            idx = idx % 12;
+            if(idx < 0) idx += 12;
+            
+            return Math.floor(idx);
+        }
+
+        // === 3D EARTH (Three.js) ===
+        let scene, camera, renderer, earthGroup;
+
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            
+            camera = new THREE.PerspectiveCamera(30, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 5;
+            camera.position.y = 1.5;
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0x555555);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+            dirLight.position.set(5, 3, 5);
+            scene.add(dirLight);
+
+            // Group
+            earthGroup = new THREE.Group();
+            scene.add(earthGroup);
+
+            // Earth
+            const sphere = new THREE.Mesh(
+                new THREE.SphereGeometry(1, 24, 24), 
+                new THREE.MeshPhongMaterial({ color: 0x1e293b, wireframe: true, transparent: true, opacity: 0.3 })
+            );
+            earthGroup.add(sphere);
+
+            // Solid Core
+            const core = new THREE.Mesh(
+                new THREE.SphereGeometry(0.95, 24, 24), 
+                new THREE.MeshBasicMaterial({ color: 0x0f172a })
+            );
+            earthGroup.add(core);
+
+            // Axis
+            const axis = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.02, 0.02, 3.5, 8),
+                new THREE.MeshBasicMaterial({ color: 0xf59e0b })
+            );
+            // Tilt axis by 23.5 deg (0.41 rad) initially
+            axis.rotation.z = 0.41;
+            earthGroup.add(axis);
+
+            // Latitude lines for visual reference
+            const equator = new THREE.Mesh(
+                new THREE.TorusGeometry(1.02, 0.01, 16, 60),
+                new THREE.MeshBasicMaterial({ color: 0x334155 })
+            );
+            equator.rotation.x = Math.PI / 2;
+            earthGroup.add(equator); // Equator doesn't tilt with axis in this group logic, wait.
+            // Actually, we want the EARTH to tilt.
+            sphere.rotation.z = 0.41;
+            core.rotation.z = 0.41;
+            equator.rotation.x = 0; // Reset
+            equator.rotation.z = 0.41; // Tilt with earth
+            // Actually Torus orientation is X-up default? No, usually lying flat on XY? 
+            // Torus lies on XY plane. To make it equator, rotate X 90. Then apply tilt Z.
+            equator.rotation.set(Math.PI/2, 0, 0.41);
+
+            animateThree();
+        }
+
+        function animateThree() {
+            requestAnimationFrame(animateThree);
+            // Precession Rotation
+            // We rotate the GROUP around the Y axis (Ecliptic Pole)
+            // Period: 25772 years.
+            // Direction: Retrograde (Clockwise viewed from top) -> Negative rotation
+            const angle = -1 * (state.year / state.precessionPeriod) * Math.PI * 2;
+            if(earthGroup) earthGroup.rotation.y = angle;
+            
+            renderer.render(scene, camera);
+        }
+
+        // === ZODIAC CANVAS (The Star Map) ===
+        function drawZodiac() {
+            const canvas = document.getElementById('zodiac-canvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+            
+            // Config
+            const outerRadius = w * 0.45;
+            const innerRadius = w * 0.25;
+            
+            // Clear
+            ctx.clearRect(0, 0, w, h);
+            
+            // Calculate Rotation Angle
+            // At year 1 AD, Pisces (index 1) should be at Top (Angle -90 deg or 270 deg).
+            // Standard circle 0 is Right (3 o'clock). Top is -90 deg.
+            // The segment for Pisces is index 1.
+            // We want the CENTER of index 1 to be at -90 deg.
+            // Arc size per segment = 30 deg.
+            
+            // Base rotation:
+            const yearsSince1AD = state.year - 1;
+            const degreesShift = (yearsSince1AD / 25772) * 360;
+            
+            // Direction:
+            // As time moves forward (AD increases), the background stars move "Forward" (Clockwise? No).
+            // Precession moves Equinox Westward (Retrograde).
+            // So Stars move Eastward (Prograde) relative to Equinox.
+            // Prograde = Counter-Clockwise.
+            // So we ADD degreesShift.
+            
+            // Initial Alignment offset:
+            // We want Pisces (idx 1) at Top (-90 deg) when shift is 0.
+            // Segment 1 spans 30 to 60 degrees in standard polar coords? No, let's just rotate context.
+            // Let's say Index 0 starts at 0 deg.
+            // Index 1 starts at 30 deg.
+            // We want Index 1 center (45 deg) to be at -90.
+            // So we rotate by -135 deg initially.
+            const baseRotation = -135 * (Math.PI / 180);
+            
+            const shiftRad = degreesShift * (Math.PI / 180);
+            const totalRotation = baseRotation - shiftRad;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(totalRotation);
+
+            // DRAW WHEEL SECTIONS
+            for (let i = 0; i < 12; i++) {
+                const startAngle = i * (Math.PI / 6); // 30 deg
+                const endAngle = (i + 1) * (Math.PI / 6);
+                const data = zodiacData[i];
+
+                // 1. Grid Lines (The Babylonian Segments)
+                ctx.beginPath();
+                ctx.moveTo(0, 0); // From center
+                ctx.lineTo(Math.cos(startAngle) * outerRadius, Math.sin(startAngle) * outerRadius);
+                ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)'; // Indigo low opacity
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // 2. Segment Arc
+                // ctx.beginPath();
+                // ctx.arc(0, 0, outerRadius, startAngle, endAngle);
+                // ctx.stroke();
+
+                // 3. Draw Constellation Stars & Lines
+                // We need to map local coords [-1, 1] to the wedge area.
+                // Simple polar conversion.
+                // Center angle of wedge = startAngle + 15deg
+                const midAngle = startAngle + (Math.PI / 12);
+                
+                // Helper to project local point [u, v] to polar [r, theta]
+                // u (-1 to 1) maps to width angle deviation
+                // v (0.5 to 1) maps to radius distance
+                const project = (u, v) => {
+                    const r = innerRadius + (v * (outerRadius - innerRadius));
+                    // Angle width at this radius.
+                    // Max deviation is +/- 15 deg (PI/12).
+                    // Let's scale u slightly smaller so stars don't hit borders.
+                    const angleDev = u * (Math.PI / 14); 
+                    const theta = midAngle + angleDev;
+                    return [Math.cos(theta) * r, Math.sin(theta) * r];
+                };
+
+                // Draw Lines
+                if(data.lines) {
+                    ctx.beginPath();
+                    data.lines.forEach(pair => {
+                        const p1 = project(data.stars[pair[0]][0], data.stars[pair[0]][1]);
+                        const p2 = project(data.stars[pair[1]][0], data.stars[pair[1]][1]);
+                        ctx.moveTo(p1[0], p1[1]);
+                        ctx.lineTo(p2[0], p2[1]);
+                    });
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+
+                // Draw Stars
+                if(data.stars) {
+                    data.stars.forEach(s => {
+                        const p = project(s[0], s[1]);
+                        ctx.beginPath();
+                        ctx.arc(p[0], p[1], 2.5, 0, Math.PI * 2);
+                        ctx.fillStyle = '#fff';
+                        ctx.fill();
+                        // Glow
+                        ctx.shadowBlur = 4;
+                        ctx.shadowColor = '#fff';
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    });
+                }
+
+                // 4. Text Label
+                ctx.save();
+                // Rotate to center of wedge to draw text upright-ish
+                const textDist = outerRadius + 25;
+                const tx = Math.cos(midAngle) * textDist;
+                const ty = Math.sin(midAngle) * textDist;
+                
+                ctx.translate(tx, ty);
+                // Rotate text to be readable (tangential)
+                ctx.rotate(midAngle + Math.PI/2);
+                
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '14px Cinzel';
+                ctx.textAlign = 'center';
+                ctx.fillText(data.name.toUpperCase(), 0, 0);
+                
+                ctx.fillStyle = '#64748b';
+                ctx.font = '24px serif';
+                ctx.fillText(data.symbol, 0, -20);
+                
+                ctx.restore();
+            }
+            
+            ctx.restore(); // Undo rotation
+
+            // === DRAW FIXED OVERLAY (THE SUN / EQUINOX) ===
+            // The Equinox is our window. It is fixed at the TOP (visually) or "East" (Right).
+            // Let's put it at TOP (-90 deg) for intuitive "Clock" feel.
+            
+            // Draw Sun Marker
+            const markerY = cy - outerRadius - 10;
+            
+            // Sun Ray Lines
+            ctx.save();
+            ctx.translate(cx, markerY);
+            
+            // Glow
+            const grd = ctx.createRadialGradient(0, 0, 2, 0, 0, 20);
+            grd.addColorStop(0, "rgba(245, 158, 11, 1)");
+            grd.addColorStop(1, "rgba(245, 158, 11, 0)");
+            ctx.fillStyle = grd;
+            ctx.beginPath();
+            ctx.arc(0, 0, 30, 0, Math.PI*2);
+            ctx.fill();
+
+            // Icon
+            ctx.beginPath();
+            ctx.arc(0, 0, 8, 0, Math.PI*2);
+            ctx.fillStyle = '#f59e0b';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Pointer Line down
+            ctx.beginPath();
+            ctx.moveTo(0, 10);
+            ctx.lineTo(0, 40);
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([2, 2]);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // === UPDATE LOGIC ===
+        function updateAll() {
+            dom.yearDisplay.innerText = state.year >= 0 ? state.year + " AD" : Math.abs(state.year) + " BC";
+            
+            // Update Text Info
+            const idx = getZodiacAgeIndex(state.year);
+            const info = zodiacData[idx];
+            if(info) {
+                dom.ageTitle.innerText = "Age of " + info.name;
+                dom.ageTitle.style.color = getAgeColor(idx);
+                dom.ageDates.innerText = info.dates;
+                dom.ageDesc.innerText = info.desc;
+            }
+
+            drawZodiac();
+        }
+
+        function getAgeColor(idx) {
+            // Simple palette
+            const colors = ['#f87171', '#60a5fa', '#c084fc', '#fb923c', '#facc15', '#ef4444', '#f472b6', '#a78bfa', '#34d399', '#2dd4bf', '#38bdf8', '#fbbf24'];
+            return colors[idx] || '#fff';
+        }
+
+        function setYear(y) {
+            state.year = parseInt(y);
+            dom.slider.value = state.year;
+            updateAll();
+        }
+
+        // === ANIMATION LOOP ===
+        function togglePlay() {
+            state.isPlaying = !state.isPlaying;
+            if(state.isPlaying) {
+                dom.playBtn.classList.add('active');
+                dom.playBtn.innerHTML = "⏸ Pause";
+                runAnimation();
+            } else {
+                dom.playBtn.classList.remove('active');
+                dom.playBtn.innerHTML = "▶ Play Animation";
+                cancelAnimationFrame(state.animationId);
+            }
+        }
+
+        function runAnimation() {
+            if(!state.isPlaying) return;
+            
+            // Speed: 20 years per frame
+            state.year += 10;
+            if(state.year > 4000) state.year = -12000; // Loop
+            
+            setYear(state.year);
+            state.animationId = requestAnimationFrame(runAnimation);
+        }
+
+        // Events
+        dom.slider.addEventListener('input', (e) => {
+            // Stop playing if user drags
+            if(state.isPlaying) togglePlay();
+            setYear(e.target.value);
+        });
+        
+        window.addEventListener('resize', () => {
+             drawZodiac();
+             if(camera) {
+                const container = document.getElementById('canvas-container');
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+             }
+        });
+
+        // Init
+        initThreeJS();
+        setYear(2025);
+
+    </script>
+</body>
+</html>
