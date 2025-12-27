@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Midnight Sky - All 88 Constellations</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        #info-panel {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        #date-display {
+            font-size: 1.1rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        #zodiac-display {
+            font-size: 1.3rem;
+            color: #ff88ff;
+            margin-bottom: 10px;
+        }
+
+        #hover-display {
+            font-size: 1.4rem;
+            color: #ffff66;
+            font-weight: bold;
+            min-height: 1.6em;
+        }
+
+        #constellation-list {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            width: 180px;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            background: rgba(10, 10, 20, 0.8);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.7rem;
+            z-index: 100;
+        }
+
+        #constellation-list h3 {
+            margin: 0 0 8px 0;
+            font-size: 0.8rem;
+            color: #888;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        .const-item {
+            padding: 2px 4px;
+            margin: 1px 0;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .const-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .const-item.selected {
+            background: rgba(255, 255, 100, 0.3);
+            color: #ffff66;
+            font-weight: bold;
+        }
+
+        .const-item.zodiac {
+            color: #cc99ff;
+        }
+
+        .const-item.active-zodiac {
+            background: rgba(255, 100, 255, 0.3);
+            color: #ff88ff;
+            font-weight: bold;
+        }
+
+        #title {
+            position: absolute;
+            top: 15px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+        h1 { margin: 0; font-weight: 300; font-size: 1.4rem; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
+
+        #controls-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            background: rgba(20, 20, 30, 0.85);
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 6px 0;
+        }
+
+        .slider-label {
+            font-size: 0.75rem;
+            color: #888;
+            min-width: 55px;
+            text-align: right;
+        }
+
+        .slider-value {
+            font-size: 0.85rem;
+            color: #4facfe;
+            min-width: 75px;
+            font-weight: 500;
+        }
+
+        input[type=range] {
+            flex: 1;
+            height: 4px;
+            accent-color: #4facfe;
+            cursor: pointer;
+        }
+
+        #loading {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            transition: opacity 0.5s;
+        }
+        #loading-text { margin-top: 20px; color: #4facfe; }
+        canvas { cursor: grab; }
+        canvas:active { cursor: grabbing; }
+        canvas.hovering { cursor: pointer; }
+
+        /* Scrollbar styling */
+        #constellation-list::-webkit-scrollbar { width: 5px; }
+        #constellation-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        #constellation-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <div id="loading">
+        <div>Loading 88 Constellations...</div>
+        <div id="loading-text">Fetching star data...</div>
+    </div>
+
+    <div id="info-panel">
+        <div id="date-display">January 1, 2025</div>
+        <div id="zodiac-display">☉ ♐ Sagittarius</div>
+        <div id="hover-display"></div>
+    </div>
+
+    <div id="constellation-list">
+        <h3>88 Constellations</h3>
+        <div id="const-list-content"></div>
+    </div>
+
+    <div id="title">
+        <h1>Midnight Sky</h1>
+    </div>
+
+    <div id="controls-container">
+        <div class="slider-row">
+            <span class="slider-label">Date</span>
+            <input type="range" id="monthSlider" min="0" max="364" step="1" value="182">
+            <span class="slider-value" id="month-display">Jan 1</span>
+        </div>
+        <div class="slider-row">
+            <span class="slider-label">Latitude</span>
+            <input type="range" id="latSlider" min="-90" max="90" step="1" value="0">
+            <span class="slider-value" id="lat-display">45° N</span>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // --- DATA URLs from celestial_data project ---
+        const CONSTELLATION_LINES_URL = 'https://cdn.jsdelivr.net/gh/dieghernan/celestial_data@main/data/constellations.lines.min.geojson';
+        const STARS_URL = 'https://cdn.jsdelivr.net/gh/dieghernan/celestial_data@main/data/stars.6.min.geojson';
+
+        // --- Zodiac constellation names ---
+        const ZODIAC_NAMES = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+                              'Libra', 'Scorpius', 'Sagittarius', 'Capricornus', 'Aquarius', 'Pisces'];
+
+        const ZODIAC_SYMBOLS = {
+            'Aries': '♈', 'Taurus': '♉', 'Gemini': '♊', 'Cancer': '♋',
+            'Leo': '♌', 'Virgo': '♍', 'Libra': '♎', 'Scorpius': '♏',
+            'Sagittarius': '♐', 'Capricornus': '♑', 'Aquarius': '♒', 'Pisces': '♓'
+        };
+
+        // Sidereal zodiac signs by ecliptic longitude (30° each)
+        // Order: Aries=0°, Taurus=30°, etc. on the sidereal ecliptic
+        const SIDEREAL_ZODIAC_ORDER = [
+            'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+            'Libra', 'Scorpius', 'Sagittarius', 'Capricornus', 'Aquarius', 'Pisces'
+        ];
+
+        // Lahiri ayanamsa for 2025 (precession offset from tropical zodiac)
+        const AYANAMSA = 24.17;
+
+        // --- THREE.JS SETUP ---
+        let scene, camera, renderer, controls;
+        let starGroup, gridGroup, visibilityGroup, zodiacSegmentsGroup;
+        let sunMesh, earthMesh, sunLine, sunLineTarget;
+        let constellationObjects = [];
+        let gridLines = [];
+        let raycaster, mouse;
+        let currentZodiacConstellation = null;
+        let hoveredConstellation = null;
+        let selectedConstellation = null;
+        let zodiacSegments = [];
+
+        const starRadius = 200;
+        const earthOrbitRadius = 8;
+        const ECLIPTIC_TILT = 23.44; // degrees
+
+        // --- HELPER FUNCTIONS ---
+        function geoToRaDec(lon, lat) {
+            if (lon < 0) lon += 360;
+            return { ra: lon / 15, dec: lat };
+        }
+
+        function celestialToCartesian(ra, dec, radius) {
+            const phi = (90 - dec) * (Math.PI / 180);
+            const theta = (ra * 15) * (Math.PI / 180);
+            const x = radius * Math.sin(phi) * Math.sin(theta);
+            const y = radius * Math.cos(phi);
+            const z = radius * Math.sin(phi) * Math.cos(theta);
+            return new THREE.Vector3(x, y, z);
+        }
+
+        function getDateFromDayOfYear(dayOfYear) {
+            const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+            const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            let day = dayOfYear;
+            let month = 0;
+            while (day > daysInMonth[month] && month < 11) {
+                day -= daysInMonth[month];
+                month++;
+            }
+
+            return {
+                full: `${monthNames[month]} ${day}, 2025`,
+                short: `${shortMonths[month]} ${day}`
+            };
+        }
+
+        // Calculate Sun's apparent position on celestial sphere AND determine zodiac sign
+        // The position is where the Sun appears among the fixed stars (J2000 coordinates)
+        function getSunPosition(dayOfYear) {
+            // Vernal equinox is around March 20 (day 79)
+            // At vernal equinox, tropical ecliptic longitude = 0°
+            const vernalEquinoxDay = 79;
+
+            // Sun's tropical ecliptic longitude increases ~0.9856° per day
+            let tropicalLongitude = ((dayOfYear - vernalEquinoxDay) / 365.25) * 360;
+            tropicalLongitude = ((tropicalLongitude % 360) + 360) % 360;
+
+            // For sidereal zodiac: subtract the ayanamsa
+            let siderealLongitude = tropicalLongitude - AYANAMSA;
+            if (siderealLongitude < 0) siderealLongitude += 360;
+
+            // Determine zodiac sign from sidereal longitude (each sign spans 30°)
+            const signIndex = Math.floor(siderealLongitude / 30);
+            const zodiacSign = SIDEREAL_ZODIAC_ORDER[signIndex];
+
+            // Convert tropical ecliptic to equatorial (RA/Dec) for J2000 star field
+            // The GeoJSON star data uses J2000 coordinates aligned with tropical system
+            const eclLongRad = tropicalLongitude * Math.PI / 180;
+            const obliquity = ECLIPTIC_TILT * Math.PI / 180;
+
+            // Ecliptic to equatorial conversion
+            const sinDec = Math.sin(obliquity) * Math.sin(eclLongRad);
+            const dec = Math.asin(sinDec) * 180 / Math.PI;
+
+            const y = Math.sin(eclLongRad) * Math.cos(obliquity);
+            const x = Math.cos(eclLongRad);
+            let ra = Math.atan2(y, x) * 180 / Math.PI / 15; // Convert to hours
+            if (ra < 0) ra += 24;
+
+            return { ra, dec, tropicalLongitude, siderealLongitude, zodiacSign };
+        }
+
+        function isZodiacConstellation(name) {
+            return ZODIAC_NAMES.some(z => name.toLowerCase() === z.toLowerCase());
+        }
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.rotateSpeed = 0.5;
+            controls.minDistance = 30;
+            controls.maxDistance = 800;
+
+            starGroup = new THREE.Group();
+            scene.add(starGroup);
+
+            gridGroup = new THREE.Group();
+            scene.add(gridGroup);
+
+            visibilityGroup = new THREE.Group();
+            scene.add(visibilityGroup);
+
+            zodiacSegmentsGroup = new THREE.Group();
+            scene.add(zodiacSegmentsGroup);
+
+            createCelestialGrid();
+            createSun();
+            createEarth();
+            createSunLine();
+            createZodiacSegments();
+
+            raycaster = new THREE.Raycaster();
+            raycaster.params.Line.threshold = 3;
+            mouse = new THREE.Vector2();
+
+            camera.position.set(400, 250, 400);
+            controls.target.set(0, 0, 0);
+            controls.update();
+
+            document.getElementById('monthSlider').addEventListener('input', updateScene);
+            document.getElementById('latSlider').addEventListener('input', updateScene);
+            window.addEventListener('resize', onWindowResize);
+            renderer.domElement.addEventListener('mousemove', onMouseMove);
+            renderer.domElement.addEventListener('mouseleave', onMouseLeave);
+        }
+
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function onMouseLeave() {
+            hoveredConstellation = null;
+            document.getElementById('hover-display').innerText = '';
+        }
+
+        function createCelestialGrid() {
+            const gridR = starRadius - 2;
+
+            [-60, -30, 0, 30, 60].forEach(dec => {
+                const points = [];
+                for (let i = 0; i <= 72; i++) {
+                    const ra = (i / 72) * 24;
+                    points.push(celestialToCartesian(ra, dec, gridR));
+                }
+                const geo = new THREE.BufferGeometry().setFromPoints(points);
+                const mat = new THREE.LineBasicMaterial({ color: 0x333355, transparent: true, opacity: 0.2 });
+                gridGroup.add(new THREE.Line(geo, mat));
+                gridLines.push({ mat, type: 'lat', dec });
+            });
+
+            for (let ra = 0; ra < 24; ra += 2) {
+                const points = [];
+                for (let i = 0; i <= 36; i++) {
+                    const dec = -90 + (i / 36) * 180;
+                    points.push(celestialToCartesian(ra, dec, gridR));
+                }
+                const geo = new THREE.BufferGeometry().setFromPoints(points);
+                const mat = new THREE.LineBasicMaterial({ color: 0x333355, transparent: true, opacity: 0.2 });
+                gridGroup.add(new THREE.Line(geo, mat));
+                gridLines.push({ mat, type: 'lon', ra });
+            }
+
+            // Add ecliptic line (tilted 23.44° from equator)
+            const eclipticPoints = [];
+            for (let i = 0; i <= 72; i++) {
+                const eclLong = (i / 72) * 360;
+                const eclLongRad = eclLong * Math.PI / 180;
+                const obliquity = ECLIPTIC_TILT * Math.PI / 180;
+
+                const sinDec = Math.sin(obliquity) * Math.sin(eclLongRad);
+                const dec = Math.asin(sinDec) * 180 / Math.PI;
+
+                const y = Math.sin(eclLongRad) * Math.cos(obliquity);
+                const x = Math.cos(eclLongRad);
+                let ra = Math.atan2(y, x) * 180 / Math.PI / 15;
+                if (ra < 0) ra += 24;
+
+                eclipticPoints.push(celestialToCartesian(ra, dec, gridR));
+            }
+            const eclGeo = new THREE.BufferGeometry().setFromPoints(eclipticPoints);
+            const eclMat = new THREE.LineBasicMaterial({ color: 0xaa6600, transparent: true, opacity: 0.4 });
+            gridGroup.add(new THREE.Line(eclGeo, eclMat));
+        }
+
+        function createSun() {
+            const sunGeo = new THREE.SphereGeometry(2, 32, 32);
+            const sunMat = new THREE.MeshBasicMaterial({ color: 0xffdd00 });
+            sunMesh = new THREE.Mesh(sunGeo, sunMat);
+            scene.add(sunMesh);
+
+            const glowCanvas = document.createElement('canvas');
+            glowCanvas.width = 128; glowCanvas.height = 128;
+            const glowCtx = glowCanvas.getContext('2d');
+            const gradient = glowCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
+            gradient.addColorStop(0, 'rgba(255, 255, 200, 1)');
+            gradient.addColorStop(0.3, 'rgba(255, 220, 100, 0.5)');
+            gradient.addColorStop(1, 'rgba(255, 100, 0, 0)');
+            glowCtx.fillStyle = gradient;
+            glowCtx.fillRect(0, 0, 128, 128);
+            const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: new THREE.CanvasTexture(glowCanvas), transparent: true, blending: THREE.AdditiveBlending
+            }));
+            sunGlow.scale.set(15, 15, 1);
+            sunMesh.add(sunGlow);
+        }
+
+        function createEarth() {
+            const earthGeo = new THREE.SphereGeometry(0.8, 16, 16);
+            const earthMat = new THREE.MeshBasicMaterial({ color: 0x6b93d6 });
+            earthMesh = new THREE.Mesh(earthGeo, earthMat);
+            scene.add(earthMesh);
+
+            // Create orbit line along the ecliptic (tilted from equator)
+            const orbitPoints = [];
+            const obliquity = ECLIPTIC_TILT * Math.PI / 180;
+            for (let i = 0; i <= 64; i++) {
+                const eclLong = (i / 64) * Math.PI * 2;
+                // Convert ecliptic position to equatorial coordinates
+                const sinDec = Math.sin(obliquity) * Math.sin(eclLong);
+                const dec = Math.asin(sinDec);
+                const y = Math.sin(eclLong) * Math.cos(obliquity);
+                const x = Math.cos(eclLong);
+                const ra = Math.atan2(y, x);
+
+                // Convert to Cartesian (same as celestialToCartesian but at orbit radius)
+                const phi = (Math.PI / 2) - dec;
+                orbitPoints.push(new THREE.Vector3(
+                    earthOrbitRadius * Math.sin(phi) * Math.sin(ra),
+                    earthOrbitRadius * Math.cos(phi),
+                    earthOrbitRadius * Math.sin(phi) * Math.cos(ra)
+                ));
+            }
+            const orbitGeo = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+            scene.add(new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color: 0x6b93d6, opacity: 0.3, transparent: true })));
+        }
+
+        function createSunLine() {
+            const lineGeo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0, 0, starRadius)
+            ]);
+            const lineMat = new THREE.LineBasicMaterial({ color: 0xffaa00, opacity: 0.7, transparent: true });
+            sunLine = new THREE.Line(lineGeo, lineMat);
+            scene.add(sunLine);
+
+            const targetGeo = new THREE.SphereGeometry(4, 16, 16);
+            const targetMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+            sunLineTarget = new THREE.Mesh(targetGeo, targetMat);
+            scene.add(sunLineTarget);
+
+            // Add a glow to the target
+            const targetGlowGeo = new THREE.SphereGeometry(6, 16, 16);
+            const targetGlowMat = new THREE.MeshBasicMaterial({
+                color: 0xffaa00,
+                transparent: true,
+                opacity: 0.3
+            });
+            const targetGlow = new THREE.Mesh(targetGlowGeo, targetGlowMat);
+            sunLineTarget.add(targetGlow);
+        }
+
+        function createZodiacSegments() {
+            const segmentRadius = starRadius - 5;
+            const bandWidth = 12; // Width of the zodiac band in degrees
+            const obliquity = ECLIPTIC_TILT * Math.PI / 180;
+
+            // Create 12 segments, each 30° wide
+            // Offset by ayanamsa to align sidereal zodiac with tropical coordinates
+            // Sidereal Aries 0° = Tropical ~24°
+            for (let i = 0; i < 12; i++) {
+                const startLong = (i * 30 + AYANAMSA) % 360;
+                const endLong = ((i + 1) * 30 + AYANAMSA) % 360;
+
+                // Create a band segment along the ecliptic
+                const innerPoints = [];
+                const outerPoints = [];
+                const steps = 15;
+
+                for (let j = 0; j <= steps; j++) {
+                    // Handle wrap-around at 360°
+                    let segmentSpan = endLong - startLong;
+                    if (segmentSpan < 0) segmentSpan += 360;
+                    const eclLongDeg = (startLong + segmentSpan * (j / steps)) % 360;
+                    const eclLong = eclLongDeg * Math.PI / 180;
+
+                    // Center line of ecliptic
+                    const sinDec = Math.sin(obliquity) * Math.sin(eclLong);
+                    const dec = Math.asin(sinDec);
+                    const y = Math.sin(eclLong) * Math.cos(obliquity);
+                    const x = Math.cos(eclLong);
+                    const ra = Math.atan2(y, x);
+
+                    // Create points for inner and outer edges of band
+                    const innerDec = dec - (bandWidth / 2) * Math.PI / 180;
+                    const outerDec = dec + (bandWidth / 2) * Math.PI / 180;
+
+                    const phi1 = (Math.PI / 2) - innerDec;
+                    const phi2 = (Math.PI / 2) - outerDec;
+
+                    innerPoints.push(new THREE.Vector3(
+                        segmentRadius * Math.sin(phi1) * Math.sin(ra),
+                        segmentRadius * Math.cos(phi1),
+                        segmentRadius * Math.sin(phi1) * Math.cos(ra)
+                    ));
+                    outerPoints.push(new THREE.Vector3(
+                        segmentRadius * Math.sin(phi2) * Math.sin(ra),
+                        segmentRadius * Math.cos(phi2),
+                        segmentRadius * Math.sin(phi2) * Math.cos(ra)
+                    ));
+                }
+
+                // Create geometry for the segment band
+                const geometry = new THREE.BufferGeometry();
+                const vertices = [];
+                const indices = [];
+
+                for (let j = 0; j <= steps; j++) {
+                    vertices.push(innerPoints[j].x, innerPoints[j].y, innerPoints[j].z);
+                    vertices.push(outerPoints[j].x, outerPoints[j].y, outerPoints[j].z);
+                }
+
+                for (let j = 0; j < steps; j++) {
+                    const a = j * 2;
+                    const b = j * 2 + 1;
+                    const c = (j + 1) * 2;
+                    const d = (j + 1) * 2 + 1;
+                    indices.push(a, b, c);
+                    indices.push(b, d, c);
+                }
+
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                geometry.setIndex(indices);
+                geometry.computeVertexNormals();
+
+                const material = new THREE.MeshBasicMaterial({
+                    color: 0x9966cc,
+                    transparent: true,
+                    opacity: 0.08,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                });
+
+                const mesh = new THREE.Mesh(geometry, material);
+                zodiacSegmentsGroup.add(mesh);
+
+                zodiacSegments.push({
+                    mesh,
+                    material,
+                    name: SIDEREAL_ZODIAC_ORDER[i],
+                    index: i
+                });
+            }
+        }
+
+        function updateZodiacSegments(activeSignName) {
+            zodiacSegments.forEach(seg => {
+                if (seg.name.toLowerCase() === activeSignName.toLowerCase()) {
+                    seg.material.opacity = 0.25;
+                    seg.material.color.setHex(0xff66ff);
+                } else {
+                    seg.material.opacity = 0.06;
+                    seg.material.color.setHex(0x9966cc);
+                }
+            });
+        }
+
+        async function loadConstellationData() {
+            document.getElementById('loading-text').innerText = 'Fetching constellation lines...';
+
+            try {
+                const linesResponse = await fetch(CONSTELLATION_LINES_URL);
+                const linesData = await linesResponse.json();
+
+                document.getElementById('loading-text').innerText = 'Fetching star data...';
+
+                const starsResponse = await fetch(STARS_URL);
+                const starsData = await starsResponse.json();
+
+                document.getElementById('loading-text').innerText = 'Building 88 constellations...';
+
+                addBackgroundStars(starsData);
+
+                linesData.features.forEach(constellation => {
+                    createConstellation(constellation);
+                });
+
+                // Sort constellation objects alphabetically
+                constellationObjects.sort((a, b) => a.name.localeCompare(b.name));
+
+                // Build constellation list
+                buildConstellationList();
+
+                document.getElementById('loading-text').innerText = `Loaded ${constellationObjects.length} constellations`;
+
+            } catch (error) {
+                console.error('Error loading constellation data:', error);
+                document.getElementById('loading-text').innerText = 'Error loading data.';
+            }
+        }
+
+        function buildConstellationList() {
+            const listEl = document.getElementById('const-list-content');
+            listEl.innerHTML = '';
+
+            constellationObjects.forEach(obj => {
+                const item = document.createElement('div');
+                item.className = 'const-item' + (obj.isZodiac ? ' zodiac' : '');
+                item.id = 'list-' + obj.name.replace(/\s/g, '-');
+                item.innerText = obj.isZodiac ? `${ZODIAC_SYMBOLS[obj.name] || ''} ${obj.name}` : obj.name;
+                item.addEventListener('click', () => {
+                    if (selectedConstellation === obj) {
+                        selectedConstellation = null;
+                    } else {
+                        selectedConstellation = obj;
+                    }
+                    updateConstellationList();
+                    applyHighlighting();
+                    document.getElementById('hover-display').innerText = selectedConstellation ? selectedConstellation.name : '';
+                });
+                listEl.appendChild(item);
+            });
+        }
+
+        function updateConstellationList() {
+            constellationObjects.forEach(obj => {
+                const item = document.getElementById('list-' + obj.name.replace(/\s/g, '-'));
+                if (item) {
+                    item.className = 'const-item';
+                    if (obj.isZodiac) item.classList.add('zodiac');
+                    if (obj === currentZodiacConstellation) item.classList.add('active-zodiac');
+                    if (obj === selectedConstellation) item.classList.add('selected');
+                }
+            });
+        }
+
+        function addBackgroundStars(starsData) {
+            const positions = [];
+            const colors = [];
+
+            starsData.features.forEach(star => {
+                const coords = star.geometry.coordinates;
+                const { ra, dec } = geoToRaDec(coords[0], coords[1]);
+                const pos = celestialToCartesian(ra, dec, starRadius);
+                positions.push(pos.x, pos.y, pos.z);
+
+                const bv = star.properties.bv || 0;
+                let r, g, b;
+                if (bv < 0) { r = 0.7; g = 0.8; b = 1.0; }
+                else if (bv < 0.5) { r = 1.0; g = 1.0; b = 1.0; }
+                else if (bv < 1.0) { r = 1.0; g = 0.9; b = 0.7; }
+                else { r = 1.0; g = 0.7; b = 0.5; }
+                colors.push(r, g, b);
+            });
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.9,
+                sizeAttenuation: true
+            });
+
+            scene.add(new THREE.Points(geometry, material));
+        }
+
+        function createConstellation(feature) {
+            const name = feature.properties.name;
+            const rank = feature.properties.rank || 2;
+            const geometry = feature.geometry;
+
+            if (!geometry || !geometry.coordinates) return;
+
+            const group = new THREE.Group();
+            let centerRA = 0, centerDec = 0, pointCount = 0;
+
+            const isZodiac = isZodiacConstellation(name);
+            const baseColor = isZodiac ? 0x9966cc : 0x4488ff;
+
+            const lineSegments = geometry.type === 'MultiLineString' ? geometry.coordinates : [geometry.coordinates];
+
+            lineSegments.forEach(lineCoords => {
+                const points = [];
+                lineCoords.forEach(coord => {
+                    const { ra, dec } = geoToRaDec(coord[0], coord[1]);
+                    const pos = celestialToCartesian(ra, dec, starRadius);
+                    points.push(pos);
+                    centerRA += ra;
+                    centerDec += dec;
+                    pointCount++;
+                });
+
+                if (points.length >= 2) {
+                    const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+                    const lineMat = new THREE.LineBasicMaterial({
+                        color: baseColor,
+                        opacity: 0.4,
+                        transparent: true
+                    });
+                    group.add(new THREE.Line(lineGeo, lineMat));
+                }
+            });
+
+            if (pointCount === 0) return;
+
+            centerRA /= pointCount;
+            centerDec /= pointCount;
+            if (centerRA > 24) centerRA -= 24;
+            if (centerRA < 0) centerRA += 24;
+
+            starGroup.add(group);
+
+            constellationObjects.push({
+                name,
+                group,
+                lineMaterials: group.children.filter(c => c.type === 'Line').map(l => l.material),
+                ra: centerRA,
+                dec: centerDec,
+                rank,
+                isZodiac,
+                baseColor
+            });
+        }
+
+        let currentVisibility = {};
+
+        function createVisibilityRing(latitude, midnightRA) {
+            while (visibilityGroup.children.length > 0) {
+                visibilityGroup.remove(visibilityGroup.children[0]);
+            }
+
+            const midnightRAhours = ((midnightRA * 180 / Math.PI) / 15 + 24) % 24;
+            const zenithRA = midnightRAhours;
+            const zenithDec = latitude;
+
+            const r = starRadius - 3;
+
+            const zenithVec = celestialToCartesian(zenithRA, zenithDec, 1).normalize();
+
+            let refVec = new THREE.Vector3(0, 1, 0);
+            if (Math.abs(zenithVec.dot(refVec)) > 0.9) {
+                refVec = new THREE.Vector3(1, 0, 0);
+            }
+
+            const horizonX = new THREE.Vector3().crossVectors(zenithVec, refVec).normalize();
+            const horizonY = new THREE.Vector3().crossVectors(zenithVec, horizonX).normalize();
+
+            // Create horizon ring
+            const ringSteps = 100;
+            const ringPoints = [];
+            for (let i = 0; i <= ringSteps; i++) {
+                const angle = (i / ringSteps) * Math.PI * 2;
+                const point = new THREE.Vector3()
+                    .addScaledVector(horizonX, Math.cos(angle))
+                    .addScaledVector(horizonY, Math.sin(angle))
+                    .multiplyScalar(r);
+                ringPoints.push(point);
+            }
+
+            const frameGeo = new THREE.BufferGeometry().setFromPoints(ringPoints);
+            const frameMat = new THREE.LineBasicMaterial({ color: 0x44ff88, linewidth: 2, opacity: 0.9, transparent: true });
+            visibilityGroup.add(new THREE.Line(frameGeo, frameMat));
+
+            // Create hemisphere mesh for visible sky
+            const hemisphereGeo = new THREE.SphereGeometry(r - 2, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+            const hemisphereMat = new THREE.MeshBasicMaterial({
+                color: 0x44ff88,
+                transparent: true,
+                opacity: 0.08,
+                side: THREE.BackSide,
+                depthWrite: false
+            });
+            const hemisphere = new THREE.Mesh(hemisphereGeo, hemisphereMat);
+
+            // Orient hemisphere to face the zenith direction
+            hemisphere.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), zenithVec);
+            visibilityGroup.add(hemisphere);
+
+            currentVisibility = { zenithRA, zenithDec: latitude, zenithVec };
+        }
+
+        function isInVisibleWindow(ra, dec) {
+            const constVec = celestialToCartesian(ra, dec, 1).normalize();
+            const dot = constVec.dot(currentVisibility.zenithVec);
+            return dot > 0;
+        }
+
+        function updateScene() {
+            const dayOfYear = parseInt(document.getElementById('monthSlider').value) + 1;
+            const latitude = parseFloat(document.getElementById('latSlider').value);
+
+            const dateInfo = getDateFromDayOfYear(dayOfYear);
+            const sunPos = getSunPosition(dayOfYear);
+            const siderealSignName = sunPos.zodiacSign;
+
+            // Update displays
+            document.getElementById('month-display').innerText = dateInfo.short;
+            document.getElementById('lat-display').innerText = latitude >= 0 ? `${Math.abs(latitude)}° N` : `${Math.abs(latitude)}° S`;
+            document.getElementById('date-display').innerText = dateInfo.full;
+
+            // Sun's apparent position on celestial sphere (from ecliptic calculation)
+            const sunTargetPos = celestialToCartesian(sunPos.ra, sunPos.dec, starRadius);
+            sunLineTarget.position.copy(sunTargetPos);
+
+            // Position Earth opposite to where the Sun appears (geometrically correct)
+            // Earth is always on the opposite side of the Sun from where the Sun appears in the sky
+            const earthDirection = sunTargetPos.clone().normalize().negate();
+            earthMesh.position.copy(earthDirection.clone().multiplyScalar(earthOrbitRadius));
+
+            // Midnight direction (opposite to Sun from Earth's perspective)
+            const midnightRA = Math.atan2(earthMesh.position.x, earthMesh.position.z);
+
+            // Update the sun line: from Earth through Sun to celestial sphere
+            const linePoints = [
+                earthMesh.position.clone(),
+                new THREE.Vector3(0, 0, 0), // Sun
+                sunTargetPos
+            ];
+            sunLine.geometry.setFromPoints(linePoints);
+            sunLine.geometry.attributes.position.needsUpdate = true;
+
+            // Create visibility ring
+            createVisibilityRing(latitude, midnightRA);
+
+            // Find zodiac constellation by name from sidereal calculation
+            currentZodiacConstellation = constellationObjects.find(obj =>
+                obj.name.toLowerCase() === siderealSignName.toLowerCase()
+            );
+
+            // Update the zodiac display
+            if (currentZodiacConstellation) {
+                const symbol = ZODIAC_SYMBOLS[currentZodiacConstellation.name] || '☉';
+                document.getElementById('zodiac-display').innerText = `☉ ${symbol} ${currentZodiacConstellation.name}`;
+            }
+
+            // Update zodiac segment highlighting
+            updateZodiacSegments(siderealSignName);
+
+            // Update constellation list highlighting
+            updateConstellationList();
+
+            // Update constellation visibility
+            applyHighlighting();
+        }
+
+        function applyHighlighting() {
+            constellationObjects.forEach(obj => {
+                const isHovered = obj === hoveredConstellation;
+                const isSelected = obj === selectedConstellation;
+                const isActiveZodiac = obj === currentZodiacConstellation;
+                const isVisible = isInVisibleWindow(obj.ra, obj.dec);
+
+                let lineOpacity, lineColor;
+
+                if (isHovered || isSelected) {
+                    lineOpacity = 1.0;
+                    lineColor = 0xffff66;
+                } else if (isActiveZodiac) {
+                    lineOpacity = 1.0;
+                    lineColor = 0xff66ff;
+                } else if (obj.isZodiac) {
+                    if (isVisible) {
+                        lineOpacity = 0.6;
+                        lineColor = 0xaa77dd;
+                    } else {
+                        lineOpacity = 0.25;
+                        lineColor = 0x664488;
+                    }
+                } else if (isVisible) {
+                    lineOpacity = 0.4;
+                    lineColor = 0x5599dd;
+                } else {
+                    lineOpacity = 0.06;
+                    lineColor = 0x334455;
+                }
+
+                obj.lineMaterials.forEach(mat => {
+                    mat.opacity = lineOpacity;
+                    mat.color.setHex(lineColor);
+                });
+            });
+        }
+
+        function checkHover() {
+            if (!raycaster || constellationObjects.length === 0) return;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            let closestDist = Infinity;
+            let closestConstellation = null;
+
+            constellationObjects.forEach(obj => {
+                const lines = obj.group.children.filter(c => c.type === 'Line' && c.geometry);
+                lines.forEach(line => {
+                    const intersects = raycaster.intersectObject(line);
+                    if (intersects.length > 0 && intersects[0].distance < closestDist) {
+                        closestDist = intersects[0].distance;
+                        closestConstellation = obj;
+                    }
+                });
+            });
+
+            if (closestConstellation !== hoveredConstellation) {
+                hoveredConstellation = closestConstellation;
+                applyHighlighting();
+
+                if (hoveredConstellation) {
+                    document.getElementById('hover-display').innerText = hoveredConstellation.name;
+                    renderer.domElement.classList.add('hovering');
+                } else {
+                    document.getElementById('hover-display').innerText = '';
+                    renderer.domElement.classList.remove('hovering');
+                }
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            checkHover();
+
+            if (sunMesh && sunMesh.children[0]) {
+                sunMesh.children[0].lookAt(camera.position);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        async function start() {
+            init();
+            await loadConstellationData();
+
+            document.getElementById('loading').style.opacity = 0;
+            setTimeout(() => document.getElementById('loading').style.display = 'none', 500);
+
+            updateScene();
+            animate();
+        }
+
+        start();
+    </script>
+</body>
+</html>

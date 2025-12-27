@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:altalpha.timvink.nl)"
+      "WebFetch(domain:altalpha.timvink.nl)",
+      "WebFetch(domain:theskylive.com)",
+      "WebSearch",
+      "WebFetch(domain:cdn.jsdelivr.net)"
     ],
     "deny": [],
     "ask": []
