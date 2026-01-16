@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paper Reader - RSVP</title>
+    <title>Rapid Series Visual Presentation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,33 +70,47 @@
     <main class="w-full max-w-2xl bg-paper-50 shadow-paper rounded-sm border border-paper-200 overflow-hidden relative">
         
         <!-- Header -->
-        <header class="bg-paper-200/50 border-b border-paper-200 p-6 flex justify-between items-center">
-            <h1 class="font-serif text-3xl font-semibold text-paper-900 tracking-wide">Rapid Reader</h1>
-            <div class="text-xs font-mono text-paper-800 uppercase tracking-widest opacity-60">Vol. 1</div>
+        <header class="bg-paper-200/50 border-b border-paper-200 p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <h1 class="font-serif text-2xl sm:text-3xl font-semibold text-paper-900 tracking-wide text-center sm:text-left">Rapid Series Visual Presentation</h1>
+            <a href="https://en.wikipedia.org/wiki/Rapid_serial_visual_presentation" target="_blank" rel="noopener noreferrer" class="text-xs font-mono text-paper-800 hover:text-orange-600 transition-colors underline underline-offset-2">Learn more</a>
         </header>
 
         <!-- Input Mode (Visible by default) -->
-        <div id="input-view" class="p-8 transition-opacity duration-300">
+        <div id="input-view" class="p-4 sm:p-8 transition-opacity duration-300">
             <div class="mb-6">
                 <label for="text-input" class="block text-sm font-serif italic text-paper-800 mb-2">Paste your text below to begin reading...</label>
-                <textarea 
-                    id="text-input" 
-                    class="w-full h-64 bg-transparent border-b-2 border-paper-200 resize-none focus:outline-none focus:border-orange-400 text-lg leading-relaxed p-2 font-body placeholder-paper-300 transition-colors"
-                    placeholder="In a hole in the ground there lived a hobbit. Not a nasty, dirty, wet hole, filled with the ends of worms and an oozy smell, nor yet a dry, bare, sandy hole with nothing in it to sit down on or to eat: it was a hobbit-hole, and that means comfort..."
-                ></textarea>
+                <textarea
+                    id="text-input"
+                    class="w-full h-64 bg-transparent border-b-2 border-paper-200 resize-none focus:outline-none focus:border-orange-400 text-base sm:text-lg leading-relaxed p-2 font-body placeholder-paper-300 transition-colors"
+                >In a hole in the ground there lived a hobbit. Not a nasty, dirty, wet hole, filled with the ends of worms and an oozy smell, nor yet a dry, bare, sandy hole with nothing in it to sit down on or to eat: it was a hobbit-hole, and that means comfort. It had a perfectly round door like a porthole, painted green, with a shiny yellow brass knob in the exact middle. The door opened on to a tube-shaped hall like a tunnel: a very comfortable tunnel without smoke, with panelled walls, and floors tiled and carpeted, provided with polished chairs, and lots and lots of pegs for hats and coats - the hobbit was fond of visitors.</textarea>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-6 items-center justify-between border-t border-paper-200 pt-6">
-                <div class="flex items-center gap-4">
+            <div class="flex flex-col gap-4 border-t border-paper-200 pt-6">
+                <!-- Speed control -->
+                <div class="flex items-center justify-between gap-4">
                     <label class="text-sm font-serif font-semibold text-paper-800">Speed (WPM)</label>
                     <div class="flex items-center bg-paper-100 rounded px-2 py-1 shadow-inner-paper">
-                        <button onclick="adjustWpm(-25)" class="text-paper-800 hover:text-orange-600 px-2 font-mono">-</button>
+                        <button onclick="adjustWpm(-25)" class="text-paper-800 hover:text-orange-600 px-3 py-1 font-mono text-lg">-</button>
                         <input type="number" id="wpm-input" value="250" class="w-16 bg-transparent text-center font-mono focus:outline-none" onchange="updateWpm(this.value)">
-                        <button onclick="adjustWpm(25)" class="text-paper-800 hover:text-orange-600 px-2 font-mono">+</button>
+                        <button onclick="adjustWpm(25)" class="text-paper-800 hover:text-orange-600 px-3 py-1 font-mono text-lg">+</button>
                     </div>
                 </div>
-                
-                <button onclick="startReader()" class="bg-paper-900 text-paper-50 px-8 py-3 font-serif text-lg hover:bg-orange-900 transition-colors shadow-lg active:transform active:scale-95">
+
+                <!-- Delay numbers toggle -->
+                <div class="flex items-center justify-between gap-4">
+                    <label for="delay-numbers" class="text-sm font-serif font-semibold text-paper-800">Delay numbers (2x)</label>
+                    <button
+                        id="delay-numbers-btn"
+                        onclick="toggleDelayNumbers()"
+                        class="w-12 h-6 rounded-full bg-paper-200 relative transition-colors"
+                        role="switch"
+                        aria-checked="false"
+                    >
+                        <span id="delay-numbers-knob" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-paper-50 shadow transition-transform"></span>
+                    </button>
+                </div>
+
+                <button onclick="startReader()" class="w-full sm:w-auto sm:self-end bg-paper-900 text-paper-50 px-8 py-3 font-serif text-lg hover:bg-orange-900 transition-colors shadow-lg active:transform active:scale-95">
                     Start Reading
                 </button>
             </div>
@@ -179,6 +193,7 @@
         let isRunning = false;
         let wpm = 250;
         let timer = null;
+        let delayNumbers = false;
 
         // --- DOM Elements ---
         const inputView = document.getElementById('input-view');
@@ -200,6 +215,8 @@
         
         const inputWpmMain = document.getElementById('wpm-input');
         const inputWpmReader = document.getElementById('wpm-reader-input');
+        const delayNumbersBtn = document.getElementById('delay-numbers-btn');
+        const delayNumbersKnob = document.getElementById('delay-numbers-knob');
 
         // --- Core Logic: Optimal Recognition Point (ORP) ---
         // Determines which character index should be centered based on word length.
@@ -219,10 +236,15 @@
 
             // Logic: Pause longer on punctuation to allow cognitive processing
             const lastChar = word.slice(-1);
-            if (lastChar === '.') delay = baseDelay * 2.5; 
+            if (lastChar === '.') delay = baseDelay * 2.5;
             else if (lastChar === ',' || lastChar === ';' || lastChar === ':') delay = baseDelay * 1.5;
             else if (word.length > 8) delay = baseDelay * 1.2; // slight slow down for long words
-            
+
+            // Delay numbers twice as long if enabled (comprehension of numbers is slower)
+            if (delayNumbers && /\d/.test(word)) {
+                delay = delay * 2;
+            }
+
             return delay;
         }
 
@@ -306,6 +328,21 @@
 
         function adjustWpm(delta) {
             updateWpm(parseInt(wpm) + delta);
+        }
+
+        function toggleDelayNumbers() {
+            delayNumbers = !delayNumbers;
+            if (delayNumbers) {
+                delayNumbersBtn.classList.remove('bg-paper-200');
+                delayNumbersBtn.classList.add('bg-orange-500');
+                delayNumbersBtn.setAttribute('aria-checked', 'true');
+                delayNumbersKnob.classList.add('translate-x-6');
+            } else {
+                delayNumbersBtn.classList.add('bg-paper-200');
+                delayNumbersBtn.classList.remove('bg-orange-500');
+                delayNumbersBtn.setAttribute('aria-checked', 'false');
+                delayNumbersKnob.classList.remove('translate-x-6');
+            }
         }
 
         // --- Render Loop ---
