@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planet Positions</title>
+    <script src="https://unpkg.com/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0a0a0f;
+            --panel-bg: rgba(20, 20, 30, 0.85);
+            --border-color: #333;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --accent: #6c5ce7;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            width: 320px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .time-display {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        #dateInput {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            outline: none;
+            letter-spacing: 0.05em;
+        }
+
+        #dateInput:focus {
+            border-color: var(--accent);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            appearance: none;
+            -webkit-appearance: none;
+            background: #2a2a35;
+            height: 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+        }
+
+        #searchInput {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: inherit;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        #searchInput:focus {
+            border-color: var(--accent);
+        }
+
+        #searchInput::placeholder {
+            color: #555;
+        }
+
+        #searchResult {
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-top: 6px;
+            min-height: 1.2em;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            z-index: 20;
+            background: var(--bg-color);
+            padding: 20px 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+<div id="loading">Initializing Astronomy Engine...</div>
+
+<div id="ui-panel">
+    <h1>Planet Positions</h1>
+    <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">Position of all of the planets and the corresponding zodiac signs and human design gates.</p>
+
+    <div class="control-group">
+        <label>Date (YYYY-MM-DD)</label>
+        <input type="text" id="dateInput" placeholder="1987-08-06" maxlength="10">
+    </div>
+
+    <div class="control-group">
+        <label>
+            <span>Day offset</span>
+            <span class="time-display" id="dayOffsetDisplay">0</span>
+        </label>
+        <input type="range" id="dayOffsetSlider" min="-10" max="10" value="0" step="1">
+    </div>
+
+    <div class="control-group">
+        <label>
+            <span>Time of Day</span>
+            <span class="time-display" id="timeDisplay">12:00</span>
+        </label>
+        <input type="range" id="timeSlider" min="0" max="1439" value="720">
+    </div>
+
+    <div class="control-group">
+        <label>Search gate or planet</label>
+        <input type="text" id="searchInput" placeholder="e.g. 25 or Mars">
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<canvas id="mandalaCanvas"></canvas>
+
+<script>
+    // --- Constants & Data ---
+    const GATE_SEQUENCE = [
+        41, 19, 13, 49, 30, 55, 37, 63, 22, 36, 25, 17, 21, 51, 42, 3, 27, 24, 2,
+        23, 8, 20, 16, 35, 45, 12, 15, 52, 39, 53, 62, 56, 31, 33, 7, 4, 29, 59, 40,
+        64, 47, 6, 46, 18, 48, 57, 32, 50, 28, 44, 1, 43, 14, 34, 9, 5, 26, 11, 10,
+        58, 38, 54, 61, 60
+    ];
+
+    const ZODIAC_SIGNS = [
+        { name: 'Aries', symbol: '♈', start: 0 },
+        { name: 'Taurus', symbol: '♉', start: 30 },
+        { name: 'Gemini', symbol: '♊', start: 60 },
+        { name: 'Cancer', symbol: '♋', start: 90 },
+        { name: 'Leo', symbol: '♌', start: 120 },
+        { name: 'Virgo', symbol: '♍', start: 150 },
+        { name: 'Libra', symbol: '♎', start: 180 },
+        { name: 'Scorpio', symbol: '♏', start: 210 },
+        { name: 'Sagittarius', symbol: '♐', start: 240 },
+        { name: 'Capricorn', symbol: '♑', start: 270 },
+        { name: 'Aquarius', symbol: '♒', start: 300 },
+        { name: 'Pisces', symbol: '♓', start: 330 }
+    ];
+
+    const PLANETS = [
+        { id: "Sun", symbol: "☉", color: "#FFD700" },
+        { id: "Earth", symbol: "⊕", color: "#55AAFF" },
+        { id: "NorthNode", label: "N.Node", symbol: "☊", color: "#AAFFAA" },
+        { id: "SouthNode", label: "S.Node", symbol: "☋", color: "#AAFFAA" },
+        { id: "Moon", symbol: "☾", color: "#C0C0C0" },
+        { id: "Mercury", symbol: "☿", color: "#A9A9A9" },
+        { id: "Venus", symbol: "♀", color: "#FFC0CB" },
+        { id: "Mars", symbol: "♂", color: "#FF4500" },
+        { id: "Jupiter", symbol: "♃", color: "#FFA500" },
+        { id: "Saturn", symbol: "♄", color: "#F4A460" },
+        { id: "Uranus", symbol: "♅", color: "#40E0D0" },
+        { id: "Neptune", symbol: "♆", color: "#4169E1" },
+        { id: "Pluto", symbol: "♇", color: "#DDA0DD" }
+    ];
+
+    const GATE_ANGLE = 360 / 64; // 5.625 degrees
+    // Gate 41 (index 0) starts at 2°00' Aquarius = 302° ecliptic longitude
+    const GATE_41_START = 302;
+
+    // Human Design channels: pairs of gates that form a complete channel
+    const CHANNELS = [
+        [1,8],[2,14],[3,60],[4,63],[5,15],[6,59],[7,31],[9,52],[10,20],[10,34],
+        [10,57],[11,56],[12,22],[13,33],[16,48],[17,62],[18,58],[19,49],[20,34],
+        [20,57],[21,45],[23,43],[24,61],[25,51],[26,44],[27,50],[28,38],[29,46],
+        [30,41],[32,54],[34,57],[35,36],[37,40],[39,55],[42,53],[47,64]
+    ];
+
+    // Get the ecliptic center angle for a gate number
+    function gateToAngleDeg(gateNum) {
+        const idx = GATE_SEQUENCE.indexOf(gateNum);
+        return GATE_41_START + idx * GATE_ANGLE + GATE_ANGLE / 2;
+    }
+
+    // --- Canvas Setup ---
+    const canvas = document.getElementById('mandalaCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, centerX, centerY, outerRadius;
+
+    function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        width = window.innerWidth;
+        height = window.innerHeight;
+
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+
+        ctx.scale(dpr, dpr);
+
+        centerX = width / 2;
+        centerY = height / 2;
+
+        const minDim = Math.min(width, height);
+        outerRadius = minDim * 0.35;
+
+        if (width > 800) {
+            centerX += 100;
+        }
+
+        draw();
+    }
+
+    // --- State Management ---
+    const state = {
+        date: new Date(),
+        activePlanets: [],
+        searchHighlight: null // { type: 'gate', value: 25 } or { type: 'planet', value: 'Mars' }
+    };
+
+    function init() {
+        const now = new Date();
+
+        // Set date picker to today
+        const offset = now.getTimezoneOffset() * 60000;
+        const localISODate = new Date(now.getTime() - offset).toISOString().split('T')[0];
+        document.getElementById('dateInput').value = localISODate;
+
+        // Default to midday (12:00)
+        document.getElementById('timeSlider').value = 720;
+
+        // Event Listeners
+        window.addEventListener('resize', resizeCanvas);
+        document.getElementById('dateInput').addEventListener('input', handleInput);
+        document.getElementById('dayOffsetSlider').addEventListener('input', handleInput);
+        document.getElementById('timeSlider').addEventListener('input', handleInput);
+        document.getElementById('searchInput').addEventListener('input', handleSearch);
+
+        document.getElementById('loading').style.display = 'none';
+
+        resizeCanvas();
+        handleInput();
+    }
+
+    function handleInput() {
+        const dateStr = document.getElementById('dateInput').value.trim();
+        const dayOffset = parseInt(document.getElementById('dayOffsetSlider').value, 10);
+        const totalMinutes = parseInt(document.getElementById('timeSlider').value, 10);
+
+        // Validate YYYY-MM-DD format
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return;
+
+        // Day offset display
+        const sign = dayOffset > 0 ? '+' : '';
+        document.getElementById('dayOffsetDisplay').innerText = `${sign}${dayOffset} day${Math.abs(dayOffset) !== 1 ? 's' : ''}`;
+
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        document.getElementById('timeDisplay').innerText =
+            `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+
+        const [year, month, day] = dateStr.split('-');
+        const baseDate = new Date(year, month - 1, day, hours, mins, 0);
+        baseDate.setDate(baseDate.getDate() + dayOffset);
+        state.date = baseDate;
+
+        calculatePositions();
+        handleSearch(); // re-evaluate search after positions change
+        draw();
+    }
+
+    function handleSearch() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+        const resultEl = document.getElementById('searchResult');
+        state.searchHighlight = null;
+
+        if (!query) {
+            resultEl.textContent = '';
+            draw();
+            return;
+        }
+
+        // Try gate number
+        const gateNum = parseInt(query, 10);
+        if (!isNaN(gateNum) && gateNum >= 1 && gateNum <= 64 && GATE_SEQUENCE.includes(gateNum)) {
+            state.searchHighlight = { type: 'gate', value: gateNum };
+            const activating = state.activePlanets.filter(p => p.gate === gateNum);
+            const activatedGates = new Set(state.activePlanets.map(p => p.gate));
+            const connectedChannels = CHANNELS.filter(([a,b]) => a === gateNum || b === gateNum);
+            const activeChannels = connectedChannels.filter(([a,b]) => activatedGates.has(a) && activatedGates.has(b));
+
+            let text = activating.length > 0
+                ? `Gate ${gateNum} activated by: ${activating.map(p => p.id).join(', ')}`
+                : `Gate ${gateNum} — not activated`;
+            if (activeChannels.length > 0) {
+                text += ` | Channels: ${activeChannels.map(([a,b]) => `${a}-${b}`).join(', ')}`;
+            }
+            resultEl.textContent = text;
+            draw();
+            return;
+        }
+
+        // Try planet name
+        const planet = state.activePlanets.find(p =>
+            p.id.toLowerCase().includes(query) ||
+            p.symbol === query ||
+            (query === 'node' && (p.id === 'NorthNode' || p.id === 'SouthNode'))
+        );
+        if (planet) {
+            state.searchHighlight = { type: 'planet', value: planet.id };
+            resultEl.textContent = `${planet.symbol} ${planet.id} → Gate ${planet.gate}.${planet.line}`;
+            draw();
+            return;
+        }
+
+        resultEl.textContent = 'No match found';
+        draw();
+    }
+
+    // True (osculating) lunar node longitude (Meeus, Astronomical Algorithms)
+    // Human Design uses the true node, not the mean node
+    function trueLunarNodeLon(date) {
+        const jd = 2440587.5 + date.getTime() / 86400000;
+        const T = (jd - 2451545.0) / 36525;
+        const rad = Math.PI / 180;
+
+        // Mean longitude of ascending node
+        let omega = 125.04452 - 1934.136261 * T + 0.0020708 * T * T + T * T * T / 450000;
+
+        // Auxiliary angles for periodic corrections
+        const D = (297.85036 + 445267.111480 * T - 0.0019142 * T * T + T * T * T / 189474) * rad;
+        const M = (357.52772 + 35999.050340 * T - 0.0001603 * T * T - T * T * T / 300000) * rad;
+        const Mp = (134.96298 + 477198.867398 * T + 0.0086972 * T * T + T * T * T / 56250) * rad;
+        const F = (93.27191 + 483202.017538 * T - 0.0036825 * T * T + T * T * T / 327270) * rad;
+
+        // Main periodic corrections to get true node from mean node
+        omega += -1.4979 * Math.sin(2 * (D - F))
+               -  0.1500 * Math.sin(M)
+               -  0.1226 * Math.sin(2 * D)
+               +  0.1176 * Math.sin(2 * F)
+               -  0.0801 * Math.sin(2 * (Mp - F));
+
+        return ((omega % 360) + 360) % 360;
+    }
+
+    function calculatePositions() {
+        if (typeof Astronomy === 'undefined') return;
+
+        state.activePlanets = [];
+
+        PLANETS.forEach(planet => {
+            try {
+                const time = Astronomy.MakeTime(state.date);
+                let lon;
+
+                if (planet.id === "Sun") {
+                    lon = Astronomy.SunPosition(time).elon;
+                } else if (planet.id === "Earth") {
+                    lon = (Astronomy.SunPosition(time).elon + 180) % 360;
+                } else if (planet.id === "Moon") {
+                    lon = Astronomy.EclipticGeoMoon(time).lon;
+                } else if (planet.id === "NorthNode") {
+                    lon = trueLunarNodeLon(state.date);
+                } else if (planet.id === "SouthNode") {
+                    lon = (trueLunarNodeLon(state.date) + 180) % 360;
+                } else {
+                    const geo = Astronomy.GeoVector(planet.id, time, true);
+                    lon = Astronomy.Ecliptic(geo).elon;
+                }
+
+                // Calculate Gate and Line from ecliptic longitude
+                let diff = lon - GATE_41_START;
+                if (diff < 0) diff += 360;
+
+                const gateIndex = Math.floor(diff / GATE_ANGLE) % 64;
+                const gate = GATE_SEQUENCE[gateIndex];
+
+                const withinGate = diff - gateIndex * GATE_ANGLE;
+                let lineNum = Math.floor(withinGate / (GATE_ANGLE / 6)) + 1;
+                if (lineNum > 6) lineNum = 6;
+                if (lineNum < 1) lineNum = 1;
+
+                state.activePlanets.push({
+                    ...planet,
+                    lon: lon,
+                    gate: gate,
+                    line: lineNum
+                });
+            } catch (err) {
+                console.error(`Calculation failed for ${planet.id}`, err);
+            }
+        });
+    }
+
+    // --- Drawing Functions ---
+    function degToCanvasRad(deg) {
+        return -deg * Math.PI / 180;
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        const midRad = outerRadius * 0.85;
+        const innerRad = midRad - outerRadius * 0.12; // thinner zodiac band
+
+        // Collect activated gate numbers for highlighting
+        const activatedGates = new Set(state.activePlanets.map(p => p.gate));
+
+        // Find which zodiac sign the Sun is in
+        const sunPlanet = state.activePlanets.find(p => p.id === 'Sun');
+        const activeSunSign = sunPlanet
+            ? Math.floor(sunPlanet.lon / 30) * 30
+            : null;
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+
+        drawChannels(midRad, activatedGates);
+        drawEarthCenter();
+        drawZodiacRing(innerRad, midRad, activeSunSign);
+        drawGatesRing(midRad, outerRadius, activatedGates);
+        drawPlanets(innerRad, outerRadius);
+
+        ctx.restore();
+    }
+
+    function channelCurve(radA, radB, innerR) {
+        const ax = Math.cos(radA) * innerR;
+        const ay = Math.sin(radA) * innerR;
+        const bx = Math.cos(radB) * innerR;
+        const by = Math.sin(radB) * innerR;
+
+        const mx = (ax + bx) / 2;
+        const my = (ay + by) / 2;
+        const dist = Math.sqrt(mx * mx + my * my);
+        const pullFactor = 0.35 + 0.5 * (1 - Math.min(dist / innerR, 1));
+
+        return { ax, ay, bx, by, cx: mx * pullFactor, cy: my * pullFactor };
+    }
+
+    function drawChannels(innerR, activatedGates) {
+        const searchGate = state.searchHighlight?.type === 'gate' ? state.searchHighlight.value : null;
+
+        // Two passes: inactive first, then active on top
+        CHANNELS.forEach(([gateA, gateB]) => {
+            const isActive = activatedGates.has(gateA) && activatedGates.has(gateB);
+            const isSearched = searchGate === gateA || searchGate === gateB;
+            if (isActive || isSearched) return; // skip, drawn in second pass
+
+            const { ax, ay, bx, by, cx, cy } = channelCurve(
+                degToCanvasRad(gateToAngleDeg(gateA)),
+                degToCanvasRad(gateToAngleDeg(gateB)), innerR);
+
+            ctx.beginPath();
+            ctx.moveTo(ax, ay);
+            ctx.quadraticCurveTo(cx, cy, bx, by);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        });
+
+        // Second pass: searched and active channels on top
+        CHANNELS.forEach(([gateA, gateB]) => {
+            const isActive = activatedGates.has(gateA) && activatedGates.has(gateB);
+            const isSearched = searchGate === gateA || searchGate === gateB;
+            if (!isActive && !isSearched) return;
+
+            const { ax, ay, bx, by, cx, cy } = channelCurve(
+                degToCanvasRad(gateToAngleDeg(gateA)),
+                degToCanvasRad(gateToAngleDeg(gateB)), innerR);
+
+            ctx.beginPath();
+            ctx.moveTo(ax, ay);
+            ctx.quadraticCurveTo(cx, cy, bx, by);
+
+            if (isActive) {
+                ctx.strokeStyle = 'rgba(255, 200, 50, 0.7)';
+                ctx.lineWidth = 2.5;
+            } else {
+                ctx.strokeStyle = 'rgba(108, 92, 231, 0.5)';
+                ctx.lineWidth = 2;
+            }
+            ctx.stroke();
+        });
+    }
+
+    function drawEarthCenter() {
+        ctx.beginPath();
+        ctx.arc(0, 0, 15, 0, Math.PI * 2);
+        ctx.fillStyle = '#2233ff';
+        ctx.fill();
+        ctx.strokeStyle = '#55aaff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(-15, 0); ctx.lineTo(15, 0);
+        ctx.moveTo(0, -15); ctx.lineTo(0, 15);
+        ctx.strokeStyle = '#55aaff';
+        ctx.stroke();
+    }
+
+    function drawZodiacRing(rIn, rOut, activeSunSign) {
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+
+        ZODIAC_SIGNS.forEach(sign => {
+            const radStart = degToCanvasRad(sign.start);
+            const radEnd = degToCanvasRad(sign.start + 30);
+            const isActive = sign.start === activeSunSign;
+
+            // Highlight the Sun's current zodiac sign
+            if (isActive) {
+                ctx.beginPath();
+                ctx.arc(0, 0, rOut, radEnd, radStart);
+                ctx.arc(0, 0, rIn, radStart, radEnd, true);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(255, 215, 0, 0.12)';
+                ctx.fill();
+            }
+
+            // Separator line
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(radStart) * rIn, Math.sin(radStart) * rIn);
+            ctx.lineTo(Math.cos(radStart) * rOut, Math.sin(radStart) * rOut);
+            ctx.stroke();
+
+            // Sign symbol
+            const centerDeg = sign.start + 15;
+            const centerRad = degToCanvasRad(centerDeg);
+            const textR = rIn + (rOut - rIn) / 2;
+
+            ctx.save();
+            ctx.translate(Math.cos(centerRad) * textR, Math.sin(centerRad) * textR);
+            let rot = centerRad + Math.PI/2;
+            if (centerDeg > 90 && centerDeg < 270) rot += Math.PI;
+            ctx.rotate(rot);
+
+            ctx.fillStyle = isActive ? '#FFD700' : '#666';
+            ctx.font = (isActive ? 'bold ' : '') + '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(sign.symbol, 0, 0);
+            ctx.restore();
+        });
+
+        ctx.beginPath();
+        ctx.arc(0, 0, rIn, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    function drawGatesRing(rIn, rOut, activatedGates) {
+        for (let i = 0; i < 64; i++) {
+            const gateNum = GATE_SEQUENCE[i];
+            const isActivated = activatedGates.has(gateNum);
+            const isSearchHighlight = state.searchHighlight?.type === 'gate' && state.searchHighlight.value === gateNum;
+
+            let startDeg = GATE_41_START + i * GATE_ANGLE;
+            let centerDeg = startDeg + GATE_ANGLE / 2;
+
+            const radStart = degToCanvasRad(startDeg);
+            const radEnd = degToCanvasRad(startDeg + GATE_ANGLE);
+
+            // Fill activated gates with a subtle highlight
+            if (isActivated || isSearchHighlight) {
+                ctx.beginPath();
+                // Arc goes clockwise in canvas, but our angles are negated, so swap start/end
+                ctx.arc(0, 0, rOut, radEnd, radStart);
+                ctx.arc(0, 0, rIn, radStart, radEnd, true);
+                ctx.closePath();
+
+                if (isSearchHighlight) {
+                    ctx.fillStyle = 'rgba(108, 92, 231, 0.5)';
+                } else {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                }
+                ctx.fill();
+            }
+
+            // Separator line
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(radStart) * rIn, Math.sin(radStart) * rIn);
+            ctx.lineTo(Math.cos(radStart) * rOut, Math.sin(radStart) * rOut);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Gate Number
+            const centerRad = degToCanvasRad(centerDeg);
+            const textR = rIn + (rOut - rIn) / 2;
+
+            ctx.save();
+            ctx.translate(Math.cos(centerRad) * textR, Math.sin(centerRad) * textR);
+
+            let normDeg = centerDeg % 360;
+            if (normDeg < 0) normDeg += 360;
+
+            let rot = centerRad + Math.PI/2;
+            if (normDeg > 90 && normDeg < 270) rot += Math.PI;
+            ctx.rotate(rot);
+
+            ctx.fillStyle = isActivated ? '#fff' : '#666';
+            if (isSearchHighlight) ctx.fillStyle = '#d4c8ff';
+            ctx.font = (isActivated ? 'bold ' : '') + '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(gateNum, 0, 0);
+            ctx.restore();
+        }
+
+        // Ring boundaries
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(0, 0, rOut, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, 0, rIn, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    function drawPlanets(innerRad, outerRadius) {
+        // Pre-compute label text and sizes for collision detection
+        ctx.font = 'bold 12px Arial';
+        const labelData = state.activePlanets.map(p => {
+            const displayName = p.label || p.id;
+            const text = `${p.symbol} ${displayName} (${p.gate}.${p.line})`;
+            const w = ctx.measureText(text).width + 10;
+            return { ...p, text, w, h: 20 };
+        });
+
+        // Place labels with pixel-based collision detection
+        const LABEL_BASE_OFFSET = 35;
+        const LABEL_STEP = 22;
+        const MAX_ATTEMPTS = 10;
+        const placedLabels = []; // { x, y, w, h }
+
+        function rectsOverlap(x1, y1, w1, h1, x2, y2, w2, h2) {
+            return Math.abs(x1 - x2) < (w1 + w2) / 2 + 4 &&
+                   Math.abs(y1 - y2) < (h1 + h2) / 2 + 2;
+        }
+
+        // Compute label positions first
+        const labelPlacements = labelData.map(p => {
+            const pRad = degToCanvasRad(p.lon);
+            let labelOffset = LABEL_BASE_OFFSET;
+
+            for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+                const r = outerRadius + labelOffset;
+                const x = Math.cos(pRad) * r;
+                const y = Math.sin(pRad) * r;
+
+                const overlaps = placedLabels.some(prev =>
+                    rectsOverlap(x, y, p.w, p.h, prev.x, prev.y, prev.w, prev.h)
+                );
+
+                if (!overlaps) {
+                    placedLabels.push({ x, y, w: p.w, h: p.h });
+                    return { ...p, pRad, labelOffset, textX: x, textY: y };
+                }
+                labelOffset += LABEL_STEP;
+            }
+
+            // Fallback: place at final offset
+            const r = outerRadius + labelOffset;
+            const x = Math.cos(pRad) * r;
+            const y = Math.sin(pRad) * r;
+            placedLabels.push({ x, y, w: p.w, h: p.h });
+            return { ...p, pRad, labelOffset, textX: x, textY: y };
+        });
+
+        // Draw everything
+        labelPlacements.forEach(p => {
+            const isSearchHighlight = state.searchHighlight?.type === 'planet' && state.searchHighlight.value === p.id;
+
+            // Connecting line from center to inner ring
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(Math.cos(p.pRad) * innerRad, Math.sin(p.pRad) * innerRad);
+            ctx.strokeStyle = p.color;
+            ctx.globalAlpha = isSearchHighlight ? 1 : 0.6;
+            ctx.lineWidth = isSearchHighlight ? 2 : 1;
+            ctx.setLineDash([2, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1;
+
+            // Arrow pointing to gate
+            const arrowTipR = outerRadius + 5;
+            const arrowBaseR = outerRadius + 20;
+            const tipX = Math.cos(p.pRad) * arrowTipR;
+            const tipY = Math.sin(p.pRad) * arrowTipR;
+
+            ctx.beginPath();
+            ctx.moveTo(tipX, tipY);
+            const wingLen = 10;
+            ctx.lineTo(tipX + Math.cos(p.pRad + Math.PI - 0.2) * wingLen, tipY + Math.sin(p.pRad + Math.PI - 0.2) * wingLen);
+            ctx.moveTo(tipX, tipY);
+            ctx.lineTo(tipX + Math.cos(p.pRad + Math.PI + 0.2) * wingLen, tipY + Math.sin(p.pRad + Math.PI + 0.2) * wingLen);
+            ctx.moveTo(tipX, tipY);
+            ctx.lineTo(Math.cos(p.pRad) * arrowBaseR, Math.sin(p.pRad) * arrowBaseR);
+            ctx.strokeStyle = p.color;
+            ctx.lineWidth = isSearchHighlight ? 3 : 2;
+            ctx.stroke();
+
+            // Label
+            ctx.save();
+            ctx.translate(p.textX, p.textY);
+
+            ctx.font = 'bold 12px Arial';
+
+            // Background pill
+            if (isSearchHighlight) {
+                ctx.fillStyle = 'rgba(108, 92, 231, 0.4)';
+            } else {
+                ctx.fillStyle = 'rgba(10, 10, 15, 0.8)';
+            }
+            ctx.beginPath();
+            ctx.roundRect(-p.w/2, -p.h/2, p.w, p.h, 4);
+            ctx.fill();
+
+            if (isSearchHighlight) {
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = p.color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(p.text, 0, 0);
+            ctx.restore();
+
+            // Connecting dotted line from arrow to label if pushed out
+            if (p.labelOffset > LABEL_BASE_OFFSET) {
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(p.pRad) * (outerRadius + LABEL_BASE_OFFSET - 10), Math.sin(p.pRad) * (outerRadius + LABEL_BASE_OFFSET - 10));
+                ctx.lineTo(p.textX - Math.cos(p.pRad) * 10, p.textY - Math.sin(p.pRad) * 10);
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = 1;
+                ctx.setLineDash([1, 2]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        });
+    }
+
+    // --- Boot up ---
+    window.onload = function() {
+        if (typeof Astronomy !== 'undefined') {
+            init();
+        } else {
+            const check = setInterval(() => {
+                if (typeof Astronomy !== 'undefined') {
+                    clearInterval(check);
+                    init();
+                }
+            }, 100);
+        }
+    };
+</script>
+</body>
+</html>
