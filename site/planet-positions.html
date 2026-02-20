@@ -165,7 +165,7 @@
 
 <div id="ui-panel">
     <h1>Planet Positions</h1>
-    <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">Position of all of the planets and the corresponding zodiac signs and human design gates.</p>
+    <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">Position of all of the planets relative to earth, expressed as angles on the orbital plane. These angles are used in astrology to determine zodiac signs and human design gates (also shown). Note the earth itself is also shown as opposite to the sun.</p>
 
     <div class="control-group">
         <label>Date (YYYY-MM-DD)</label>
@@ -177,7 +177,7 @@
             <span>Day offset</span>
             <span class="time-display" id="dayOffsetDisplay">0</span>
         </label>
-        <input type="range" id="dayOffsetSlider" min="-10" max="10" value="0" step="1">
+        <input type="range" id="dayOffsetSlider" min="-20" max="20" value="0" step="1">
     </div>
 
     <div class="control-group">
@@ -189,8 +189,8 @@
     </div>
 
     <div class="control-group">
-        <label>Search gate or planet</label>
-        <input type="text" id="searchInput" placeholder="e.g. 25 or Mars">
+        <label>Search gate, planet, or sign</label>
+        <input type="text" id="searchInput" placeholder="e.g. 25, Mars, or Leo">
         <div id="searchResult"></div>
     </div>
 </div>
@@ -383,6 +383,30 @@
         if (planet) {
             state.searchHighlight = { type: 'planet', value: planet.id };
             resultEl.textContent = `${planet.symbol} ${planet.id} → Gate ${planet.gate}.${planet.line}`;
+            draw();
+            return;
+        }
+
+        // Try zodiac sign name
+        const sign = ZODIAC_SIGNS.find(s =>
+            s.name.toLowerCase().includes(query) || s.symbol === query
+        );
+        if (sign) {
+            state.searchHighlight = { type: 'sign', value: sign.start };
+            const planetsInSign = state.activePlanets.filter(p => {
+                const signStart = sign.start;
+                const signEnd = (sign.start + 30) % 360;
+                return signEnd > signStart
+                    ? p.lon >= signStart && p.lon < signEnd
+                    : p.lon >= signStart || p.lon < signEnd;
+            });
+            let text = `${sign.symbol} ${sign.name}`;
+            if (planetsInSign.length > 0) {
+                text += ` — ${planetsInSign.map(p => `${p.symbol} ${p.label || p.id}`).join(', ')}`;
+            } else {
+                text += ' — no planets';
+            }
+            resultEl.textContent = text;
             draw();
             return;
         }
@@ -582,14 +606,15 @@
             const radStart = degToCanvasRad(sign.start);
             const radEnd = degToCanvasRad(sign.start + 30);
             const isActive = sign.start === activeSunSign;
+            const isSearched = state.searchHighlight?.type === 'sign' && state.searchHighlight.value === sign.start;
 
-            // Highlight the Sun's current zodiac sign
-            if (isActive) {
+            // Highlight the Sun's current zodiac sign or searched sign
+            if (isActive || isSearched) {
                 ctx.beginPath();
                 ctx.arc(0, 0, rOut, radEnd, radStart);
                 ctx.arc(0, 0, rIn, radStart, radEnd, true);
                 ctx.closePath();
-                ctx.fillStyle = 'rgba(255, 215, 0, 0.12)';
+                ctx.fillStyle = isSearched ? 'rgba(108, 92, 231, 0.35)' : 'rgba(255, 215, 0, 0.12)';
                 ctx.fill();
             }
 
@@ -610,8 +635,9 @@
             if (centerDeg > 90 && centerDeg < 270) rot += Math.PI;
             ctx.rotate(rot);
 
-            ctx.fillStyle = isActive ? '#FFD700' : '#666';
-            ctx.font = (isActive ? 'bold ' : '') + '16px Arial';
+            const highlighted = isActive || isSearched;
+            ctx.fillStyle = isSearched ? '#d4c8ff' : (isActive ? '#FFD700' : '#666');
+            ctx.font = (highlighted ? 'bold ' : '') + '16px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(sign.symbol, 0, 0);
