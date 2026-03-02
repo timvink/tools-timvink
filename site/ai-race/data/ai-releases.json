@@ -1,0 +1,437 @@
+{
+  "last_updated": "2026-03-02",
+  "companies": [
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "color": "#A78BFA",
+      "website": "https://www.anthropic.com",
+      "releases": [
+        {
+          "name": "Claude 1.0",
+          "date": "2023-03-14",
+          "tier": "flagship",
+          "description": "Anthropic's first publicly available AI assistant, focused on safety and helpfulness.",
+          "url": "https://www.anthropic.com/news/introducing-claude"
+        },
+        {
+          "name": "Claude 2",
+          "date": "2023-07-11",
+          "tier": "flagship",
+          "description": "Major upgrade with improved reasoning, coding, and safety. 100K context window.",
+          "url": "https://www.anthropic.com/news/claude-2"
+        },
+        {
+          "name": "Claude 2.1",
+          "date": "2023-11-21",
+          "tier": "major",
+          "description": "Expanded 200K context window and reduced hallucination rates.",
+          "url": "https://www.anthropic.com/news/claude-2-1"
+        },
+        {
+          "name": "Claude 3 Sonnet",
+          "date": "2024-03-04",
+          "tier": "major",
+          "description": "Balanced intelligence and speed — ideal combination for enterprise workloads.",
+          "url": "https://www.anthropic.com/news/claude-3-family"
+        },
+        {
+          "name": "Claude 3 Opus",
+          "date": "2024-03-04",
+          "tier": "flagship",
+          "description": "Anthropic's most capable model, outperforming GPT-4 on many benchmarks at launch.",
+          "url": "https://www.anthropic.com/news/claude-3-family"
+        },
+        {
+          "name": "Claude 3 Haiku",
+          "date": "2024-03-13",
+          "tier": "major",
+          "description": "Fastest and most compact model for near-instant responses.",
+          "url": "https://www.anthropic.com/news/claude-3-family"
+        },
+        {
+          "name": "Claude 3.5 Sonnet",
+          "date": "2024-06-20",
+          "tier": "flagship",
+          "description": "Surpassed Claude 3 Opus in most evaluations. Introduced 'computer use' agentic capability.",
+          "url": "https://www.anthropic.com/news/claude-3-5-sonnet"
+        },
+        {
+          "name": "Claude 3.5 Sonnet v2",
+          "date": "2024-10-22",
+          "tier": "major",
+          "description": "Upgraded Sonnet 3.5 with improved agentic and coding capabilities.",
+          "url": "https://www.anthropic.com/news/claude-3-5-sonnet-and-haiku"
+        },
+        {
+          "name": "Claude 3.5 Haiku",
+          "date": "2024-11-04",
+          "tier": "major",
+          "description": "Faster, affordable Haiku matching Claude 3 Opus on many benchmarks.",
+          "url": "https://www.anthropic.com/news/claude-3-5-haiku"
+        },
+        {
+          "name": "Claude 3.7 Sonnet",
+          "date": "2025-02-24",
+          "tier": "flagship",
+          "description": "First Claude model with extended thinking for complex step-by-step reasoning.",
+          "url": "https://www.anthropic.com/news/claude-3-7-sonnet"
+        },
+        {
+          "name": "Claude Opus 4",
+          "date": "2025-05-22",
+          "tier": "flagship",
+          "description": "World-leading coding model at release. Excels in sustained performance on complex, long-running agentic tasks.",
+          "url": "https://www.anthropic.com/news/claude-4"
+        },
+        {
+          "name": "Claude Sonnet 4",
+          "date": "2025-05-22",
+          "tier": "major",
+          "description": "Significantly enhanced Claude 4 mid-tier model excelling in coding and reasoning with improved precision.",
+          "url": "https://www.anthropic.com/news/claude-4"
+        },
+        {
+          "name": "Claude Opus 4.1",
+          "date": "2025-08-05",
+          "tier": "major",
+          "description": "Updated flagship with improved performance in coding, reasoning, and agentic tasks. 74.5% on SWE-bench Verified.",
+          "url": "https://www.anthropic.com/news/claude-opus-4-1"
+        },
+        {
+          "name": "Claude Sonnet 4.5",
+          "date": "2025-09-29",
+          "tier": "major",
+          "description": "Anthropic's most advanced Sonnet model to date, optimized for real-world agents and coding workflows.",
+          "url": "https://www.anthropic.com/news/claude-sonnet-4-5"
+        },
+        {
+          "name": "Claude Haiku 4.5",
+          "date": "2025-10-01",
+          "tier": "major",
+          "description": "Fast, affordable model in the Claude 4 generation. Near-frontier intelligence at low cost.",
+          "url": "https://www.anthropic.com/news/claude-haiku-4-5"
+        },
+        {
+          "name": "Claude Opus 4.5",
+          "date": "2025-11-24",
+          "tier": "flagship",
+          "description": "Anthropic's most powerful model with agent team and multi-agent coordination capabilities.",
+          "url": "https://www.anthropic.com/news/claude-opus-4-5"
+        },
+        {
+          "name": "Claude Opus 4.6",
+          "date": "2026-02-05",
+          "tier": "flagship",
+          "description": "Enhanced flagship with improved long-context retrieval, coding skills, and 1M token context window in beta.",
+          "url": "https://www.anthropic.com/news/claude-opus-4-6"
+        },
+        {
+          "name": "Claude Sonnet 4.6",
+          "date": "2026-02-17",
+          "tier": "flagship",
+          "description": "Opus-level coding performance at Sonnet pricing. 1M token context window in beta.",
+          "url": "https://www.anthropic.com/news/claude-sonnet-4-6"
+        }
+      ]
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "color": "#34D399",
+      "website": "https://openai.com",
+      "releases": [
+        {
+          "name": "GPT-4",
+          "date": "2023-03-14",
+          "tier": "flagship",
+          "description": "OpenAI's groundbreaking multimodal model with unprecedented reasoning and problem-solving.",
+          "url": "https://openai.com/research/gpt-4"
+        },
+        {
+          "name": "GPT-4 Turbo",
+          "date": "2023-11-06",
+          "tier": "major",
+          "description": "Faster, cheaper GPT-4 with 128K context window, updated knowledge, and vision.",
+          "url": "https://openai.com/blog/new-models-and-developer-products-announced-at-devday"
+        },
+        {
+          "name": "GPT-4o",
+          "date": "2024-05-13",
+          "tier": "flagship",
+          "description": "Omni model with native multimodal capabilities — 2× faster and 50% cheaper than GPT-4 Turbo.",
+          "url": "https://openai.com/index/hello-gpt-4o/"
+        },
+        {
+          "name": "GPT-4o mini",
+          "date": "2024-07-18",
+          "tier": "major",
+          "description": "Affordable, efficient small model replacing GPT-3.5 Turbo with superior performance.",
+          "url": "https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence/"
+        },
+        {
+          "name": "o1-preview",
+          "date": "2024-09-12",
+          "tier": "flagship",
+          "description": "First reasoning model that 'thinks' before responding, excelling at complex STEM tasks.",
+          "url": "https://openai.com/index/introducing-openai-o1-preview/"
+        },
+        {
+          "name": "o1-mini",
+          "date": "2024-09-12",
+          "tier": "major",
+          "description": "Smaller, faster reasoning model optimized for STEM tasks at lower cost.",
+          "url": "https://openai.com/index/openai-o1-mini-advancing-cost-efficient-reasoning/"
+        },
+        {
+          "name": "o1",
+          "date": "2024-12-05",
+          "tier": "flagship",
+          "description": "Full release of o1 with enhanced reasoning, safety features, and vision capabilities.",
+          "url": "https://openai.com/index/openai-o1-and-new-tools-for-developers/"
+        },
+        {
+          "name": "o3-mini",
+          "date": "2025-01-31",
+          "tier": "major",
+          "description": "Efficient reasoning model with configurable compute levels for math and coding.",
+          "url": "https://openai.com/index/openai-o3-mini/"
+        },
+        {
+          "name": "GPT-4.5",
+          "date": "2025-02-27",
+          "tier": "major",
+          "description": "Largest and most capable chat model; significant upgrade in natural conversation.",
+          "url": "https://openai.com/index/introducing-gpt-4-5/"
+        },
+        {
+          "name": "GPT-4.1",
+          "date": "2025-04-14",
+          "tier": "major",
+          "description": "GPT-4.1 family (Mini, Nano) with improved coding, instruction-following, and 1M context.",
+          "url": "https://openai.com/index/gpt-4-1/"
+        },
+        {
+          "name": "o3",
+          "date": "2025-04-16",
+          "tier": "flagship",
+          "description": "Full o3 reasoning model with superior performance on math, coding, and science benchmarks.",
+          "url": "https://openai.com/index/introducing-o3-and-o4-mini/"
+        },
+        {
+          "name": "o4-mini",
+          "date": "2025-04-16",
+          "tier": "major",
+          "description": "Efficient reasoning model — top performer on AIME 2024 and 2025 benchmarks.",
+          "url": "https://openai.com/index/introducing-o3-and-o4-mini/"
+        },
+        {
+          "name": "o3-pro",
+          "date": "2025-06-10",
+          "tier": "major",
+          "description": "Professional tier o3 with maximum accuracy for the most complex reasoning tasks.",
+          "url": "https://openai.com/index/o3-pro/"
+        },
+        {
+          "name": "GPT-5",
+          "date": "2025-08-07",
+          "tier": "flagship",
+          "description": "Generational leap in AI capability. Superseded GPT-4.5 on release.",
+          "url": "https://openai.com/index/gpt-5/"
+        },
+        {
+          "name": "GPT-5.1",
+          "date": "2025-11-12",
+          "tier": "major",
+          "description": "Refined GPT-5 with improved conversational quality and 15% better complex reasoning.",
+          "url": "https://openai.com/index/gpt-5-1/"
+        },
+        {
+          "name": "GPT-5.2",
+          "date": "2025-12-11",
+          "tier": "major",
+          "description": "Updated GPT-5 with extended thinking and stronger professional task performance.",
+          "url": "https://openai.com/index/introducing-gpt-5-2/"
+        },
+        {
+          "name": "GPT-5.3 Codex",
+          "date": "2026-02-05",
+          "tier": "major",
+          "description": "Most capable agentic coding model to date. 25% faster than GPT-5.2-Codex. First model to hit 'high' on OpenAI's cybersecurity preparedness framework.",
+          "url": "https://openai.com/index/introducing-gpt-5-3-codex/"
+        }
+      ]
+    },
+    {
+      "id": "google",
+      "name": "Google DeepMind",
+      "color": "#60A5FA",
+      "website": "https://deepmind.google",
+      "releases": [
+        {
+          "name": "Bard (PaLM 2)",
+          "date": "2023-03-21",
+          "tier": "major",
+          "description": "Google's AI assistant based on PaLM 2, launched as a response to ChatGPT.",
+          "url": "https://blog.google/technology/ai/bard-google-ai-search-updates/"
+        },
+        {
+          "name": "PaLM 2",
+          "date": "2023-05-10",
+          "tier": "major",
+          "description": "More capable base model powering all Google AI products and services.",
+          "url": "https://blog.google/technology/ai/google-palm-2-ai-large-language-model/"
+        },
+        {
+          "name": "Gemini 1.0",
+          "date": "2023-12-06",
+          "tier": "flagship",
+          "description": "Google's first natively multimodal model family (Ultra, Pro, Nano). Built for images, audio, video, code.",
+          "url": "https://blog.google/technology/ai/google-gemini-ai/"
+        },
+        {
+          "name": "Gemini 1.5 Pro",
+          "date": "2024-02-15",
+          "tier": "flagship",
+          "description": "Revolutionary 1M token context window for processing entire codebases and long documents.",
+          "url": "https://blog.google/technology/ai/google-gemini-next-generation-model-february-2024/"
+        },
+        {
+          "name": "Gemini 1.5 Flash",
+          "date": "2024-05-14",
+          "tier": "major",
+          "description": "Efficient model optimized for high-volume tasks at lower cost than 1.5 Pro.",
+          "url": "https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/"
+        },
+        {
+          "name": "Gemini 2.0 Flash",
+          "date": "2025-01-30",
+          "tier": "major",
+          "description": "Next-gen Gemini with improved multimodal performance and agentic capabilities.",
+          "url": "https://blog.google/technology/google-deepmind/google-gemini-ai-update-january-2025/"
+        },
+        {
+          "name": "Gemini 2.0 Pro",
+          "date": "2025-02-05",
+          "tier": "major",
+          "description": "Powerful 2.0 model with advanced coding, complex reasoning, and multimodal capabilities.",
+          "url": "https://blog.google/technology/google-deepmind/gemini-model-updates-february-2025/"
+        },
+        {
+          "name": "Gemini 2.5 Pro",
+          "date": "2025-03-25",
+          "tier": "flagship",
+          "description": "Gemini's thinking model with deep reasoning. #1 on LMArena at release.",
+          "url": "https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/"
+        },
+        {
+          "name": "Gemini 2.5 Flash",
+          "date": "2025-06-17",
+          "tier": "major",
+          "description": "Thinking model balancing speed and reasoning quality. Became default Gemini model.",
+          "url": "https://developers.googleblog.com/en/gemini-2-5-thinking-model-updates/"
+        },
+        {
+          "name": "Gemini 2.5 Flash-Lite",
+          "date": "2025-06-17",
+          "tier": "minor",
+          "description": "Lightweight variant optimized for fast, cost-effective high-volume deployments.",
+          "url": "https://developers.googleblog.com/en/gemini-2-5-thinking-model-updates/"
+        },
+        {
+          "name": "Gemini 3 Pro",
+          "date": "2025-11-18",
+          "tier": "flagship",
+          "description": "Google's flagship frontier model with high-precision multimodal reasoning across text, image, video, audio, and code. 1M token context.",
+          "url": "https://blog.google/products/gemini/gemini-3/"
+        },
+        {
+          "name": "Gemini 3 Flash",
+          "date": "2026-01-07",
+          "tier": "major",
+          "description": "High-speed thinking model for agentic workflows, chat, and coding. Near Pro-level reasoning at Flash speed. Default model in Google Search AI Mode.",
+          "url": "https://blog.google/products/gemini/gemini-3-flash/"
+        },
+        {
+          "name": "Gemini 3.1 Pro",
+          "date": "2026-02-19",
+          "tier": "major",
+          "description": "Frontier reasoning model with enhanced software engineering performance and more efficient token usage.",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/"
+        }
+      ]
+    },
+    {
+      "id": "xai",
+      "name": "xAI",
+      "color": "#FBBF24",
+      "website": "https://x.ai",
+      "releases": [
+        {
+          "name": "Grok-1",
+          "date": "2023-11-04",
+          "tier": "flagship",
+          "description": "xAI's first model with real-time knowledge via the X (Twitter) platform.",
+          "url": "https://x.ai/blog/grok"
+        },
+        {
+          "name": "Grok-1.5",
+          "date": "2024-04-12",
+          "tier": "major",
+          "description": "Improved coding and math capabilities with multimodal vision support.",
+          "url": "https://x.ai/blog/grok-1.5"
+        },
+        {
+          "name": "Grok-2",
+          "date": "2024-08-13",
+          "tier": "flagship",
+          "description": "Major upgrade with frontier-level performance, beating Claude 3.5 Sonnet on MMLU.",
+          "url": "https://x.ai/blog/grok-2"
+        },
+        {
+          "name": "Grok-2 mini",
+          "date": "2024-08-13",
+          "tier": "major",
+          "description": "Smaller, faster version of Grok-2 for faster responses and lower cost.",
+          "url": "https://x.ai/blog/grok-2"
+        },
+        {
+          "name": "Grok-3",
+          "date": "2025-02-17",
+          "tier": "flagship",
+          "description": "xAI's most capable model claiming top-of-leaderboard benchmark results at release.",
+          "url": "https://x.ai/blog/grok-3"
+        },
+        {
+          "name": "Grok-3 Mini",
+          "date": "2025-06-10",
+          "tier": "major",
+          "description": "Lightweight thinking model that reasons before responding. Great for logic and STEM tasks.",
+          "url": "https://x.ai/news/grok-3-mini",
+          "openrouter_id": "x-ai/grok-3-mini"
+        },
+        {
+          "name": "Grok-4",
+          "date": "2025-07-09",
+          "tier": "flagship",
+          "description": "Next major version with advanced reasoning and real-time information capabilities. 256K context window.",
+          "url": "https://x.ai/news/grok-4"
+        },
+        {
+          "name": "Grok-4.1",
+          "date": "2025-11-17",
+          "tier": "major",
+          "description": "Updated Grok-4 with best-in-class agentic tool calling and 2M token context window.",
+          "url": "https://x.ai/news/grok-4-1"
+        },
+        {
+          "name": "Grok 4.20",
+          "date": "2026-02-17",
+          "tier": "major",
+          "description": "Public beta with rapid-learning AI capabilities and enhanced real-time reasoning.",
+          "url": "https://x.ai/news"
+        }
+      ]
+    }
+  ]
+}
