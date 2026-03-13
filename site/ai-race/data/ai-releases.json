@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-02",
+  "last_updated": "2026-03-13",
   "companies": [
     {
       "id": "anthropic",
@@ -259,6 +259,13 @@
           "tier": "major",
           "description": "Most capable agentic coding model to date. 25% faster than GPT-5.2-Codex. First model to hit 'high' on OpenAI's cybersecurity preparedness framework.",
           "url": "https://openai.com/index/introducing-gpt-5-3-codex/"
+        },
+        {
+          "name": "GPT-5.4",
+          "date": "2026-03-05",
+          "tier": "flagship",
+          "description": "Most capable frontier model with native computer-use, 1M token context, and 83% match/exceed rate on professional knowledge work.",
+          "url": "https://openai.com/index/introducing-gpt-5-4/"
         }
       ]
     },

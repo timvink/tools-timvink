@@ -394,6 +394,51 @@
 			animation: dot-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 		}
 
+		/* ── Release cadence ───────────────────── */
+		.release-cadence {
+			display: flex;
+			gap: 1.25rem 2rem;
+			flex-wrap: wrap;
+			margin-top: 2.5rem;
+			margin-bottom: 1.25rem;
+		}
+
+		.cadence-item {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			font-size: 0.85rem;
+			font-variant-numeric: tabular-nums;
+		}
+
+		.cadence-pip {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			flex-shrink: 0;
+		}
+
+		.cadence-name {
+			font-weight: 600;
+			white-space: nowrap;
+		}
+
+		.cadence-days {
+			color: var(--text);
+			font-weight: 700;
+			white-space: nowrap;
+		}
+
+		.cadence-days.overdue {
+			color: #f87171;
+		}
+
+		.cadence-avg {
+			color: var(--muted);
+			font-size: 0.78rem;
+			white-space: nowrap;
+		}
+
 		/* ── Stats section ─────────────────────── */
 		.stats-section {
 			margin-top: 2.5rem;
@@ -666,6 +711,8 @@
 		</div>
 	</div>
 
+	<div class="release-cadence" id="release-cadence" style="display:none"></div>
+
 	<div class="stats-section" id="stats" style="display:none">
 		<div class="stats-heading">The race is accelerating</div>
 		<div class="stats-layout">
@@ -913,7 +960,46 @@
 		document.getElementById('last-updated').textContent =
 			d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
+		renderCadence(data);
 		renderStats(data);
+	}
+
+	// ── Render release cadence ────────────────────────
+	function renderCadence(data) {
+		const container = document.getElementById('release-cadence');
+		container.style.display = 'flex';
+		container.innerHTML = '';
+		const now = new Date();
+		now.setHours(12, 0, 0, 0);
+
+		data.companies.forEach(co => {
+			const sorted = [...co.releases].sort((a, b) => a.date.localeCompare(b.date));
+			const latest = sorted[sorted.length - 1];
+			const latestDate = new Date(latest.date + 'T12:00:00');
+			const daysSince = Math.round((now - latestDate) / 86400000);
+
+			// Average gap between last 3 releases (2 intervals)
+			let avgGap = null;
+			if (sorted.length >= 3) {
+				const last3 = sorted.slice(-3);
+				const d0 = new Date(last3[0].date + 'T12:00:00');
+				const d1 = new Date(last3[1].date + 'T12:00:00');
+				const d2 = new Date(last3[2].date + 'T12:00:00');
+				avgGap = Math.round(((d1 - d0) + (d2 - d1)) / 2 / 86400000);
+			}
+
+			const isOverdue = avgGap !== null && daysSince > avgGap;
+
+			const item = document.createElement('div');
+			item.className = 'cadence-item';
+			item.innerHTML = `
+				<span class="cadence-pip" style="background:${co.color}; box-shadow:0 0 4px ${co.color}80"></span>
+				<span class="cadence-name" style="color:${co.color}">${co.name}</span>
+				<span class="cadence-days${isOverdue ? ' overdue' : ''}">${daysSince}d ago</span>
+				${avgGap !== null ? `<span class="cadence-avg">(avg ${avgGap}d)</span>` : ''}
+			`;
+			container.appendChild(item);
+		});
 	}
 
 	// ── Render stats ──────────────────────────────────
