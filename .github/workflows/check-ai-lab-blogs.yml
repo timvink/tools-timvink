@@ -22,6 +22,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
             You are checking AI lab blogs for new model releases to update site/ai-race/data/ai-releases.json.
 
