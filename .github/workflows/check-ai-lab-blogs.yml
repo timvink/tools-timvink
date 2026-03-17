@@ -9,6 +9,7 @@ on:
 permissions:
   contents: write
   id-token: write
+  actions: write
 
 jobs:
   check-blogs:
@@ -18,27 +19,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Check lab blogs for new releases
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Filter new articles from RSS feeds
+        id: filter
+        run: python scripts/filter-new-articles.py
+
+      - name: Check new articles for model releases
+        if: steps.filter.outputs.has_new_articles == 'true'
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
-            You are checking AI lab blogs for new model releases to update site/ai-race/data/ai-releases.json.
+            You are checking new AI lab articles for model releases to update site/ai-race/data/ai-releases.json.
 
             Step 1: Read site/ai-race/data/ai-releases.json to see all currently tracked releases.
 
-            Step 2: Fetch each of these pages to find recent model release announcements.
+            Step 2: Read /tmp/new-articles.json — it contains only new, unprocessed articles from AI lab RSS feeds.
+            Each entry has a title, url, and source.
 
-            Pages to check:
-            - OpenAI: https://openai.com/blog/rss.xml
-            - Google DeepMind: https://blog.google/technology/ai/rss/
-            - Anthropic: https://www.anthropic.com/news
-
-            Step 3: Identify ONLY new AI model releases. A model release is a new model version you can call via API or use in a product (e.g. "GPT-5.4", "Gemini 3.2 Pro", "Claude Opus 5").
+            Step 3: For any article whose title suggests a new model release, fetch the article URL to get details.
+            A model release is a new model version you can call via API or use in a product (e.g. "GPT-5.4", "Gemini 3.2 Pro", "Claude Opus 5").
             Do NOT include: feature updates, API/platform changes, research papers, safety reports, product launches, partnership announcements, or tool/app announcements.
 
-            Step 4: Compare against existing releases in ai-releases.json. For any genuinely new model NOT already tracked:
+            Step 4: For any genuinely new model NOT already tracked:
             - Add to the correct company's releases array in chronological order
             - "date": announcement date in YYYY-MM-DD format
             - "description": under 200 characters summarizing the model's key capability
@@ -52,13 +60,22 @@ jobs:
           claude_args: "--max-turns 15"
 
       - name: Commit and push if data changed
+        id: commit
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/ai-race/data/ai-releases.json
+          git add site/ai-race/data/ai-releases.json site/ai-race/data/checked-blog-urls.json
           if git diff --cached --quiet; then
             echo "No changes to commit."
+            echo "pushed=false" >> $GITHUB_OUTPUT
           else
             git commit -m "chore: update AI releases from lab blogs ($(date -u '+%Y-%m-%d'))"
             git push
+            echo "pushed=true" >> $GITHUB_OUTPUT
           fi
+
+      - name: Trigger site deploy
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pages.yml
