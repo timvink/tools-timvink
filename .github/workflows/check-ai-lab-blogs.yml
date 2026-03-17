@@ -28,12 +28,11 @@ jobs:
 
             Step 1: Read site/ai-race/data/ai-releases.json to see all currently tracked releases.
 
-            Step 2: Fetch each of these blog pages to find recent model release announcements.
-            To fetch content, prepend https://markdown.new/ to each URL for clean markdown.
+            Step 2: Fetch each of these pages to find recent model release announcements.
 
-            Blogs to check:
-            - OpenAI: https://openai.com/research/index/release/
-            - Google DeepMind: https://blog.google/innovation-and-ai/models-and-research/gemini-models/
+            Pages to check:
+            - OpenAI: https://openai.com/blog/rss.xml
+            - Google DeepMind: https://blog.google/technology/ai/rss/
             - Anthropic: https://www.anthropic.com/news
 
             Step 3: Identify ONLY new AI model releases. A model release is a new model version you can call via API or use in a product (e.g. "GPT-5.4", "Gemini 3.2 Pro", "Claude Opus 5").
