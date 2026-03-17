@@ -58,7 +58,12 @@ jobs:
             Step 5: Update "last_updated" to today's date (YYYY-MM-DD format).
 
             Step 6: Save the file if any changes were made. Report what you added, or confirm no new releases were found.
-          show_full_output: true
+          settings: |
+            {
+              "permissions": {
+                "allow": ["Edit", "Write"]
+              }
+            }
           claude_args: "--max-turns 15"
 
       - name: Commit and push if data changed
