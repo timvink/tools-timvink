@@ -69,7 +69,7 @@ def main() -> None:
         f.write("\n")
 
     # Write new articles for Claude to process
-    with open("/tmp/new-articles.json", "w") as f:
+    with open("site/ai-race/data/new-articles.json", "w") as f:
         json.dump(new_articles, f, indent=2)
 
     print(f"Found {len(new_articles)} new article(s) to check")
