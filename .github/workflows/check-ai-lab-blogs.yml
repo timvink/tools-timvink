@@ -39,19 +39,20 @@ jobs:
 
             Step 1: Read site/ai-race/data/ai-releases.json to see all currently tracked releases.
 
-            Step 2: Read site/ai-race/data/new-articles.json — it contains only new, unprocessed articles from AI lab RSS feeds.
-            Each entry has a title, url, and source.
+            Step 2: Read site/ai-race/data/new-articles.json — it contains new, unprocessed articles from AI lab RSS feeds.
+            Each entry has a title, url, date, description, and source.
 
-            Step 3: For any article whose title suggests a new model release, fetch the article URL to get details.
+            Step 3: Identify which articles are new AI model releases based on the title.
             A model release is a new model version you can call via API or use in a product (e.g. "GPT-5.4", "Gemini 3.2 Pro", "Claude Opus 5").
             Do NOT include: feature updates, API/platform changes, research papers, safety reports, product launches, partnership announcements, or tool/app announcements.
+            If a single article announces multiple models (e.g. "mini and nano"), add a separate entry for each model.
 
             Step 4: For any genuinely new model NOT already tracked:
             - Add to the correct company's releases array in chronological order
-            - "date": announcement date in YYYY-MM-DD format
-            - "description": under 200 characters summarizing the model's key capability
+            - "date": use the date from the RSS entry (already in YYYY-MM-DD format)
+            - "description": write a concise description under 200 characters using the RSS description and your knowledge of the model
             - "tier": "flagship" for new model generations or major capability leaps, "major" for significant updates or new model sizes, "minor" for incremental iterations
-            - "url": the announcement URL (link to the specific blog post, not the blog index)
+            - "url": the article URL from the RSS entry
             - Do NOT add a model if an entry with the same name already exists
 
             Step 5: Update "last_updated" to today's date (YYYY-MM-DD format).

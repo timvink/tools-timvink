@@ -10,6 +10,7 @@ import os
 import sys
 import urllib.request
 import xml.etree.ElementTree as ET
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "site" / "ai-race" / "data"
@@ -33,8 +34,18 @@ def fetch_rss_entries(feed_url: str) -> list[dict]:
     for item in root.iter("item"):
         title = item.findtext("title", "").strip()
         link = item.findtext("link", "").strip()
+        description = item.findtext("description", "").strip()
+        pub_date_str = item.findtext("pubDate", "").strip()
+        date = ""
+        if pub_date_str:
+            try:
+                date = parsedate_to_datetime(pub_date_str).strftime("%Y-%m-%d")
+            except Exception:
+                pass
         if link:
-            entries.append({"title": title, "url": link})
+            entries.append(
+                {"title": title, "url": link, "date": date, "description": description}
+            )
     return entries
 
 
