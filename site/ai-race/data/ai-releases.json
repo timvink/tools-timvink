@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-25",
+  "last_updated": "2026-03-27",
   "companies": [
     {
       "id": "anthropic",
@@ -400,6 +400,13 @@
           "tier": "minor",
           "description": "Gemini 3.1 Flash Lite Preview is Google's high-efficiency model optimized for high-volume use cases. It outperforms Gemini 2.5 Flash Lite on overall quality and approaches Gemini 2.5 Flash performance across key capab…",
           "openrouter_id": "google/gemini-3.1-flash-lite-preview"
+        },
+        {
+          "name": "Gemini 3.1 Flash Live",
+          "date": "2026-03-26",
+          "tier": "minor",
+          "description": "Live audio model variant optimized for real-time voice interactions. More natural and reliable audio AI, available across Google products.",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-live/"
         }
       ]
     },
