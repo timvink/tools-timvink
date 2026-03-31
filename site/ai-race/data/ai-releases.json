@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-30",
+  "last_updated": "2026-03-31",
   "companies": [
     {
       "id": "anthropic",
@@ -407,6 +407,20 @@
           "tier": "minor",
           "description": "Live audio model variant optimized for real-time voice interactions. More natural and reliable audio AI, available across Google products.",
           "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-live/"
+        },
+        {
+          "name": "Google: Lyria 3 Pro Preview",
+          "date": "2026-03-30",
+          "tier": "minor",
+          "description": "Full-length songs are priced at $0.08 per song. Lyria 3 is Google's family of music generation models, available through the Gemini API. With Lyria 3, you can generate high-quality, 48kHz stereo audio from text prompt…",
+          "openrouter_id": "google/lyria-3-pro-preview"
+        },
+        {
+          "name": "Google: Lyria 3 Clip Preview",
+          "date": "2026-03-30",
+          "tier": "minor",
+          "description": "30 second duration clips are priced at $0.04 per clip. Lyria 3 is Google's family of music generation models, available through the Gemini API. With Lyria 3, you can generate high-quality, 48kHz stereo audio from text…",
+          "openrouter_id": "google/lyria-3-clip-preview"
         }
       ]
     },
