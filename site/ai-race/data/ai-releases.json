@@ -421,6 +421,13 @@
           "tier": "minor",
           "description": "30 second duration clips are priced at $0.04 per clip. Lyria 3 is Google's family of music generation models, available through the Gemini API. With Lyria 3, you can generate high-quality, 48kHz stereo audio from text…",
           "openrouter_id": "google/lyria-3-clip-preview"
+        },
+        {
+          "name": "Veo 3.1 Lite",
+          "date": "2026-03-31",
+          "tier": "minor",
+          "description": "Google's most cost-effective video generation model, available in paid preview via the Gemini API and Google AI Studio.",
+          "url": "https://blog.google/innovation-and-ai/technology/ai/veo-3-1-lite/"
         }
       ]
     },
