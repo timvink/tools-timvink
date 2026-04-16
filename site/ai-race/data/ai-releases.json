@@ -428,6 +428,13 @@
           "tier": "minor",
           "description": "Google's most cost-effective video generation model, available in paid preview via the Gemini API and Google AI Studio.",
           "url": "https://blog.google/innovation-and-ai/technology/ai/veo-3-1-lite/"
+        },
+        {
+          "name": "Gemini 3.1 Flash TTS",
+          "date": "2026-04-15",
+          "tier": "minor",
+          "description": "Google's expressive text-to-speech model built on Gemini 3.1 Flash, now available across Google products.",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-tts/"
         }
       ]
     },
