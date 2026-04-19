@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-17",
+  "last_updated": "2026-04-19",
   "companies": [
     {
       "id": "anthropic",
@@ -132,6 +132,13 @@
           "tier": "flagship",
           "description": "Opus-level coding performance at Sonnet pricing. 1M token context window in beta.",
           "url": "https://www.anthropic.com/news/claude-sonnet-4-6"
+        },
+        {
+          "name": "Anthropic: Claude Opus 4.7",
+          "date": "2026-04-16",
+          "tier": "minor",
+          "description": "Opus 4.7 is the next generation of Anthropic's Opus family, built for long-running, asynchronous agents. Building on the coding and agentic strengths of Opus 4.6, it delivers stronger performance on...",
+          "openrouter_id": "anthropic/claude-opus-4.7"
         }
       ]
     },
