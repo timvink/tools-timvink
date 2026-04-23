@@ -62,6 +62,10 @@ SKIP_FRAGMENTS = [
 
 # Regex for dated version suffixes we want to skip, e.g. gpt-4o-2024-11-20
 DATED_SNAPSHOT_RE = re.compile(r"-\d{4}-\d{2}-\d{2}$")
+VERSION_TOKEN_RE = re.compile(r"^\d+(?:\.\d+)*$")
+V_SUFFIX_RE = re.compile(r"^v\d+$")
+NON_SLUG_CHARS_RE = re.compile(r"[^a-z0-9]+")
+TIER_RANK = {"minor": 0, "major": 1, "flagship": 2}
 
 
 def fetch_openrouter_models() -> list[dict]:
@@ -99,6 +103,98 @@ def normalise_name(name: str) -> str:
     name = re.sub(r"[-_]", " ", name)
     name = re.sub(r"\s+", " ", name)
     return name.strip().lower()
+
+
+def display_name(name: str) -> str:
+    """Strip provider prefixes from model names for display consistency."""
+    return name.split(": ", 1)[1].strip() if ": " in name else name.strip()
+
+
+def family_key(name: str) -> str:
+    """Collapse version tokens so nearby family releases can share a tier."""
+    tokens = normalise_name(name).split()
+    family_tokens = [
+        token for token in tokens
+        if not VERSION_TOKEN_RE.fullmatch(token) and not V_SUFFIX_RE.fullmatch(token)
+    ]
+    return " ".join(family_tokens)
+
+
+def build_family_tier_map(company: dict) -> dict[str, str]:
+    """Return the highest seen tier per release family within a company."""
+    families: dict[str, str] = {}
+    for release in company["releases"]:
+        key = family_key(release["name"])
+        if not key:
+            continue
+        tier = release.get("tier", "major")
+        best = families.get(key)
+        if best is None or TIER_RANK.get(tier, 1) > TIER_RANK.get(best, 1):
+            families[key] = tier
+    return families
+
+
+def infer_release_tier(company_id: str, name: str, model_id: str, family_tiers: dict[str, str]) -> str:
+    """Infer a sensible tier for newly discovered releases."""
+    norm = normalise_name(name)
+    family = family_key(name)
+
+    if family and family in family_tiers:
+        return family_tiers[family]
+
+    minor_markers = ("chat", "nano", "lite", "live", "preview", "clip")
+    if any(marker in norm for marker in minor_markers):
+        return "minor"
+
+    if "mini" in norm:
+        return "minor" if company_id == "google" else "major"
+
+    if company_id == "anthropic":
+        if "opus" in norm:
+            return "flagship"
+        if "sonnet" in norm or "haiku" in norm:
+            return "major"
+        if norm.startswith("claude "):
+            return "flagship"
+
+    if company_id == "openai":
+        if "codex" in norm or norm.startswith("o"):
+            return "major"
+        if norm.startswith("gpt"):
+            return "flagship"
+
+    if company_id == "google":
+        if "pro" in norm:
+            return "flagship"
+        if "flash" in norm:
+            return "major"
+
+    if company_id == "xai":
+        if "mini" in norm:
+            return "major"
+        if norm.startswith("grok"):
+            return "flagship"
+
+    slug = model_id.split("/", 1)[-1].lower() if "/" in model_id else model_id.lower()
+    if slug.startswith(("claude", "gpt", "gemini", "grok")):
+        return "major"
+    return "minor"
+
+
+def slugify_release_name(name: str) -> str:
+    slug = NON_SLUG_CHARS_RE.sub("-", display_name(name).lower().replace(".", "-"))
+    return slug.strip("-")
+
+
+def infer_release_url(company_id: str, name: str) -> str | None:
+    """Best-effort official announcement URL for releases with predictable slugs."""
+    if company_id != "anthropic":
+        return None
+
+    slug = slugify_release_name(name)
+    if not slug.startswith("claude-"):
+        return None
+    return f"https://www.anthropic.com/news/{slug}"
 
 
 def collect_known_ids(data: dict) -> set[str]:
@@ -153,6 +249,7 @@ def main() -> int:
     known_ids   = collect_known_ids(data)
     known_names = collect_known_normalised_names(data)
     company_idx = {co["id"]: co for co in data["companies"]}
+    family_tiers = {co["id"]: build_family_tier_map(co) for co in data["companies"]}
 
     added = 0
     for model in models:
@@ -170,7 +267,7 @@ def main() -> int:
             continue
 
         # Human-readable name
-        name = (model.get("name") or _slug.replace("-", " ").title()).strip()
+        name = display_name(model.get("name") or _slug.replace("-", " ").title())
         # Strip leading "Provider: " the API sometimes adds
         norm = normalise_name(name)
 
@@ -198,10 +295,13 @@ def main() -> int:
         new_release = {
             "name":          name,
             "date":          date_str,
-            "tier":          "minor",
+            "tier":          infer_release_tier(company_id, name, model_id, family_tiers.get(company_id, {})),
             "description":   description,
             "openrouter_id": model_id,
         }
+        inferred_url = infer_release_url(company_id, name)
+        if inferred_url:
+            new_release["url"] = inferred_url
 
         company = company_idx.get(company_id)
         if company is None:
@@ -210,6 +310,12 @@ def main() -> int:
         company["releases"].append(new_release)
         known_names.setdefault(company_id, set()).add(norm)
         known_ids.add(model_id)
+        family = family_key(name)
+        if family:
+            tier = new_release["tier"]
+            current = family_tiers.setdefault(company_id, {}).get(family)
+            if current is None or TIER_RANK.get(tier, 1) > TIER_RANK.get(current, 1):
+                family_tiers[company_id][family] = tier
         added += 1
         print(f"  + [{company_id}] {name}  ({date_str})")
 

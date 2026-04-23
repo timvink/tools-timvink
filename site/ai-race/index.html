@@ -345,7 +345,13 @@
 			position: absolute;
 			top: 50%;
 			transform: translate(-50%, -50%);
+			display: block;
+			padding: 0;
+			border: 0;
 			border-radius: 50%;
+			background-clip: padding-box;
+			text-decoration: none;
+			appearance: none;
 			cursor: pointer;
 			z-index: 10;
 			transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -780,6 +786,100 @@
 		});
 	}
 
+	const TIER_RANK = { minor: 0, major: 1, flagship: 2 };
+	const VERSION_TOKEN_RE = /^\d+(?:\.\d+)*$/;
+	const V_SUFFIX_RE = /^v\d+$/;
+
+	function displayName(name) {
+		return name.includes(': ') ? name.split(': ', 2)[1].trim() : name.trim();
+	}
+
+	function normaliseName(name) {
+		return displayName(name)
+			.toLowerCase()
+			.replace(/[-_]/g, ' ')
+			.replace(/\s+/g, ' ')
+			.trim();
+	}
+
+	function familyKey(name) {
+		return normaliseName(name)
+			.split(' ')
+			.filter(token => token && !VERSION_TOKEN_RE.test(token) && !V_SUFFIX_RE.test(token))
+			.join(' ');
+	}
+
+	function buildFamilyTierMap(releases) {
+		const familyTiers = new Map();
+		releases.forEach(release => {
+			const key = familyKey(release.name);
+			if (!key) return;
+			const tier = release.tier || 'major';
+			const current = familyTiers.get(key);
+			if (!current || TIER_RANK[tier] > TIER_RANK[current]) {
+				familyTiers.set(key, tier);
+			}
+		});
+		return familyTiers;
+	}
+
+	function inferReleaseTier(release, company, familyTiers) {
+		const currentTier = release.tier || 'major';
+		if (!release.openrouter_id || currentTier !== 'minor') {
+			return currentTier;
+		}
+
+		const familyTier = familyTiers.get(familyKey(release.name));
+		if (familyTier && TIER_RANK[familyTier] > TIER_RANK[currentTier]) {
+			return familyTier;
+		}
+
+		const norm = normaliseName(release.name);
+		if (/\b(chat|nano|lite|live|preview|clip)\b/.test(norm)) {
+			return 'minor';
+		}
+
+		if (/\bmini\b/.test(norm)) {
+			return company.id === 'google' ? 'minor' : 'major';
+		}
+
+		if (company.id === 'anthropic') {
+			if (norm.includes('opus')) return 'flagship';
+			if (norm.includes('sonnet') || norm.includes('haiku')) return 'major';
+			if (norm.startsWith('claude ')) return 'flagship';
+		}
+
+		if (company.id === 'openai') {
+			if (norm.includes('codex') || /^o\d/.test(norm)) return 'major';
+			if (norm.startsWith('gpt')) return 'flagship';
+		}
+
+		if (company.id === 'google') {
+			if (norm.includes('pro')) return 'flagship';
+			if (norm.includes('flash')) return 'major';
+		}
+
+		if (company.id === 'xai') {
+			if (norm.includes('mini')) return 'major';
+			if (norm.startsWith('grok')) return 'flagship';
+		}
+
+		return currentTier;
+	}
+
+	function inferReleaseUrl(release, company) {
+		if (release.url) return release.url;
+		if (company.id !== 'anthropic') return null;
+
+		const slug = displayName(release.name)
+			.toLowerCase()
+			.replace(/\./g, '-')
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/^-+|-+$/g, '');
+
+		return slug.startsWith('claude-') ? `https://www.anthropic.com/news/${slug}` : null;
+	}
+
 	// ── Tooltip ───────────────────────────────────────
 	const tooltip = document.getElementById('tooltip');
 	const ttPip   = document.getElementById('tt-pip');
@@ -795,7 +895,7 @@
 		ttName.textContent      = release.name;
 		ttDate.textContent      = formatDate(release.date);
 		ttDesc.textContent      = release.description || '';
-		ttLink.style.display    = release.url ? 'flex' : 'none';
+		ttLink.style.display    = release.effectiveUrl ? 'flex' : 'none';
 		tooltip.classList.add('visible');
 		tooltip.setAttribute('aria-hidden', 'false');
 		ttActive = true;
@@ -860,8 +960,8 @@
 	// ── Build a release dot ───────────────────────────
 	function buildDot(release, company, isLatest, delay) {
 		const left = dateToPercent(release.date);
-		const dot  = document.createElement('div');
-		dot.className = `release-dot tier-${release.tier || 'major'}${isLatest ? ' is-latest' : ''}`;
+		const dot  = document.createElement(release.effectiveUrl ? 'a' : 'button');
+		dot.className = `release-dot tier-${release.effectiveTier || 'major'}${isLatest ? ' is-latest' : ''}`;
 		dot.style.cssText = [
 			`left: ${left}%`,
 			`background: ${company.color}`,
@@ -869,20 +969,21 @@
 			`--pulse-color: ${company.color}50`,
 			`animation-delay: ${delay}ms`,
 		].join('; ');
-		dot.setAttribute('tabindex', '0');
-		dot.setAttribute('role', 'button');
 		dot.setAttribute('aria-label', `${release.name} — ${formatDate(release.date)}`);
+		if (release.effectiveUrl) {
+			dot.href = release.effectiveUrl;
+			dot.target = '_blank';
+			dot.rel = 'noopener noreferrer';
+		} else {
+			dot.type = 'button';
+		}
 
 		dot.addEventListener('mouseenter', e => showTooltip(e, release, company));
 		dot.addEventListener('mouseleave', hideTooltip);
-		dot.addEventListener('touchstart', e => { e.preventDefault(); showTooltip(e, release, company); }, { passive: false });
+		dot.addEventListener('touchstart', e => showTooltip(e, release, company), { passive: true });
 		dot.addEventListener('touchend', hideTooltip);
 		dot.addEventListener('focus', e => showTooltip(e, release, company));
 		dot.addEventListener('blur', hideTooltip);
-
-		if (release.url) {
-			dot.addEventListener('click', () => window.open(release.url, '_blank', 'noopener'));
-		}
 		return dot;
 	}
 
@@ -937,7 +1038,14 @@
 
 		// Lane rows
 		data.companies.forEach((co, ci) => {
-			const sorted = [...co.releases].sort((a, b) => a.date.localeCompare(b.date));
+			const familyTiers = buildFamilyTierMap(co.releases);
+			const sorted = co.releases
+				.map(release => ({
+					...release,
+					effectiveTier: inferReleaseTier(release, co, familyTiers),
+					effectiveUrl: inferReleaseUrl(release, co),
+				}))
+				.sort((a, b) => a.date.localeCompare(b.date));
 			const latest = sorted[sorted.length - 1];
 
 			const row = document.createElement('div');
