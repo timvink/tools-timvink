@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-22",
+  "last_updated": "2026-04-23",
   "companies": [
     {
       "id": "anthropic",
@@ -308,6 +308,13 @@
           "tier": "major",
           "description": "Frontier reasoning model specialized for life sciences research — drug discovery, genomics analysis, and protein reasoning workflows.",
           "url": "https://openai.com/index/introducing-gpt-rosalind"
+        },
+        {
+          "name": "ChatGPT Images 2.0",
+          "date": "2026-04-21",
+          "tier": "major",
+          "description": "State-of-the-art image generation model with improved text rendering, multilingual support, and advanced visual reasoning.",
+          "url": "https://openai.com/index/introducing-chatgpt-images-2-0"
         }
       ]
     },
