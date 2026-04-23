@@ -315,6 +315,13 @@
           "tier": "major",
           "description": "State-of-the-art image generation model with improved text rendering, multilingual support, and advanced visual reasoning.",
           "url": "https://openai.com/index/introducing-chatgpt-images-2-0"
+        },
+        {
+          "name": "GPT-5.5",
+          "date": "2026-04-23",
+          "tier": "flagship",
+          "description": "OpenAI's smartest model yet — faster and more capable, built for complex tasks like coding, research, and data analysis across tools.",
+          "url": "https://openai.com/index/introducing-gpt-5-5"
         }
       ]
     },
