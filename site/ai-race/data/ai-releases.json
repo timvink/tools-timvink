@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-07",
+  "last_updated": "2026-05-08",
   "companies": [
     {
       "id": "anthropic",
@@ -336,6 +336,13 @@
           "tier": "major",
           "description": "Updated default ChatGPT model with smarter, more accurate answers, reduced hallucinations, and improved personalization controls.",
           "url": "https://openai.com/index/gpt-5-5-instant"
+        },
+        {
+          "name": "GPT-5.5-Cyber",
+          "date": "2026-05-07",
+          "tier": "minor",
+          "description": "Specialized GPT-5.5 variant for cybersecurity, helping verified defenders accelerate vulnerability research and protect critical infrastructure.",
+          "url": "https://openai.com/index/gpt-5-5-with-trusted-access-for-cyber"
         }
       ]
     },
