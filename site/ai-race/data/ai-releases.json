@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-19",
+  "last_updated": "2026-05-20",
   "companies": [
     {
       "id": "anthropic",
@@ -484,6 +484,13 @@
           "tier": "minor",
           "description": "Google's expressive text-to-speech model built on Gemini 3.1 Flash, now available across Google products.",
           "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-tts/"
+        },
+        {
+          "name": "Gemini 3.5",
+          "date": "2026-05-19",
+          "tier": "flagship",
+          "description": "New flagship Gemini series combining frontier intelligence with native agentic action capabilities. Announced at Google I/O 2026.",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/"
         }
       ]
     },
