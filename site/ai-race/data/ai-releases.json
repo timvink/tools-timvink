@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-21",
+  "last_updated": "2026-05-22",
   "companies": [
     {
       "id": "anthropic",
@@ -570,6 +570,13 @@
           "tier": "flagship",
           "description": "Grok 4.3 is a reasoning model from xAI. It accepts text and image inputs with text output, and is suited for agentic workflows, instruction-following tasks, and applications requiring high factual...",
           "openrouter_id": "x-ai/grok-4.3"
+        },
+        {
+          "name": "Grok Build 0.1",
+          "date": "2026-05-20",
+          "tier": "flagship",
+          "description": "Grok Build 0.1 is xAI’s fast coding model trained specifically for agentic software engineering workflows. It supports text and image inputs with text output, and is optimized for interactive coding...",
+          "openrouter_id": "x-ai/grok-build-0.1"
         }
       ]
     }
