@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-30",
+  "last_updated": "2026-05-31",
   "companies": [
     {
       "id": "anthropic",
@@ -139,6 +139,14 @@
           "tier": "minor",
           "description": "Opus 4.7 is the next generation of Anthropic's Opus family, built for long-running, asynchronous agents. Building on the coding and agentic strengths of Opus 4.6, it delivers stronger performance on...",
           "openrouter_id": "anthropic/claude-opus-4.7"
+        },
+        {
+          "name": "Claude Opus 4.8 (Fast)",
+          "date": "2026-05-27",
+          "tier": "flagship",
+          "description": "Fast-mode variant of Opus 4.8 - identical capabilities with higher output speed at 2x pricing relative to regular Opus 4.8.\n\nLearn more in Anthropic's docs: https://platform.claude.com/docs/en/build-with-claude/fast-mode",
+          "openrouter_id": "anthropic/claude-opus-4.8-fast",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8-fast"
         }
       ]
     },
