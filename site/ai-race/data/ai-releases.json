@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-07",
+  "last_updated": "2026-06-10",
   "companies": [
     {
       "id": "anthropic",
@@ -147,6 +147,14 @@
           "description": "Fast-mode variant of Opus 4.8 - identical capabilities with higher output speed at 2x pricing relative to regular Opus 4.8.\n\nLearn more in Anthropic's docs: https://platform.claude.com/docs/en/build-with-claude/fast-mode",
           "openrouter_id": "anthropic/claude-opus-4.8-fast",
           "url": "https://www.anthropic.com/news/claude-opus-4-8-fast"
+        },
+        {
+          "name": "Claude Fable 5",
+          "date": "2026-06-09",
+          "tier": "flagship",
+          "description": "Claude Fable 5 is a Mythos-class model from Anthropic, built for autonomous knowledge work and coding. It supports text, image, and file inputs with text output, with reasoning support and...",
+          "openrouter_id": "anthropic/claude-fable-5",
+          "url": "https://www.anthropic.com/news/claude-fable-5"
         }
       ]
     },
