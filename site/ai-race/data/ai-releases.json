@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-25",
+  "last_updated": "2026-06-27",
   "companies": [
     {
       "id": "anthropic",
@@ -359,6 +359,13 @@
           "tier": "minor",
           "description": "Specialized GPT-5.5 variant for cybersecurity, helping verified defenders accelerate vulnerability research and protect critical infrastructure.",
           "url": "https://openai.com/index/gpt-5-5-with-trusted-access-for-cyber"
+        },
+        {
+          "name": "GPT-5.6 Sol",
+          "date": "2026-06-26",
+          "tier": "flagship",
+          "description": "Next-generation frontier model with stronger capabilities in coding, science, and cybersecurity, paired with OpenAI's most advanced safety stack.",
+          "url": "https://openai.com/index/previewing-gpt-5-6-sol"
         }
       ]
     },
