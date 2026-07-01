@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-28",
+  "last_updated": "2026-07-01",
   "companies": [
     {
       "id": "anthropic",
@@ -155,6 +155,14 @@
           "description": "Claude Fable 5 is a Mythos-class model from Anthropic, built for autonomous knowledge work and coding. It supports text, image, and file inputs with text output, with reasoning support and...",
           "openrouter_id": "anthropic/claude-fable-5",
           "url": "https://www.anthropic.com/news/claude-fable-5"
+        },
+        {
+          "name": "Claude Sonnet 5",
+          "date": "2026-06-30",
+          "tier": "flagship",
+          "description": "Sonnet 5 is Anthropic's most capable Sonnet-class model, with frontier performance across coding, agents, and professional work. It supports adaptive thinking with selectable reasoning effort levels (low, medium, high…",
+          "openrouter_id": "anthropic/claude-sonnet-5",
+          "url": "https://www.anthropic.com/news/claude-sonnet-5"
         }
       ]
     },
