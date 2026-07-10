@@ -376,6 +376,13 @@
           "url": "https://openai.com/index/previewing-gpt-5-6-sol"
         },
         {
+          "name": "GPT-Live",
+          "date": "2026-07-08",
+          "tier": "major",
+          "description": "A new generation of voice models for natural human-AI interaction, now powering ChatGPT Voice.",
+          "url": "https://openai.com/index/introducing-gpt-live"
+        },
+        {
           "name": "GPT-5.6 Luna Pro",
           "date": "2026-07-09",
           "tier": "flagship",
@@ -388,6 +395,13 @@
           "tier": "flagship",
           "description": "GPT-5.6 Terra Pro is the same underlying model as GPT-5.6 Terra, served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks.\n\nLearn more in OpenAI's docs: https://developers.openai.com/api…",
           "openrouter_id": "openai/gpt-5.6-terra-pro"
+        },
+        {
+          "name": "GPT-5.6",
+          "date": "2026-07-09",
+          "tier": "flagship",
+          "description": "OpenAI's frontier model delivering more intelligence per token, stronger performance per dollar, and more capability on demand for the hardest work.",
+          "url": "https://openai.com/index/gpt-5-6"
         }
       ]
     },
