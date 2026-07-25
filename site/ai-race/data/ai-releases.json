@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-22",
+  "last_updated": "2026-07-25",
   "companies": [
     {
       "id": "anthropic",
@@ -163,6 +163,14 @@
           "description": "Sonnet 5 is Anthropic's most capable Sonnet-class model, with frontier performance across coding, agents, and professional work. It supports adaptive thinking with selectable reasoning effort levels (low, medium, high…",
           "openrouter_id": "anthropic/claude-sonnet-5",
           "url": "https://www.anthropic.com/news/claude-sonnet-5"
+        },
+        {
+          "name": "Claude Opus 5 (Fast)",
+          "date": "2026-07-24",
+          "tier": "flagship",
+          "description": "Fast-mode variant of Opus 5 - identical capabilities with higher output speed at 2x pricing relative to regular Opus 5.\n\nLearn more in Anthropic's docs: https://platform.claude.com/docs/en/build-with-claude/fast-mode",
+          "openrouter_id": "anthropic/claude-opus-5-fast",
+          "url": "https://www.anthropic.com/news/claude-opus-5-fast"
         }
       ]
     },
