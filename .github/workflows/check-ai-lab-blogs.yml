@@ -64,7 +64,10 @@ jobs:
                 "allow": ["Edit", "Write"]
               }
             }
-          claude_args: "--max-turns 15"
+          # Pin the model: the action's default drifts over time (it had moved to
+          # claude-opus-5[1m], the priciest option) and this job only classifies
+          # RSS titles, so Sonnet is ample and much cheaper per run.
+          claude_args: "--max-turns 15 --model claude-sonnet-5"
 
       - name: Commit and push if data changed
         id: commit
