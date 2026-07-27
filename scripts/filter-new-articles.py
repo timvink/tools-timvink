@@ -3,6 +3,10 @@
 
 Maintains a list of previously seen URLs in checked-blog-urls.json so that
 only genuinely new articles are sent to the (expensive) LLM for processing.
+
+Also writes tracked-models.json: the compact context the LLM needs (valid
+company ids and the model names already tracked) so it never has to read the
+full ai-releases.json. Dedupe and merging happen in merge-detected-releases.py.
 """
 
 import json
@@ -15,6 +19,9 @@ from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "site" / "ai-race" / "data"
 CHECKED_URLS_FILE = DATA_DIR / "checked-blog-urls.json"
+RELEASES_FILE = DATA_DIR / "ai-releases.json"
+NEW_ARTICLES_FILE = DATA_DIR / "new-articles.json"
+TRACKED_MODELS_FILE = DATA_DIR / "tracked-models.json"
 
 FEEDS = [
     {"source": "OpenAI", "url": "https://openai.com/blog/rss.xml"},
@@ -49,6 +56,22 @@ def fetch_rss_entries(feed_url: str) -> list[dict]:
     return entries
 
 
+def write_tracked_models() -> None:
+    """Write the LLM's context: company ids, names, and already-tracked models."""
+    with open(RELEASES_FILE) as f:
+        data = json.load(f)
+    context = {
+        company["id"]: {
+            "name": company["name"],
+            "tracked_models": [r["name"] for r in company["releases"]],
+        }
+        for company in data["companies"]
+    }
+    with open(TRACKED_MODELS_FILE, "w") as f:
+        json.dump(context, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+
 def main() -> None:
     # Load previously checked URLs
     if CHECKED_URLS_FILE.exists():
@@ -79,9 +102,10 @@ def main() -> None:
         json.dump(updated_checked, f, indent=2)
         f.write("\n")
 
-    # Write new articles for Claude to process
-    with open("site/ai-race/data/new-articles.json", "w") as f:
+    # Write new articles for Claude to process, plus the context it needs
+    with open(NEW_ARTICLES_FILE, "w") as f:
         json.dump(new_articles, f, indent=2)
+    write_tracked_models()
 
     print(f"Found {len(new_articles)} new article(s) to check")
 

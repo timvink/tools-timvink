@@ -1,2 +1,5 @@
 .DS_Store
+# Transient inputs/outputs of the check-ai-lab-blogs workflow
 site/ai-race/data/new-articles.json
+site/ai-race/data/tracked-models.json
+site/ai-race/data/detected-releases.json
