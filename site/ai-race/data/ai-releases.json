@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-28",
+  "last_updated": "2026-07-31",
   "companies": [
     {
       "id": "anthropic",
@@ -147,6 +147,14 @@
           "description": "Fast-mode variant of Opus 4.8 - identical capabilities with higher output speed at 2x pricing relative to regular Opus 4.8.\n\nLearn more in Anthropic's docs: https://platform.claude.com/docs/en/build-with-claude/fast-mode",
           "openrouter_id": "anthropic/claude-opus-4.8-fast",
           "url": "https://www.anthropic.com/news/claude-opus-4-8-fast"
+        },
+        {
+          "name": "Claude Opus 4.8 (batch)",
+          "date": "2026-05-27",
+          "tier": "flagship",
+          "description": "Claude Opus 4.8 is Anthropic's most capable generally available model in the Opus family. It supports text, image, and file inputs with text output, with reasoning support and a 1M-token...",
+          "openrouter_id": "anthropic/claude-opus-4.8:batch",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8-batch"
         },
         {
           "name": "Claude Fable 5",
@@ -551,6 +559,13 @@
           "tier": "minor",
           "description": "Google's expressive text-to-speech model built on Gemini 3.1 Flash, now available across Google products.",
           "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-tts/"
+        },
+        {
+          "name": "Gemini 3.1 Flash Lite (batch)",
+          "date": "2026-05-07",
+          "tier": "minor",
+          "description": "Gemini 3.1 Flash Lite is Google’s GA high-efficiency multimodal model optimized for low-latency, high-volume workloads. It supports text, image, video, audio, and PDF inputs, and is designed for lightweight agentic...",
+          "openrouter_id": "google/gemini-3.1-flash-lite:batch"
         },
         {
           "name": "Gemini 3.5",
