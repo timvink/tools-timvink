@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-04",
+  "last_updated": "2026-08-07",
   "companies": [
     {
       "id": "anthropic",
@@ -179,6 +179,14 @@
           "description": "Fast-mode variant of Opus 5 - identical capabilities with higher output speed at 2x pricing relative to regular Opus 5.\n\nLearn more in Anthropic's docs: https://platform.claude.com/docs/en/build-with-claude/fast-mode",
           "openrouter_id": "anthropic/claude-opus-5-fast",
           "url": "https://www.anthropic.com/news/claude-opus-5-fast"
+        },
+        {
+          "name": "Claude Opus 5 (batch)",
+          "date": "2026-07-24",
+          "tier": "flagship",
+          "description": "Claude Opus 5 is Anthropic’s flagship model for demanding reasoning, coding, and long-horizon agentic work. It is particularly strong at end-to-end software tasks, code review and bug finding, visual analysis...",
+          "openrouter_id": "anthropic/claude-opus-5:batch",
+          "url": "https://www.anthropic.com/news/claude-opus-5-batch"
         }
       ]
     },
