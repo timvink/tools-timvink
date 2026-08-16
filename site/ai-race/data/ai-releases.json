@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-13",
+  "last_updated": "2026-08-16",
   "companies": [
     {
       "id": "anthropic",
@@ -588,6 +588,13 @@
           "tier": "major",
           "description": "Gemini 3.6 Flash is a high-efficiency model from Google for coding, agentic workflows, and web and app development. It is designed to produce polished outputs with fewer unnecessary edits and...",
           "openrouter_id": "google/gemini-3.6-flash"
+        },
+        {
+          "name": "Gemini 3.7 Flash",
+          "date": "2026-08-13",
+          "tier": "major",
+          "description": "Gemini 3.7 Flash is a multimodal model from Google for fast agentic workflows, coding, and complex multi-step reasoning. It is designed for tasks that require responsive performance and reliable multi-step...",
+          "openrouter_id": "google/gemini-3.7-flash"
         }
       ]
     },
