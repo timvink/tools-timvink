@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-01",
+  "last_updated": "2026-09-04",
   "companies": [
     {
       "id": "anthropic",
@@ -187,6 +187,14 @@
           "description": "Claude Opus 5 is Anthropic’s flagship model for demanding reasoning, coding, and long-horizon agentic work. It is particularly strong at end-to-end software tasks, code review and bug finding, visual analysis...",
           "openrouter_id": "anthropic/claude-opus-5:batch",
           "url": "https://www.anthropic.com/news/claude-opus-5-batch"
+        },
+        {
+          "name": "Claude Fable 5.1",
+          "date": "2026-09-01",
+          "tier": "flagship",
+          "description": "Claude Fable 5.1 improves on Claude Fable 5 across the board, with the biggest gains in agentic coding, long-running agentic workflows, and knowledge work: long code refactors, front-end and visual...",
+          "openrouter_id": "anthropic/claude-fable-5.1",
+          "url": "https://www.anthropic.com/news/claude-fable-5-1"
         }
       ]
     },
@@ -595,6 +603,13 @@
           "tier": "major",
           "description": "Gemini 3.7 Flash is a multimodal model from Google for fast agentic workflows, coding, and complex multi-step reasoning. It is designed for tasks that require responsive performance and reliable multi-step...",
           "openrouter_id": "google/gemini-3.7-flash"
+        },
+        {
+          "name": "Gemini 3.8 Flash",
+          "date": "2026-09-02",
+          "tier": "major",
+          "description": "Gemini 3.8 Flash is Google's most intelligent Flash model with significant gains from 3.7 Flash across software engineering, agentic tasks, and multi-step reasoning.",
+          "openrouter_id": "google/gemini-3.8-flash"
         }
       ]
     },
