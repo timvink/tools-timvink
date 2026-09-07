@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-04",
+  "last_updated": "2026-09-07",
   "companies": [
     {
       "id": "anthropic",
@@ -434,6 +434,13 @@
           "tier": "flagship",
           "description": "OpenAI's frontier model delivering more intelligence per token, stronger performance per dollar, and more capability on demand for the hardest work.",
           "url": "https://openai.com/index/gpt-5-6"
+        },
+        {
+          "name": "GPT-6 Astra",
+          "date": "2026-09-04",
+          "tier": "flagship",
+          "description": "GPT-6 Astra is OpenAI's flagship model for demanding end-to-end work. It is suited for advanced analysis, software engineering, deep research, scientific work, and document creation, with particular strengths in long-…",
+          "openrouter_id": "openai/gpt-6-astra"
         }
       ]
     },
