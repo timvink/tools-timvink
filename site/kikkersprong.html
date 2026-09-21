@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Rekenspel op snelheid: help de kikker in 2 minuten zo vaak mogelijk de vijver over. Begint met 7 + 2 en wordt elk level moeilijker, tot 100.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231E8A5F'/%3E%3Ccircle cx='11' cy='12' r='3.2' fill='%23fff'/%3E%3Ccircle cx='21' cy='12' r='3.2' fill='%23fff'/%3E%3Ccircle cx='11' cy='12.6' r='1.5' fill='%2317261D'/%3E%3Ccircle cx='21' cy='12.6' r='1.5' fill='%2317261D'/%3E%3Cpath d='M10 21q6 4 12 0' stroke='%23fff' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>Noams Kikkersprong</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* ---------- reset (standalone) ---------- */
+html{color-scheme:light dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+
+:root{
+  padding-top:env(safe-area-inset-top, 0px);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+}
+
+/* ---------- tokens ---------- */
+:root{
+  --ground:#EEF3EC;
+  --panel:#FFFFFF;
+  --panel-2:#F7FBF6;
+  --ink:#17261D;
+  --muted:#5F7568;
+  --line:#D5E3D6;
+  --ruit:#CBDDE6;
+  --plus:#1E8A5F;
+  --plus-soft:#DCF0E5;
+  --min:#C9661B;
+  --min-soft:#FAE8D6;
+  --goed:#1E8A5F;
+  --fout:#CE3F58;
+  --fout-soft:#FBE2E6;
+  --goud:#D9991F;
+  --water:#BFE4F2;
+  --water-2:#8FCDE6;
+  --blad:#57B36F;
+  --blad-rand:#3C8F54;
+  --lift:0 5px 0 rgba(23,38,29,.12);
+  --lift-klein:0 2px 0 rgba(23,38,29,.12);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1A14;
+    --panel:#17281F;
+    --panel-2:#1D3126;
+    --ink:#E8F2EA;
+    --muted:#9CB5A6;
+    --line:#2C4536;
+    --ruit:#2A4C58;
+    --plus:#4CC28C;
+    --plus-soft:#153A2B;
+    --min:#EFA05C;
+    --min-soft:#3A2617;
+    --goed:#4CC28C;
+    --fout:#F0788C;
+    --fout-soft:#3B1F26;
+    --goud:#F0BF5A;
+    --water:#173F50;
+    --water-2:#1F5568;
+    --blad:#2F7A49;
+    --blad-rand:#48A365;
+    --lift:0 5px 0 rgba(0,0,0,.45);
+    --lift-klein:0 2px 0 rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1A14;
+  --panel:#17281F;
+  --panel-2:#1D3126;
+  --ink:#E8F2EA;
+  --muted:#9CB5A6;
+  --line:#2C4536;
+  --ruit:#2A4C58;
+  --plus:#4CC28C;
+  --plus-soft:#153A2B;
+  --min:#EFA05C;
+  --min-soft:#3A2617;
+  --goed:#4CC28C;
+  --fout:#F0788C;
+  --fout-soft:#3B1F26;
+  --goud:#F0BF5A;
+  --water:#173F50;
+  --water-2:#1F5568;
+  --blad:#2F7A49;
+  --blad-rand:#48A365;
+  --lift:0 5px 0 rgba(0,0,0,.45);
+  --lift-klein:0 2px 0 rgba(0,0,0,.45);
+}
+
+/* ---------- basis ---------- */
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{
+  max-width:560px;
+  margin:0 auto;
+  padding-inline:16px;
+  padding-block:12px 24px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+h1,h2,h3{font-family:"Fredoka","Nunito",sans-serif;font-weight:600;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.5rem,5.5vw,2rem);line-height:1.15}
+h2{font-size:clamp(1.35rem,5vw,1.7rem);line-height:1.2}
+h3{font-size:1.05rem}
+p{margin:0}
+strong{font-weight:800}
+.eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.lead{color:var(--muted);font-size:1rem}
+.hint{color:var(--muted);font-size:.9rem}
+
+/* ---------- kop ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.merknaam{
+  display:flex;align-items:center;gap:8px;
+  font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.05rem;
+}
+.kop-kikker{font-size:1.25rem;line-height:1}
+.meters{display:flex;align-items:center;gap:8px}
+.pil{
+  display:flex;align-items:baseline;gap:5px;
+  background:var(--panel);border:2px solid var(--line);border-radius:999px;
+  padding:4px 11px;box-shadow:var(--lift-klein);
+  font-family:"Fredoka",sans-serif;font-size:1.05rem;font-variant-numeric:tabular-nums;
+}
+.pil small{font-size:.66rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-family:"Nunito",sans-serif}
+.pil.tijd.haast{border-color:var(--fout);color:var(--fout);animation:tik 1s ease-in-out infinite}
+.pil.punten.pop{animation:puntpop .35s ease}
+@keyframes tik{50%{transform:scale(1.07)}}
+@keyframes puntpop{40%{transform:scale(1.16)}}
+
+/* ---------- kaarten ---------- */
+.kaart{
+  background:var(--panel);
+  border:2px solid var(--line);
+  border-radius:20px;
+  padding:clamp(14px,4.5vw,22px);
+  display:flex;flex-direction:column;gap:12px;
+  box-shadow:var(--lift);
+}
+
+/* ---------- knoppen ---------- */
+.btn{
+  font-family:"Nunito",sans-serif;font-weight:800;font-size:1.05rem;
+  border:2px solid transparent;border-radius:14px;padding:13px 20px;min-height:52px;
+  background:var(--plus);color:#fff;box-shadow:var(--lift);cursor:pointer;
+}
+.btn.groot{width:100%;font-size:1.15rem;padding:16px 20px}
+.btn.zacht{background:var(--panel);color:var(--ink);border-color:var(--line)}
+.btn:active{transform:translateY(3px);box-shadow:var(--lift-klein)}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+:where(button):focus-visible{outline:3px solid var(--goud);outline-offset:3px}
+.keuze{display:flex;gap:8px;flex-wrap:wrap}
+.kies{
+  flex:1 1 130px;
+  font-family:"Nunito",sans-serif;font-weight:800;font-size:.95rem;
+  padding:12px 10px;min-height:48px;border-radius:14px;cursor:pointer;
+  background:var(--panel);color:var(--muted);border:2px solid var(--line);
+}
+.kies.aan{background:var(--plus-soft);color:var(--plus);border-color:var(--plus)}
+.tekstknop{
+  background:none;border:0;padding:8px 2px;color:var(--muted);
+  font-family:"Nunito",sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+}
+
+/* ---------- tijdbalk ---------- */
+.tijdbalk{
+  height:10px;border-radius:999px;background:var(--line);overflow:hidden;
+}
+.tijdvul{height:100%;width:100%;background:var(--plus);border-radius:999px}
+.tijdbalk.haast .tijdvul{background:var(--fout)}
+
+/* ---------- de vijver ---------- */
+.vijver{
+  position:relative;
+  height:118px;
+  border:2px solid var(--line);border-radius:18px;overflow:hidden;
+  background:
+    linear-gradient(to bottom, var(--water) 0%, var(--water-2) 100%);
+}
+.golven{
+  position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(to bottom, rgba(255,255,255,.22) 0 2px, transparent 2px 19px);
+  opacity:.45;
+}
+.oever{
+  position:absolute;top:0;bottom:0;width:28px;
+  background:linear-gradient(to bottom, var(--blad) 0%, var(--blad-rand) 100%);
+}
+.oever.links{left:0;border-right:2px solid var(--blad-rand)}
+.oever.rechts{right:0;border-left:2px solid var(--blad-rand)}
+.oever.rechts.doel{box-shadow:inset 0 0 0 3px var(--goud)}
+.bladen{position:absolute;inset:0 24px;display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:22px}
+.blad{
+  position:relative;
+  width:min(13vw,46px);height:min(6.6vw,23px);
+  background:var(--blad);border:2px solid var(--blad-rand);
+  border-radius:999px;
+  box-shadow:0 3px 0 rgba(0,0,0,.14);
+}
+.blad::after{
+  content:"";position:absolute;left:50%;top:50%;width:42%;height:2px;
+  background:var(--blad-rand);transform:translate(-50%,-50%) rotate(14deg);border-radius:2px;opacity:.7;
+}
+.blad.gehad{filter:saturate(.7) brightness(1.06)}
+.vlieg{
+  position:absolute;left:50%;top:-16px;transform:translateX(-50%);
+  font-size:1rem;animation:zoem 1.6s ease-in-out infinite;
+}
+@keyframes zoem{50%{transform:translateX(-50%) translateY(-5px) rotate(12deg)}}
+.kikker{
+  position:absolute;bottom:30px;left:0;
+  font-size:min(9vw,34px);line-height:1;
+  transform:translate(-50%,0);
+  transition:left .38s cubic-bezier(.34,.9,.5,1);
+  z-index:2;
+}
+.kikker.hop{animation:hop .38s ease-out}
+@keyframes hop{
+  0%{transform:translate(-50%,0) scale(1)}
+  45%{transform:translate(-50%,-38px) scale(1.14) rotate(-9deg)}
+  100%{transform:translate(-50%,0) scale(1)}
+}
+.kikker.plons{animation:plons .5s ease}
+@keyframes plons{
+  30%{transform:translate(-50%,7px) scale(.86,.78)}
+  70%{transform:translate(-50%,0) scale(1.04,.98)}
+}
+.rimpel{
+  position:absolute;bottom:26px;width:34px;height:12px;margin-left:-17px;
+  border:2px solid rgba(255,255,255,.85);border-radius:999px;
+  animation:rimpel .7s ease-out forwards;pointer-events:none;
+}
+@keyframes rimpel{
+  0%{transform:scale(.3);opacity:.9}
+  100%{transform:scale(1.9);opacity:0}
+}
+.zwever{
+  position:absolute;bottom:50px;
+  font-family:"Fredoka",sans-serif;font-weight:700;font-size:1.15rem;color:#fff;
+  text-shadow:0 2px 0 rgba(0,0,0,.35);
+  transform:translateX(-50%);pointer-events:none;
+  animation:zweef 1s ease-out forwards;white-space:nowrap;
+}
+@keyframes zweef{
+  0%{opacity:0;transform:translateX(-50%) translateY(6px) scale(.7)}
+  25%{opacity:1}
+  100%{opacity:0;transform:translateX(-50%) translateY(-40px) scale(1.1)}
+}
+.banier{
+  position:absolute;inset:0;display:grid;place-items:center;
+  background:rgba(23,38,29,.45);z-index:3;
+  font-family:"Fredoka",sans-serif;color:#fff;text-align:center;padding:8px;
+}
+.banier b{display:block;font-size:1.4rem;line-height:1.1}
+.banier span{font-size:.92rem;font-family:"Nunito",sans-serif;font-weight:700;opacity:.92}
+.banier.aftel b{font-size:2.6rem}
+
+/* ---------- levelstrip ---------- */
+.strip{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.levelnaam{
+  font-family:"Fredoka",sans-serif;font-size:1rem;
+  display:flex;align-items:center;gap:7px;
+}
+.levelnaam em{font-style:normal;color:var(--muted);font-family:"Nunito",sans-serif;font-weight:700;font-size:.85rem}
+.badge{
+  background:var(--plus);color:#fff;border-radius:8px;padding:2px 8px;
+  font-size:.82rem;font-weight:600;
+}
+.streakje{font-size:.82rem;font-weight:800;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.streakje.vlam{color:var(--goud)}
+
+/* ---------- somveld ---------- */
+.somveld{
+  position:relative;
+  border:2px solid var(--line);border-radius:18px;
+  padding:clamp(14px,4.4vw,24px) 10px;
+  background:
+    repeating-linear-gradient(to right, var(--ruit) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--ruit) 0 1px, transparent 1px 28px),
+    var(--panel-2);
+}
+.som{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+  gap:.06em .24em;
+  font-family:"Fredoka",sans-serif;font-weight:600;
+  font-size:clamp(1.8rem,9vw,3rem);line-height:1.1;min-height:1.2em;
+  font-variant-numeric:tabular-nums;
+}
+.teken{color:var(--muted);font-weight:500}
+.som.op-plus .teken.bewerking{color:var(--plus)}
+.som.op-min .teken.bewerking{color:var(--min)}
+.vak{
+  min-width:2.3em;text-align:center;
+  display:inline-flex;align-items:baseline;justify-content:center;gap:.04em;
+  border-bottom:5px solid var(--line);padding:0 .1em;
+}
+.som.op-plus .vak{border-bottom-color:var(--plus)}
+.som.op-min .vak{border-bottom-color:var(--min)}
+.som.is-goed .vak{border-bottom-color:var(--goed);color:var(--goed)}
+.som.is-fout .vak{border-bottom-color:var(--fout);color:var(--fout)}
+.caret{
+  display:inline-block;width:.09em;height:.82em;background:currentColor;opacity:.45;
+  animation:knipper 1.1s steps(1) infinite;
+}
+@keyframes knipper{50%{opacity:0}}
+.schud{animation:schud .35s ease}
+@keyframes schud{
+  20%{transform:translateX(-7px)}
+  50%{transform:translateX(6px)}
+  80%{transform:translateX(-3px)}
+}
+.melding{
+  min-height:1.6em;text-align:center;font-weight:800;font-size:.98rem;color:var(--muted);
+}
+.melding.is-goed{color:var(--goed)}
+.melding.is-fout{color:var(--fout)}
+
+/* ---------- numpad ---------- */
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.toets{
+  font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.6rem;
+  min-height:clamp(48px,7.6vh,58px);border-radius:14px;cursor:pointer;
+  background:var(--panel);color:var(--ink);border:2px solid var(--line);
+  box-shadow:var(--lift);font-variant-numeric:tabular-nums;
+  -webkit-tap-highlight-color:transparent;
+}
+.toets:active{transform:translateY(3px);box-shadow:var(--lift-klein)}
+.toets:disabled{opacity:.4;cursor:default;transform:none}
+.toets.wis{font-family:"Nunito",sans-serif;font-weight:800;font-size:1rem}
+.toets.hop{
+  font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.25rem;
+  background:var(--plus);color:#fff;border-color:transparent;
+}
+.onderbalk{display:flex;justify-content:center}
+
+/* ---------- laddertje op startscherm ---------- */
+.ladder{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ladder li{
+  display:flex;align-items:center;gap:9px;
+  background:var(--panel-2);border:2px solid var(--line);border-radius:12px;padding:7px 10px;
+  font-size:.92rem;
+}
+.ladder b{font-family:"Fredoka",sans-serif;font-weight:600}
+.ladder .vb{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:700}
+.nr{
+  width:22px;height:22px;flex:none;border-radius:7px;background:var(--plus-soft);color:var(--plus);
+  display:grid;place-items:center;font-weight:800;font-size:.78rem;
+}
+
+/* ---------- eind ---------- */
+.stats{
+  list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+}
+.stats li{
+  background:var(--panel-2);border:2px solid var(--line);border-radius:14px;
+  padding:10px 8px;text-align:center;display:flex;flex-direction:column;gap:2px;
+}
+.stats span{
+  font-family:"Fredoka",sans-serif;font-size:1.35rem;font-weight:600;font-variant-numeric:tabular-nums;
+}
+.stats small{font-size:.7rem;color:var(--muted);font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.scorekaart{
+  display:flex;align-items:baseline;justify-content:center;gap:10px;
+  background:var(--plus-soft);border:2px solid var(--plus);border-radius:16px;padding:12px;
+}
+.scorekaart b{font-family:"Fredoka",sans-serif;font-weight:700;font-size:2.6rem;color:var(--plus);font-variant-numeric:tabular-nums}
+.scorekaart small{font-weight:800;color:var(--plus);text-transform:uppercase;letter-spacing:.06em;font-size:.72rem}
+.foutenlijst{
+  list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;font-variant-numeric:tabular-nums;
+}
+.foutenlijst li{
+  background:var(--fout-soft);color:var(--ink);border-radius:10px;padding:6px 10px;
+  font-family:"Fredoka",sans-serif;font-size:1rem;
+}
+.blok{display:flex;flex-direction:column;gap:9px}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="merknaam"><span class="kop-kikker" aria-hidden="true">🐸</span> Noams Kikkersprong</div>
+  <div class="meters" id="meters" hidden>
+    <div class="pil tijd" id="pilTijd"><span id="tijdTekst">2:00</span><small>tijd</small></div>
+    <div class="pil punten" id="pilPunten"><span id="puntenTekst">0</span><small>punten</small></div>
+  </div>
+</header>
+
+<main>
+
+<!-- ---------- start ---------- -->
+<section class="kaart" id="startScherm">
+  <p class="eyebrow">Rekenen op snelheid · tot 100</p>
+  <h1>Hoe vaak komt de kikker de vijver over?</h1>
+  <p class="lead">Elke som die je goed hebt, springt de kikker een blad verder. Ben je aan de overkant? Dan is het <strong>een level moeilijker</strong>. Hoe sneller je antwoordt, hoe meer punten je krijgt — en op een blad met een <strong>vlieg 🪰</strong> tellen de punten dubbel.</p>
+  <ol class="ladder" id="ladder"></ol>
+  <div class="keuze" role="group" aria-label="Kies hoe lang je speelt">
+    <button class="kies" data-duur="60">⏱️ 1 minuut</button>
+    <button class="kies aan" data-duur="120">⏱️ 2 minuten</button>
+  </div>
+  <button class="btn groot" id="startBtn">Start de sprong →</button>
+  <p class="hint" id="recordRegel"></p>
+</section>
+
+<!-- ---------- spelen ---------- -->
+<section class="kaart" id="speelScherm" hidden>
+  <div class="tijdbalk" id="tijdbalk" aria-hidden="true"><div class="tijdvul" id="tijdvul"></div></div>
+
+  <div class="vijver" id="vijver">
+    <div class="golven" aria-hidden="true"></div>
+    <div class="oever links" aria-hidden="true"></div>
+    <div class="oever rechts" id="oeverRechts" aria-hidden="true"></div>
+    <div class="bladen" id="bladen" aria-hidden="true"></div>
+    <div class="kikker" id="kikker" aria-hidden="true">🐸</div>
+    <div class="banier aftel" id="banier" hidden><b id="banierKop">3</b><span id="banierRegel"></span></div>
+  </div>
+
+  <div class="strip">
+    <div class="levelnaam"><span class="badge" id="levelBadge">Level 1</span> <b id="levelTitel">Plons</b> <em id="levelUitleg"></em></div>
+    <div class="streakje" id="streakje">0 op rij</div>
+  </div>
+
+  <div class="somveld">
+    <div class="som op-plus" id="som"></div>
+  </div>
+
+  <p class="melding" id="melding" role="status" aria-live="polite"></p>
+
+  <div class="numpad" id="numpad">
+    <button class="toets" data-toets="1">1</button>
+    <button class="toets" data-toets="2">2</button>
+    <button class="toets" data-toets="3">3</button>
+    <button class="toets" data-toets="4">4</button>
+    <button class="toets" data-toets="5">5</button>
+    <button class="toets" data-toets="6">6</button>
+    <button class="toets" data-toets="7">7</button>
+    <button class="toets" data-toets="8">8</button>
+    <button class="toets" data-toets="9">9</button>
+    <button class="toets wis" data-toets="wis">← wis</button>
+    <button class="toets" data-toets="0">0</button>
+    <button class="toets hop" data-toets="hop">Hop!</button>
+  </div>
+
+  <div class="onderbalk"><button class="tekstknop" id="stopBtn">stoppen</button></div>
+</section>
+
+<!-- ---------- klaar ---------- -->
+<section class="kaart" id="eindScherm" hidden>
+  <p class="eyebrow" id="eindEyebrow">Tijd om!</p>
+  <h2 id="eindTitel">Goed gesprongen!</h2>
+  <div class="scorekaart"><b id="eindPunten">0</b><small>punten</small></div>
+  <p class="lead" id="eindRegel"></p>
+  <ul class="stats">
+    <li><span id="statOver">0</span><small>oversteken</small></li>
+    <li><span id="statGoed">0</span><small>goed</small></li>
+    <li><span id="statLevel">1</span><small>level</small></li>
+  </ul>
+  <p class="hint" id="eindRecord"></p>
+  <div class="blok" id="foutenBlok" hidden>
+    <h3>Deze waren lastig</h3>
+    <ul class="foutenlijst" id="foutenlijst"></ul>
+  </div>
+  <button class="btn groot" id="opnieuwBtn">Nog een keer →</button>
+</section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SLEUTEL = "noam-kikkersprong-v1";
+  var BLADEN  = 5;          /* bladen tussen de oevers */
+  var STAPPEN = BLADEN + 1; /* zoveel goede sommen = een oversteek */
+  var TEKEN   = {"+":"+", "-":"−"};
+
+  var el = {};
+  ["meters","pilTijd","pilPunten","tijdTekst","puntenTekst","tijdbalk","tijdvul",
+   "startScherm","speelScherm","eindScherm","ladder","startBtn","recordRegel",
+   "vijver","bladen","kikker","banier","banierKop","banierRegel","oeverRechts",
+   "levelBadge","levelTitel","levelUitleg","streakje","som","melding","numpad","stopBtn",
+   "eindEyebrow","eindTitel","eindPunten","eindRegel","statOver","statGoed","statLevel",
+   "eindRecord","foutenBlok","foutenlijst","opnieuwBtn"].forEach(function(id){
+    el[id] = document.getElementById(id);
+  });
+
+  /* ---------- sommen per level ---------- */
+  function rnd(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+  function munt(){ return Math.random() < 0.5; }
+
+  function plus(a, b){ return { a:a, b:b, op:"+", antwoord:a + b }; }
+  function min(a, b){ return { a:a, b:b, op:"-", antwoord:a - b }; }
+
+  var NIVEAUS = [
+    {
+      titel:"Plons", uitleg:"plussen tot 10", voorbeeld:"7 + 2",
+      maak:function(){ var a = rnd(1,8); return plus(a, rnd(1, 9 - a)); }
+    },
+    {
+      titel:"Heen en terug", uitleg:"plus en min tot 10", voorbeeld:"9 − 4",
+      maak:function(){
+        if (munt()){ var a = rnd(1,8); return plus(a, rnd(1, 9 - a)); }
+        var c = rnd(5,10); return min(c, rnd(1, c - 1));
+      }
+    },
+    {
+      titel:"Voorbij de tien", uitleg:"er komt een tiental bij", voorbeeld:"24 + 5",
+      maak:function(){
+        var a, e;
+        if (munt()){
+          do { a = rnd(11,84); e = a % 10; } while (e > 8);
+          return plus(a, rnd(1, 9 - e));
+        }
+        do { a = rnd(13,89); e = a % 10; } while (e < 2);
+        return min(a, rnd(1, e));
+      }
+    },
+    {
+      titel:"Hele tientallen", uitleg:"met ronde getallen", voorbeeld:"40 + 60",
+      maak:function(){
+        if (munt()){ var t = rnd(1,9); return plus(t * 10, rnd(1, 10 - t) * 10); }
+        var c = rnd(3,10); return min(c * 10, rnd(1, c - 1) * 10);
+      }
+    },
+    {
+      titel:"Over de tien", uitleg:"springen over het tiental", voorbeeld:"17 + 6",
+      maak:function(){
+        var a, e, keus = rnd(1,3);
+        if (keus === 1){ a = rnd(3,9); return plus(a, rnd(11 - a, 9)); }
+        if (keus === 2){
+          do { a = rnd(11,88); e = a % 10; } while (e === 0 || a + (10 - e) > 99);
+          return plus(a, rnd(10 - e, Math.min(9, 99 - a)));
+        }
+        do { a = rnd(12,99); e = a % 10; } while (e > 7);
+        return min(a, rnd(e + 1, 9));
+      }
+    },
+    {
+      titel:"Grote sprongen", uitleg:"twee grote getallen", voorbeeld:"24 + 36",
+      maak:function(){
+        var a, b, i;
+        if (munt()){
+          for (i = 0; i < 40; i++){
+            a = rnd(13,78); b = rnd(13, 100 - a);
+            if ((a % 10) + (b % 10) >= 10) return plus(a, b);
+          }
+          return plus(a, b);
+        }
+        for (i = 0; i < 40; i++){
+          a = rnd(31,99); b = rnd(12, a - 10);
+          if ((b % 10) > (a % 10)) return min(a, b);
+        }
+        return min(a, b);
+      }
+    },
+    {
+      titel:"Kikkerkoning", uitleg:"alles door elkaar, ook met een leeg vakje", voorbeeld:"60 + ? = 100",
+      maak:function(){
+        if (Math.random() < 0.4){
+          var a = rnd(11,89);
+          var t = Math.random() < 0.5 ? 100 : (Math.floor(a / 10) + rnd(1,3)) * 10;
+          if (t > 100) t = 100;
+          if (t <= a) t = 100;
+          return { a:a, op:"+", totaal:t, mis:true, antwoord:t - a };
+        }
+        return NIVEAUS[5].maak();
+      }
+    }
+  ];
+
+  var s = null;
+  var tikker = null;
+
+  /* ---------- schermen ---------- */
+  function toon(naam){
+    el.startScherm.hidden = naam !== "start";
+    el.speelScherm.hidden = naam !== "speel";
+    el.eindScherm.hidden  = naam !== "eind";
+    el.meters.hidden      = naam !== "speel";
+  }
+
+  function tijdTekst(ms){
+    var t = Math.max(0, Math.ceil(ms / 1000));
+    return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0");
+  }
+
+  /* ---------- opslag ---------- */
+  function leesRecords(){
+    try {
+      var r = JSON.parse(localStorage.getItem(SLEUTEL));
+      return (r && typeof r === "object") ? r : {};
+    } catch (e){ return {}; }
+  }
+  function schrijfRecords(r){
+    try { localStorage.setItem(SLEUTEL, JSON.stringify(r)); } catch (e){}
+  }
+  function record(duur){ return leesRecords()[String(duur)] || null; }
+
+  function duurTekst(d){
+    if (d % 60 !== 0) return d + " seconden";
+    var m = d / 60;
+    return m === 1 ? "1 minuut" : m + " minuten";
+  }
+
+  function toonRecordRegel(){
+    var r = record(duur);
+    el.recordRegel.textContent = r
+      ? "Jouw record bij " + duurTekst(duur) + ": " +
+        r.punten + " punten, " + r.oversteken + " keer overgestoken."
+      : "Nog geen record — deze ronde telt!";
+  }
+
+  /* ---------- startscherm ---------- */
+  var duur = 120;
+
+  el.ladder.innerHTML = NIVEAUS.map(function(n, i){
+    return '<li><span class="nr">' + (i + 1) + "</span><b>" + n.titel + "</b>" +
+           '<span class="vb">' + n.voorbeeld + "</span></li>";
+  }).join("");
+
+  /* ---------- vijver tekenen ---------- */
+  function bouwVijver(){
+    el.bladen.innerHTML = "";
+    for (var i = 0; i < BLADEN; i++){
+      var b = document.createElement("div");
+      b.className = "blad";
+      el.bladen.appendChild(b);
+    }
+  }
+
+  function plek(stap){
+    /* stap 0 = linkeroever, 1..BLADEN = bladen, STAPPEN = rechteroever */
+    var vr = el.vijver.getBoundingClientRect();
+    if (stap <= 0) return 15;
+    if (stap >= STAPPEN) return vr.width - 15;
+    var blad = el.bladen.children[stap - 1];
+    if (!blad) return vr.width / 2;
+    var br = blad.getBoundingClientRect();
+    return br.left - vr.left + br.width / 2;
+  }
+
+  function zetKikker(stap, springen){
+    el.kikker.style.left = plek(stap) + "px";
+    if (springen){
+      el.kikker.classList.remove("hop");
+      void el.kikker.offsetWidth;
+      el.kikker.classList.add("hop");
+      setTimeout(function(){ rimpel(stap); }, 330);
+    }
+  }
+
+  function rimpel(stap){
+    var r = document.createElement("div");
+    r.className = "rimpel";
+    r.style.left = plek(stap) + "px";
+    el.vijver.appendChild(r);
+    setTimeout(function(){ r.remove(); }, 720);
+  }
+
+  function zwever(stap, tekst){
+    var z = document.createElement("div");
+    z.className = "zwever";
+    z.textContent = tekst;
+    z.style.left = plek(stap) + "px";
+    el.vijver.appendChild(z);
+    setTimeout(function(){ z.remove(); }, 1020);
+  }
+
+  function zetVlieg(){
+    var kinderen = el.bladen.children, i;
+    for (i = 0; i < kinderen.length; i++){
+      kinderen[i].classList.remove("gehad");
+      var oud = kinderen[i].querySelector(".vlieg");
+      if (oud) oud.remove();
+    }
+    s.vliegStap = rnd(1, BLADEN);
+    var v = document.createElement("span");
+    v.className = "vlieg";
+    v.textContent = "🪰";
+    kinderen[s.vliegStap - 1].appendChild(v);
+  }
+
+  function banier(kop, regel, ms, aftelStijl){
+    el.banier.className = "banier" + (aftelStijl ? " aftel" : "");
+    el.banierKop.textContent = kop;
+    el.banierRegel.textContent = regel || "";
+    el.banier.hidden = false;
+    if (ms) setTimeout(function(){ el.banier.hidden = true; }, ms);
+  }
+
+  /* ---------- level ---------- */
+  function toonLevel(){
+    var n = NIVEAUS[s.level];
+    el.levelBadge.textContent = "Level " + (s.level + 1);
+    el.levelTitel.textContent = n.titel;
+    el.levelUitleg.textContent = n.uitleg;
+  }
+
+  /* ---------- ronde ---------- */
+  function startRonde(){
+    s = {
+      punten:0, goed:0, mis:0, streak:0, besteStreak:0,
+      level:0, stap:0, oversteken:0, foutenNu:0, hoogsteLevel:0,
+      invoer:"", fase:"wacht", vraagStart:0, vliegStap:0,
+      fouten:[], laatsteSleutel:"", eindTijd:0, som:null
+    };
+    el.puntenTekst.textContent = "0";
+    el.tijdTekst.textContent = tijdTekst(duur * 1000);
+    el.tijdvul.style.width = "100%";
+    el.tijdbalk.classList.remove("haast");
+    el.pilTijd.classList.remove("haast");
+    el.melding.textContent = "";
+    el.melding.className = "melding";
+    toon("speel");
+    bouwVijver();
+    toonLevel();
+    werkStreakBij();
+    requestAnimationFrame(function(){
+      zetVlieg();
+      zetKikker(0, false);
+      aftellen();
+    });
+  }
+
+  function aftellen(){
+    var stappen = ["3", "2", "1", "Hop!"], i = 0;
+    zetToetsen(true);
+    banier(stappen[0], "klaar?", 0, true);
+    var id = setInterval(function(){
+      i++;
+      if (i < stappen.length){
+        el.banierKop.textContent = stappen[i];
+        el.banierRegel.textContent = i === stappen.length - 1 ? "" : "klaar?";
+      } else {
+        clearInterval(id);
+        el.banier.hidden = true;
+        zetToetsen(false);
+        s.eindTijd = Date.now() + duur * 1000;
+        startKlok();
+        nieuweSom();
+      }
+    }, 650);
+  }
+
+  function startKlok(){
+    if (tikker) clearInterval(tikker);
+    tikker = setInterval(function(){
+      var over = s.eindTijd - Date.now();
+      el.tijdTekst.textContent = tijdTekst(over);
+      el.tijdvul.style.width = Math.max(0, (over / (duur * 1000)) * 100) + "%";
+      var haast = over <= 20000;
+      el.tijdbalk.classList.toggle("haast", haast);
+      el.pilTijd.classList.toggle("haast", haast);
+      if (over <= 0) stopRonde(true);
+    }, 100);
+  }
+
+  function stopRonde(klaar){
+    if (tikker){ clearInterval(tikker); tikker = null; }
+    if (klaar) eindScherm();
+    else { toonRecordRegel(); toon("start"); }
+  }
+
+  /* ---------- som tonen ---------- */
+  function nieuweSom(){
+    if (!s || el.speelScherm.hidden) return;
+    var maak = NIVEAUS[s.level].maak, som, sleutel, i;
+    for (i = 0; i < 25; i++){
+      som = maak();
+      sleutel = som.a + som.op + (som.mis ? "?" + som.totaal : som.b);
+      if (sleutel !== s.laatsteSleutel) break;
+    }
+    s.laatsteSleutel = sleutel;
+    s.som = som;
+    s.invoer = "";
+    s.fase = "invoer";
+    s.vraagStart = Date.now();
+
+    var html = '<span class="getal">' + som.a + "</span>" +
+               '<span class="teken bewerking">' + TEKEN[som.op] + "</span>";
+    if (som.mis){
+      html += '<span class="vak" id="vak"><span id="invoer"></span><span class="caret" id="caret"></span></span>' +
+              '<span class="teken">=</span><span class="getal">' + som.totaal + "</span>";
+    } else {
+      html += '<span class="getal">' + som.b + "</span>" +
+              '<span class="teken">=</span>' +
+              '<span class="vak" id="vak"><span id="invoer"></span><span class="caret" id="caret"></span></span>';
+    }
+    el.som.className = "som " + (som.op === "+" ? "op-plus" : "op-min");
+    el.som.innerHTML = html;
+    el.vak = document.getElementById("vak");
+    el.invoer = document.getElementById("invoer");
+    el.caret = document.getElementById("caret");
+    el.vak.setAttribute("aria-label", "Antwoord");
+    el.melding.textContent = "";
+    el.melding.className = "melding";
+    zetToetsen(false);
+    tekenInvoer();
+  }
+
+  function tekenInvoer(){
+    if (!el.invoer) return;
+    el.invoer.textContent = s.invoer;
+    el.caret.hidden = s.fase !== "invoer";
+  }
+
+  function zetToetsen(uit){
+    var toetsen = el.numpad.querySelectorAll(".toets");
+    for (var i = 0; i < toetsen.length; i++) toetsen[i].disabled = uit;
+  }
+
+  function werkStreakBij(){
+    el.streakje.textContent = s.streak + " op rij";
+    el.streakje.classList.toggle("vlam", s.streak >= 3);
+  }
+
+  /* ---------- invoer ---------- */
+  function voegToe(cijfer){
+    if (s.fase !== "invoer") return;
+    if (s.invoer.length >= 3) return;
+    if (s.invoer === "" && cijfer === "0") return;
+    s.invoer += cijfer;
+    tekenInvoer();
+    /* even snel als je bent: zodra er genoeg cijfers staan, springt hij vanzelf */
+    if (s.invoer.length === String(s.som.antwoord).length){
+      setTimeout(function(){
+        if (s.fase === "invoer" && s.invoer.length === String(s.som.antwoord).length) nakijken();
+      }, 130);
+    }
+  }
+
+  function wisCijfer(){
+    if (s.fase !== "invoer") return;
+    s.invoer = s.invoer.slice(0, -1);
+    tekenInvoer();
+  }
+
+  function schud(node){
+    node.classList.remove("schud");
+    void node.offsetWidth;
+    node.classList.add("schud");
+  }
+
+  var JUBELS = ["Hop!", "Yes!", "Raak!", "Goed zo!", "Zoef!", "Top!"];
+
+  function nakijken(){
+    if (s.fase !== "invoer") return;
+    if (s.invoer === ""){ schud(el.vak); return; }
+    s.fase = "na";
+    zetToetsen(true);
+    tekenInvoer();
+
+    if (parseInt(s.invoer, 10) === s.som.antwoord) goedAntwoord();
+    else foutAntwoord();
+  }
+
+  function goedAntwoord(){
+    var sec = (Date.now() - s.vraagStart) / 1000;
+    var snel = sec < 2 ? 10 : sec < 3.5 ? 7 : sec < 6 ? 4 : 0;
+    s.goed++;
+    s.streak++;
+    if (s.streak > s.besteStreak) s.besteStreak = s.streak;
+
+    var punten = (10 + snel + (s.streak >= 3 ? 5 : 0)) * (s.level + 1);
+    var vlieg = (s.stap + 1) === s.vliegStap;
+    if (vlieg) punten *= 2;
+
+    s.punten += punten;
+    el.puntenTekst.textContent = s.punten;
+    el.pilPunten.classList.remove("pop");
+    void el.pilPunten.offsetWidth;
+    el.pilPunten.classList.add("pop");
+
+    el.som.classList.add("is-goed");
+    el.melding.className = "melding is-goed";
+    el.melding.textContent = JUBELS[Math.floor(Math.random() * JUBELS.length)] +
+      (snel === 10 ? " Supersnel!" : "") + (vlieg ? " Vlieg gevangen 🪰" : "");
+
+    var vorige = s.stap;
+    s.stap++;
+    if (vorige >= 1 && el.bladen.children[vorige - 1]) el.bladen.children[vorige - 1].classList.add("gehad");
+    if (vlieg){
+      var v = el.bladen.children[s.vliegStap - 1].querySelector(".vlieg");
+      if (v) v.remove();
+    }
+    zetKikker(s.stap, true);
+    zwever(s.stap, "+" + punten + (vlieg ? " 🪰" : ""));
+    werkStreakBij();
+
+    if (s.stap >= STAPPEN) setTimeout(oversteek, 480);
+    else setTimeout(nieuweSom, 450);
+  }
+
+  function foutAntwoord(){
+    s.mis++;
+    s.streak = 0;
+    s.foutenNu++;
+    if (s.fouten.length < 12) s.fouten.push(s.som);
+    el.som.classList.add("is-fout");
+    el.melding.className = "melding is-fout";
+    el.melding.textContent = "Het was " + s.som.antwoord + ". Volgende!";
+    schud(el.vak);
+    el.kikker.classList.remove("plons");
+    void el.kikker.offsetWidth;
+    el.kikker.classList.add("plons");
+    rimpel(s.stap);
+    werkStreakBij();
+    setTimeout(nieuweSom, 1100);
+  }
+
+  function oversteek(){
+    s.oversteken++;
+    el.oeverRechts.classList.add("doel");
+    var bonus = 25 * (s.level + 1);
+    s.punten += bonus;
+    el.puntenTekst.textContent = s.punten;
+    zwever(STAPPEN, "+" + bonus);
+
+    var omhoog = s.foutenNu <= 2 && s.level < NIVEAUS.length - 1;
+    if (omhoog){
+      s.level++;
+      if (s.level > s.hoogsteLevel) s.hoogsteLevel = s.level;
+    }
+    banier(
+      "Overgestoken! 🎉",
+      omhoog ? "Level " + (s.level + 1) + ": " + NIVEAUS[s.level].titel
+             : "Zelfde level, nog een keer!",
+      1250, false
+    );
+
+    setTimeout(function(){
+      if (!s || el.speelScherm.hidden) return;
+      el.oeverRechts.classList.remove("doel");
+      s.stap = 0;
+      s.foutenNu = 0;
+      toonLevel();
+      zetVlieg();
+      el.kikker.style.transition = "none";
+      zetKikker(0, false);
+      requestAnimationFrame(function(){ el.kikker.style.transition = ""; });
+      nieuweSom();
+    }, 1250);
+  }
+
+  /* ---------- eind ---------- */
+  function eindScherm(){
+    var r = record(duur);
+    var nieuw = !r || s.punten > r.punten;
+
+    el.eindPunten.textContent = s.punten;
+    el.statOver.textContent = s.oversteken;
+    el.statGoed.textContent = s.goed;
+    el.statLevel.textContent = s.level + 1;
+
+    el.eindEyebrow.textContent = nieuw ? "Nieuw record! 🏆" : "Tijd om!";
+    el.eindTitel.textContent =
+      s.oversteken >= 5 ? "Kikkerkoning! 👑" :
+      s.oversteken >= 3 ? "Wat een sprongen!" :
+      s.oversteken >= 1 ? "Goed gesprongen!" : "Lekker geoefend!";
+    el.eindRegel.textContent =
+      s.goed + " sommen goed" + (s.mis ? ", " + s.mis + " mis" : "") +
+      ", langste reeks " + s.besteStreak + " op rij.";
+
+    if (nieuw){
+      var alles = leesRecords();
+      alles[String(duur)] = { punten:s.punten, oversteken:s.oversteken, goed:s.goed, level:s.level + 1 };
+      schrijfRecords(alles);
+      el.eindRecord.textContent = "Dat is je beste ronde van " + duurTekst(duur) + " tot nu toe!";
+    } else {
+      el.eindRecord.textContent = "Je record is " + r.punten + " punten. Nog " + (r.punten - s.punten + 1) + " te gaan!";
+    }
+
+    if (s.fouten.length){
+      el.foutenlijst.innerHTML = s.fouten.map(function(f){
+        return "<li>" + (f.mis
+          ? f.a + " + " + f.antwoord + " = " + f.totaal
+          : f.a + " " + TEKEN[f.op] + " " + f.b + " = " + f.antwoord) + "</li>";
+      }).join("");
+      el.foutenBlok.hidden = false;
+    } else {
+      el.foutenBlok.hidden = true;
+    }
+
+    toon("eind");
+  }
+
+  /* ---------- luisteraars ---------- */
+  var kiesKnoppen = document.querySelectorAll(".kies");
+  for (var k = 0; k < kiesKnoppen.length; k++){
+    kiesKnoppen[k].addEventListener("click", function(){
+      duur = parseInt(this.getAttribute("data-duur"), 10);
+      for (var j = 0; j < kiesKnoppen.length; j++) kiesKnoppen[j].classList.remove("aan");
+      this.classList.add("aan");
+      toonRecordRegel();
+    });
+  }
+
+  el.startBtn.addEventListener("click", startRonde);
+  el.opnieuwBtn.addEventListener("click", function(){ toonRecordRegel(); toon("start"); });
+  el.stopBtn.addEventListener("click", function(){ stopRonde(false); });
+
+  el.numpad.addEventListener("click", function(e){
+    var knop = e.target.closest(".toets");
+    if (!knop || knop.disabled) return;
+    var t = knop.getAttribute("data-toets");
+    if (t === "wis") wisCijfer();
+    else if (t === "hop") nakijken();
+    else voegToe(t);
+  });
+
+  document.addEventListener("keydown", function(e){
+    if (el.speelScherm.hidden || !s) return;
+    if (e.key >= "0" && e.key <= "9" && e.key.length === 1){ voegToe(e.key); e.preventDefault(); }
+    else if (e.key === "Backspace"){ wisCijfer(); e.preventDefault(); }
+    else if (e.key === "Enter" || e.key === " "){ nakijken(); e.preventDefault(); }
+  });
+
+  window.addEventListener("resize", function(){
+    if (!s || el.speelScherm.hidden) return;
+    el.kikker.style.transition = "none";
+    zetKikker(s.stap, false);
+    requestAnimationFrame(function(){ el.kikker.style.transition = ""; });
+  });
+
+  toonRecordRegel();
+})();
+</script>
+</body>
+</html>
