@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Een interactief verhaal in 9 stapjes dat kinderen uitlegt wat een bank is en hoe die geld maakt uit beloftes.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='34%25' cy='28%25'%3E%3Cstop offset='8%25' stop-color='%23ffffff'/%3E%3Cstop offset='40%25' stop-color='%232E9FB5'/%3E%3Cstop offset='100%25' stop-color='%2317667A'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='15' fill='url(%23g)'/%3E%3C/svg%3E">
+<title>Noams Knikkerbank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* ---------- reset (standalone) ---------- */
+html{color-scheme:light dark}
+[hidden]{display:none!important}
+img{max-width:100%}
+:root{
+  padding-top:env(safe-area-inset-top, 0px);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+}
+:root{
+  --ground:#EDF3F9;
+  --panel:#FFFFFF;
+  --panel-2:#F5FAFE;
+  --ink:#14233D;
+  --muted:#5E7292;
+  --line:#D6E2F0;
+  --marble:#2E9FB5;
+  --marble-deep:#17667A;
+  --gold:#E4941F;
+  --gold-soft:#FBEBCF;
+  --rose:#D9485D;
+  --rose-soft:#FBE0E3;
+  --leaf:#358F5F;
+  --leaf-soft:#DDF0E5;
+  --lift:0 5px 0 rgba(20,35,61,.09);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C1523;
+    --panel:#15243A;
+    --panel-2:#1C2F49;
+    --ink:#E8F0FA;
+    --muted:#9DB2CD;
+    --line:#2B3E5C;
+    --marble:#45BCD1;
+    --marble-deep:#1D7B90;
+    --gold:#F3B04D;
+    --gold-soft:#3B3018;
+    --rose:#F0707F;
+    --rose-soft:#3D2027;
+    --leaf:#5BC189;
+    --leaf-soft:#153228;
+    --lift:0 5px 0 rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C1523;
+  --panel:#15243A;
+  --panel-2:#1C2F49;
+  --ink:#E8F0FA;
+  --muted:#9DB2CD;
+  --line:#2B3E5C;
+  --marble:#45BCD1;
+  --marble-deep:#1D7B90;
+  --gold:#F3B04D;
+  --gold-soft:#3B3018;
+  --rose:#F0707F;
+  --rose-soft:#3D2027;
+  --leaf:#5BC189;
+  --leaf-soft:#153228;
+  --lift:0 5px 0 rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:18px;
+  line-height:1.6;
+  padding-inline:16px;
+  padding-block:0 48px;
+}
+.wrap{max-width:720px;margin:0 auto}
+
+/* ---------- header ---------- */
+header.top{
+  position:sticky;
+  top:env(safe-area-inset-top, 0px);
+  z-index:20;
+  background:var(--ground);
+  padding-block:14px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.brand{
+  display:flex;align-items:center;gap:10px;
+  font-family:"Fredoka",system-ui,sans-serif;
+  font-weight:600;font-size:17px;letter-spacing:.2px;
+}
+.brand .knikker{width:20px;height:20px}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dot{
+  flex:1 1 14px;min-width:14px;height:8px;border-radius:99px;
+  background:var(--line);border:none;padding:0;cursor:pointer;
+  transition:background .25s ease;
+}
+.dot[data-state="done"]{background:var(--marble)}
+.dot[data-state="now"]{background:var(--gold)}
+.dot:disabled{cursor:default}
+.dot:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+/* ---------- cards ---------- */
+.step{
+  background:var(--panel);
+  border:2px solid var(--line);
+  border-radius:22px;
+  padding:22px 20px;
+  box-shadow:var(--lift);
+  display:flex;flex-direction:column;gap:16px;
+}
+.eyebrow{
+  font-family:"Fredoka",sans-serif;font-weight:600;
+  font-size:13px;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--marble-deep);
+}
+h1{
+  font-family:"Fredoka",sans-serif;font-weight:700;
+  font-size:clamp(28px,7vw,40px);line-height:1.1;margin:0;
+  text-wrap:balance;
+}
+h2{
+  font-family:"Fredoka",sans-serif;font-weight:600;
+  font-size:clamp(23px,5.5vw,30px);line-height:1.15;margin:0;
+  text-wrap:balance;
+}
+p{margin:0}
+p + p{margin-top:12px}
+strong{font-weight:800}
+.lead{font-size:19px}
+
+/* ---------- stage ---------- */
+.stage{
+  background:var(--panel-2);
+  border:2px dashed var(--line);
+  border-radius:18px;
+  padding:18px 16px;
+  display:flex;flex-direction:column;gap:14px;
+  align-items:center;
+  text-align:center;
+}
+.stage.left{align-items:stretch;text-align:left}
+
+/* ---------- bits ---------- */
+.knikker{
+  width:24px;height:24px;border-radius:50%;
+  background:radial-gradient(circle at 32% 26%, #fff 0 9%, var(--marble) 38%, var(--marble-deep) 100%);
+  box-shadow:inset -2px -3px 5px rgba(0,0,0,.28);
+  display:inline-block;flex:0 0 auto;
+}
+.knikkerrij{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.briefje{
+  background:var(--gold-soft);
+  border:2px solid var(--gold);
+  border-radius:10px;
+  padding:10px 14px;
+  font-family:"Fredoka",sans-serif;font-weight:500;
+  font-size:14px;line-height:1.35;
+  color:var(--ink);
+  box-shadow:2px 3px 0 rgba(0,0,0,.08);
+  text-align:left;
+  max-width:280px;
+}
+.briefje b{display:block;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);}
+.teller{
+  font-family:"Fredoka",sans-serif;font-weight:600;
+  font-variant-numeric:tabular-nums;
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--panel);border:2px solid var(--line);
+  border-radius:99px;padding:6px 14px;font-size:17px;
+}
+.figuur{font-size:34px;line-height:1}
+
+/* ---------- buttons ---------- */
+button{font:inherit;color:inherit}
+.btn{
+  font-family:"Fredoka",sans-serif;font-weight:600;font-size:17px;
+  background:var(--marble);color:#fff;border:none;
+  border-radius:14px;padding:12px 20px;cursor:pointer;
+  box-shadow:0 4px 0 var(--marble-deep);
+  transition:transform .08s ease, box-shadow .08s ease;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--marble-deep)}
+.btn.goud{background:var(--gold);box-shadow:0 4px 0 #A96C0B;color:#20160A}
+.btn.zacht{background:var(--panel);color:var(--ink);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none;transform:none}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.btnrij{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.nav{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:15px}
+
+/* ---------- bubbles ---------- */
+.bubbel{
+  background:var(--panel);border:2px solid var(--line);
+  border-radius:16px;border-bottom-left-radius:4px;
+  padding:12px 14px;max-width:420px;text-align:left;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.bubbel .figuur{flex:0 0 auto}
+.uitkomst{
+  border-radius:14px;padding:12px 14px;font-weight:600;
+  border:2px solid var(--line);background:var(--panel-2);
+  text-align:left;
+}
+.uitkomst.goed{background:var(--leaf-soft);border-color:var(--leaf)}
+.uitkomst.fout{background:var(--rose-soft);border-color:var(--rose)}
+.uitkomst.let-op{background:var(--gold-soft);border-color:var(--gold)}
+
+/* ---------- winkel ---------- */
+.winkel{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
+.waar{
+  flex:1 1 130px;max-width:180px;
+  background:var(--panel);border:2px solid var(--line);border-radius:16px;
+  padding:12px 8px;cursor:pointer;text-align:center;
+  display:flex;flex-direction:column;gap:4px;align-items:center;
+  font-family:"Fredoka",sans-serif;font-weight:500;
+  box-shadow:0 4px 0 var(--line);
+}
+.waar:active{transform:translateY(3px);box-shadow:none}
+.waar .prijs{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.waar[data-bought="1"]{background:var(--leaf-soft);border-color:var(--leaf)}
+.waar:disabled{opacity:.45;cursor:not-allowed}
+.waar:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+/* ---------- kluis ---------- */
+.kluis{
+  width:150px;height:150px;border-radius:20px;
+  background:linear-gradient(160deg,var(--panel-2),var(--line));
+  border:5px solid var(--marble-deep);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  position:relative;
+  box-shadow:inset 0 0 0 4px var(--panel);
+}
+.kluis::after{
+  content:"";position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  width:22px;height:22px;border-radius:50%;
+  border:4px solid var(--marble-deep);
+  background:conic-gradient(var(--marble-deep) 0 25%, transparent 0 50%, var(--marble-deep) 0 75%, transparent 0);
+}
+.kluis .label{font-family:"Fredoka",sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.kluis .getal{font-family:"Fredoka",sans-serif;font-weight:700;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.kluis.leeg{border-color:var(--rose)}
+.kluis.leeg .getal{color:var(--rose)}
+
+/* ---------- balken ---------- */
+.balken{display:flex;flex-direction:column;gap:12px;width:100%}
+.balk-rij{display:flex;flex-direction:column;gap:5px}
+.balk-kop{display:flex;justify-content:space-between;gap:10px;font-size:15px;font-weight:700}
+.balk-kop span:last-child{font-variant-numeric:tabular-nums;color:var(--muted)}
+.spoor{height:22px;background:var(--panel);border:2px solid var(--line);border-radius:99px;overflow:hidden}
+.vul{height:100%;width:0;border-radius:99px;transition:width .45s cubic-bezier(.2,.8,.3,1)}
+.vul.marmer{background:linear-gradient(90deg,var(--marble),var(--marble-deep))}
+.vul.goud{background:linear-gradient(90deg,var(--gold),#C87C09)}
+.vul.blad{background:var(--leaf)}
+.vul.roos{background:var(--rose)}
+
+input[type=range]{width:100%;accent-color:var(--gold);height:32px}
+input[type=range]:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+
+/* ---------- dorpelingen ---------- */
+.rij-mensen{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.mens{
+  width:52px;height:52px;border-radius:14px;
+  border:2px solid var(--line);background:var(--panel);
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  transition:opacity .2s ease, filter .2s ease;
+}
+.mens[data-status="betaald"]{background:var(--leaf-soft);border-color:var(--leaf)}
+.mens[data-status="niks"]{background:var(--rose-soft);border-color:var(--rose);filter:grayscale(1)}
+
+/* ---------- piramide ---------- */
+.piramide{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+.laag{
+  border:2px solid var(--line);border-radius:14px;background:var(--panel);
+  padding:12px 14px;cursor:pointer;text-align:center;width:100%;
+  font-family:"Fredoka",sans-serif;font-weight:600;font-size:17px;
+  box-shadow:0 4px 0 var(--line);
+}
+.laag:nth-child(1){max-width:58%}
+.laag:nth-child(2){max-width:78%}
+.laag:nth-child(3){max-width:100%}
+.laag[data-open="1"]{background:var(--gold-soft);border-color:var(--gold);box-shadow:0 4px 0 var(--gold)}
+.laag small{display:block;font-family:"Nunito",sans-serif;font-weight:400;font-size:15px;color:var(--muted);margin-top:4px}
+.laag:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+@media (max-width:420px){
+  .laag:nth-child(1){max-width:80%}
+  .laag:nth-child(2){max-width:92%}
+}
+
+/* ---------- quiz ---------- */
+.vraag{display:flex;flex-direction:column;gap:10px;width:100%}
+.vraag h3{font-family:"Fredoka",sans-serif;font-weight:600;font-size:19px;margin:0}
+.opties{display:flex;flex-direction:column;gap:8px}
+.optie{
+  text-align:left;background:var(--panel);border:2px solid var(--line);
+  border-radius:14px;padding:11px 14px;cursor:pointer;font-size:17px;
+}
+.optie:hover{border-color:var(--marble)}
+.optie[data-mark="goed"]{background:var(--leaf-soft);border-color:var(--leaf);font-weight:700}
+.optie[data-mark="fout"]{background:var(--rose-soft);border-color:var(--rose)}
+.optie:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+.trofee{text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.trofee .figuur{font-size:56px}
+
+footer{
+  margin-top:26px;color:var(--muted);font-size:14px;text-align:center;
+}
+footer a{color:var(--marble-deep)}
+
+.pulse{animation:pulse .5s ease}
+@keyframes pulse{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.vallen{animation:vallen .5s ease}
+@keyframes vallen{0%{transform:translateY(-18px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="brand"><span class="knikker"></span> Noams Knikkerbank</div>
+  <div class="dots" id="dots" role="tablist" aria-label="Stappen"></div>
+</header>
+
+<main id="main">
+
+<!-- 0 -->
+<section class="step" data-step="0">
+  <div class="eyebrow">Start</div>
+  <h1>Hoi Noam! Wat is een bank eigenlijk?</h1>
+  <p class="lead">Een bank lijkt saai. Een gebouw met een pinautomaat. Maar er zit een <strong>truc</strong> in die bijna niemand kent — en jij gaat hem straks zien gebeuren.</p>
+  <div class="stage">
+    <div class="knikkerrij" id="introKnikkers"></div>
+    <p class="hint">We beginnen in een dorp waar je betaalt met knikkers.</p>
+  </div>
+  <div class="nav"><span class="hint">9 stapjes · klik jezelf erdoorheen</span><button class="btn" data-next>Start →</button></div>
+</section>
+
+<!-- 1 -->
+<section class="step" data-step="1" hidden>
+  <div class="eyebrow">Stap 1 van 9</div>
+  <h2>Eerst was er nog geen geld</h2>
+  <p>Je hebt <strong>10 appels</strong>. Je wilt heel graag een step. Dus je moet iemand vinden die een step heeft <em>én</em> die appels wil. Vraag maar rond.</p>
+  <div class="stage">
+    <div class="bubbel" id="ruilBubbel"><span class="figuur">🙋</span><span>Klik op de knop en vraag het aan een dorpsgenoot.</span></div>
+    <button class="btn" id="ruilBtn">Vraag het aan iemand →</button>
+    <div class="hint" id="ruilTeller">0 mensen gevraagd</div>
+  </div>
+  <p id="ruilSlot" hidden class="uitkomst let-op">Ruilen is een gepuzzel. Je hebt iets nodig dat <strong>iedereen</strong> aanneemt.</p>
+  <div class="nav"><button class="btn zacht" data-prev>← Terug</button><button class="btn" data-next disabled>Probeer het eerst 👆</button></div>
+</section>
+
+<!-- 2 -->
+<section class="step" data-step="2" hidden>
+  <div class="eyebrow">Stap 2 van 9</div>
+  <h2>Knikkers worden geld</h2>
+  <p>In dit dorp vindt <strong>iedereen</strong> knikkers mooi. Ze gaan nooit stuk, en er zijn er niet zoveel. Dus iedereen wil ze wel hebben — en daarom kun je er álles mee kopen.</p>
+  <p>Dát is geld: <strong>iets wat iedereen van je aanneemt.</strong></p>
+  <div class="stage">
+    <div class="teller"><span class="knikker"></span><span id="portemonnee">100</span> knikkers</div>
+    <div class="winkel">
+      <button class="waar" data-prijs="2"><span class="figuur">🥖</span>brood<span class="prijs">2 knikkers</span></button>
+      <button class="waar" data-prijs="30"><span class="figuur">🛴</span>step<span class="prijs">30 knikkers</span></button>
+      <button class="waar" data-prijs="60"><span class="figuur">🐄</span>koe<span class="prijs">60 knikkers</span></button>
+    </div>
+    <div class="hint" id="koopHint">Koop maar iets. Niemand zegt nee tegen knikkers.</div>
+  </div>
+  <div class="nav"><button class="btn zacht" data-prev>← Terug</button><button class="btn" data-next disabled>Koop eerst iets 👆</button></div>
+</section>
+
+<!-- 3 -->
+<section class="step" data-step="3" hidden>
+  <div class="eyebrow">Stap 3 van 9</div>
+  <h2>Waar laat je 100 knikkers?</h2>
+  <p>Knikkers zijn zwaar. En onder je bed kan iemand ze pakken. Gelukkig heeft <strong>vrouw Vera</strong> een enorme kluis van staal. Zij bewaart ze voor je.</p>
+  <div class="stage">
+    <div class="kluis" id="kluis3"><span class="label">Kluis van Vera</span><span class="getal" id="kluis3Getal">0</span><span class="label">knikkers</span></div>
+    <button class="btn" id="stortBtn">Stop je knikkers in de kluis</button>
+    <div id="briefje3" hidden class="briefje vallen"><b>Briefje van Vera</b>Goed voor <strong>100 knikkers</strong>. Kom maar langs, dan krijg je ze terug. — V.</div>
+  </div>
+  <p id="slot3" hidden class="uitkomst">Je knikkers zijn weg… maar je hebt een <strong>belofte</strong> op papier terug. Onthoud dat woord: belofte.</p>
+  <div class="nav"><button class="btn zacht" data-prev>← Terug</button><button class="btn" data-next disabled>Stort eerst 👆</button></div>
+</section>
+
+<!-- 4 -->
+<section class="step" data-step="4" hidden>
+  <div class="eyebrow">Stap 4 van 9</div>
+  <h2>En toen werd het briefje zelf geld</h2>
+  <p>Oma verkoopt een step voor 30 knikkers. Je kunt naar de kluis lopen en 30 knikkers gaan sjouwen. Of je geeft oma gewoon een briefje van Vera. <strong>Probeer allebei eens.</strong></p>
+  <div class="stage">
+    <div class="btnrij">
+      <button class="btn zacht" id="sjouwBtn">🥵 Sjouw 30 knikkers</button>
+      <button class="btn goud" id="briefBtn">📜 Geef het briefje</button>
+    </div>
+    <div class="spoor" style="width:100%;max-width:320px"><div class="vul marmer" id="sjouwBalk"></div></div>
+    <div class="uitkomst" id="uitkomst4">Oma wacht rustig af.</div>
+  </div>
+  <p id="slot4" hidden class="uitkomst goed">Oma vertrouwt Vera ook. Dus het briefje is nu <strong>net zo goed als knikkers</strong> — en veel lichter. Bijna niemand haalt de echte knikkers nog op.</p>
+  <div class="nav"><button class="btn zacht" data-prev>← Terug</button><button class="btn" data-next disabled>Probeer het eerst 👆</button></div>
+</section>
+
+<!-- 5 -->
+<section class="step" data-step="5" hidden>
+  <div class="eyebrow">Stap 5 van 9 · de truc</div>
+  <h2>Vera ontdekt iets geks</h2>
+  <p>In haar kluis liggen nu <strong>1000 knikkers</strong> van het hele dorp. En elke dag komt er bijna niemand ze ophalen. Ze liggen daar maar… te liggen.</p>
+  <p>Ondertussen heeft de boer <em>nu</em> zaden nodig. Vera kan hem gewoon een nieuw briefje geven. <strong>Schuif maar hoeveel Vera uitleent.</strong></p>
+  <div class="stage left">
+    <input type="range" id="leenSlider" min="0" max="1000" step="100" value="300" aria-label="Hoeveel briefjes leent Vera uit">
+    <div class="balken">
+      <div class="balk-rij">
+        <div class="balk-kop"><span>Echte knikkers in de kluis</span><span id="b5kluis">1000</span></div>
+        <div class="spoor"><div class="vul marmer" id="v5kluis" style="width:50%"></div></div>
+      </div>
+      <div class="balk-rij">
+        <div class="balk-kop"><span>Briefjes in het dorp</span><span id="b5brief">1300</span></div>
+        <div class="spoor"><div class="vul goud" id="v5brief"></div></div>
+      </div>
+    </div>
+    <div class="uitkomst" id="uitkomst5"></div>
+  </div>
+  <p class="uitkomst let-op">Kijk goed: de knikkers blijven hetzelfde. Maar er is <strong>meer geld</strong> in het dorp. Zo maakt een bank geld: niet van knikkers, maar van <strong>beloftes</strong>.</p>
+  <div class="nav"><button class="btn zacht" data-prev>← Terug</button><button class="btn" data-next disabled>Schuif eerst 👆</button></div>
+</section>
+
+<!-- 6 -->
+<section class="step" data-step="6" hidden>
+  <div class="eyebrow">Stap 6 van 9</div>
+  <h2>Waarom doet Vera dat? Rente</h2>
+  <p>De boer leent 100 briefjes. Na een jaar heeft hij geoogst en geeft hij er <strong>110</strong> terug. Die 10 extra heet <strong>rente</strong>.</p>
+  <div class="stage left">
+    <div class="balken">
+      <div class="balk-rij"><div class="balk-kop"><span>🧑‍🌾 boer leent</span><span>100</span></div><div class="spoor"><div class="vul marmer" id="v6a"></div></div></div>
+      <div class="balk-rij"><div class="balk-kop"><span>🧑‍🌾 boer betaalt terug</span><span>110</span></div><div class="spoor"><div class="vul goud" id="v6b"></div></div></div>
+      <div class="balk-rij"><div class="balk-kop"><span>👦 jouw deel van de rente</span><span id="b6c">0</span></div><div class="spoor"><div class="vul blad" id="v6c"></div></div></div>
+    </div>
+    <button class="btn" id="jaarBtn">⏳ Laat een jaar voorbijgaan</button>
+  </div>
+  <p id="slot6" hidden class="uitkomst goed">Van die 10 rente krijg jij er <strong>3</strong>, omdat jouw knikkers in de kluis liggen. De andere 7 houdt Vera. Daarom wil een bank jouw geld graag bewaren — ze wil er iets mee dóén.</p>
+  <div class="nav"><button class="btn zacht" data-prev>← Terug</button><button class="btn" data-next disabled>Laat eerst een jaar voorbijgaan 👆</button></div>
+</section>
+
+<!-- 7 -->
+<section class="step" data-step="7" hidden>
+  <div class="eyebrow">Stap 7 van 9 · paniek</div>
+  <h2>Wat als iedereen tegelijk komt?</h2>
+  <p>Vera werd overmoedig: er zijn nu <strong>2000 briefjes</strong> in het dorp, maar nog steeds maar <strong>1000 knikkers</strong> in de kluis. Op een dag fluistert iemand het door. Iedereen rent naar de bank.</p>
+  <div class="stage">
+    <div class="kluis" id="kluis7"><span class="label">Kluis van Vera</span><span class="getal" id="kluis7Getal">1000</span><span class="label">knikkers</span></div>
+    <div class="rij-mensen" id="rij7"></div>
+    <button class="btn" id="runBtn">Volgende dorpeling wil 200 knikkers →</button>
+    <div class="uitkomst" id="uitkomst7">Er staan 10 mensen in de rij. Elk wil 200 knikkers terug.</div>
+  </div>
+  <p id="slot7" hidden class="uitkomst fout">Dit heet een <strong>bankrun</strong>. En het gekke is: Vera is niet arm! De boer betaalt heus terug — maar pas ná de oogst. Ze <em>heeft</em> het geld wel, alleen niet <strong>nu</strong>.</p>
+  <div class="nav"><button class="btn zacht" data-prev>← Terug</button><button class="btn" data-next disabled>Help de mensen eerst 👆</button></div>
+</section>
+
+<!-- 8 -->
+<section class="step" data-step="8" hidden>
+  <div class="eyebrow">Stap 8 van 9</div>
+  <h2>De bank van de banken</h2>
+  <p>Daarom bedachten ze iets: een <strong>bank voor de banken</strong>. Die heeft een reuzenkluis en leent bliksemsnel uit als er paniek is. <strong>Klik op elke laag.</strong></p>
+  <div class="stage">
+    <div class="piramide" id="piramide">
+      <button class="laag" data-uitleg="Dit is de Centrale Bank. In Nederland: de ECB. Zij kan altijd bijspringen — daarom durft iedereen z'n geld op de bank te laten staan.">🏛️ De Grote Bank</button>
+      <button class="laag" data-uitleg="Gewone banken: Vera, de ING, de Rabobank. Zij lenen jouw geld uit aan mensen die nu een huis of zaden nodig hebben.">🏦 De banken</button>
+      <button class="laag" data-uitleg="Jij, oma, de boer. Jullie geld is eigenlijk een belofte van de bank: een getal op een scherm dat je altijd kunt opeisen.">👦 Jij en het dorp</button>
+    </div>
+    <div class="uitkomst" id="uitkomst8">Klik op een laag om te zien wat er gebeurt.</div>
+  </div>
+  <p id="slot8" hidden class="uitkomst goed">Het mooiste: zodra iedereen <em>weet</em> dat hij z'n geld kan krijgen, wil bijna niemand het nog hebben. De paniek stopt vanzelf.</p>
+  <div class="nav"><button class="btn zacht" data-prev>← Terug</button><button class="btn" data-next disabled>Klik alle drie 👆</button></div>
+</section>
+
+<!-- 9 -->
+<section class="step" data-step="9" hidden>
+  <div class="eyebrow">Stap 9 van 9</div>
+  <h2>En de knikkers dan?</h2>
+  <p>Die zijn er niet meer. Echt waar. Je kunt bij geen enkele bank ter wereld je euro's inruilen voor goud of knikkers. Er ligt <strong>niets</strong> onder.</p>
+  <p>Geld is vandaag één grote afspraak: <strong>we vertrouwen erop dat het werkt.</strong> Zolang iedereen dat doet, werkt het ook. Best knap, toch?</p>
+  <div class="stage left">
+    <div class="vraag" id="quiz"></div>
+  </div>
+  <div id="trofee" hidden class="trofee">
+    <span class="figuur">🏆</span>
+    <h2>Je snapt nu hoe een bank werkt</h2>
+    <p>Meer dan de meeste volwassenen, Noam. Vraag maar eens aan papa of hij weet waar de knikkers liggen.</p>
+    <button class="btn zacht" id="opnieuwBtn">Nog een keer vanaf het begin</button>
+  </div>
+  <div class="nav"><button class="btn zacht" data-prev>← Terug</button><span class="hint" id="quizStand">0 van 4 goed</span></div>
+</section>
+
+</main>
+
+<footer>
+  Voor de grote mensen: dit verhaal volgt de hiërarchie van geld uit
+  <a href="https://gregorygundersen.com/blog/2026/09/20/hierarchy-of-money/">The Hierarchy of Money</a> van Gregory Gundersen.
+</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var stappen = Array.prototype.slice.call(document.querySelectorAll(".step"));
+  var dots = document.getElementById("dots");
+  var nu = 0;
+  var klaar = {};
+
+  /* ---- navigatie ---- */
+  stappen.forEach(function(s, i){
+    var d = document.createElement("button");
+    d.className = "dot";
+    d.setAttribute("role","tab");
+    d.setAttribute("aria-label","Stap " + i);
+    d.addEventListener("click", function(){ if(i <= hoogsteBereikt) ga(i); });
+    dots.appendChild(d);
+  });
+  var hoogsteBereikt = 0;
+
+  function tekenDots(){
+    Array.prototype.forEach.call(dots.children, function(d, i){
+      d.dataset.state = i === nu ? "now" : (i < nu || i <= hoogsteBereikt && klaar[i] ? "done" : "");
+      d.disabled = i > hoogsteBereikt;
+    });
+  }
+
+  function ga(i){
+    if(i < 0 || i >= stappen.length) return;
+    stappen[nu].hidden = true;
+    nu = i;
+    hoogsteBereikt = Math.max(hoogsteBereikt, i);
+    stappen[nu].hidden = false;
+    tekenDots();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.addEventListener("click", function(e){
+    var t = e.target.closest("[data-next],[data-prev]");
+    if(!t) return;
+    ga(t.hasAttribute("data-next") ? nu + 1 : nu - 1);
+  });
+
+  function ontgrendel(stap, label){
+    klaar[stap] = true;
+    var knop = stappen[stap].querySelector("[data-next]");
+    if(knop){ knop.disabled = false; knop.textContent = (label || "Volgende") + " →"; }
+    tekenDots();
+  }
+
+  /* ---- 0: knikkers ---- */
+  var intro = document.getElementById("introKnikkers");
+  for(var k = 0; k < 24; k++){
+    var b = document.createElement("span");
+    b.className = "knikker";
+    intro.appendChild(b);
+  }
+
+  /* ---- 1: ruilen ---- */
+  var antwoorden = [
+    ["🧑‍🌾", "Een step? Nee joh. Ik heb alleen koeien. Wil jij een koe?"],
+    ["👵", "Ik heb wél een step! Maar appels hoef ik niet, ik wil wol."],
+    ["🧒", "Appels! Lekker! Maar ik heb geen step, alleen knikkers."],
+    ["🧔", "Sorry, ik heb net appels gekregen van je buurman."]
+  ];
+  var ruilN = 0;
+  document.getElementById("ruilBtn").addEventListener("click", function(){
+    var a = antwoorden[ruilN % antwoorden.length];
+    var bub = document.getElementById("ruilBubbel");
+    bub.innerHTML = '<span class="figuur">' + a[0] + '</span><span>' + a[1] + '</span>';
+    bub.classList.remove("vallen"); void bub.offsetWidth; bub.classList.add("vallen");
+    ruilN++;
+    document.getElementById("ruilTeller").textContent = ruilN + (ruilN === 1 ? " persoon gevraagd" : " mensen gevraagd");
+    if(ruilN >= 3){
+      document.getElementById("ruilSlot").hidden = false;
+      ontgrendel(1, "Gelukkig zijn er knikkers");
+    }
+  });
+
+  /* ---- 2: winkel ---- */
+  var saldo = 100;
+  var portemonnee = document.getElementById("portemonnee");
+  document.querySelectorAll(".waar").forEach(function(w){
+    w.addEventListener("click", function(){
+      var prijs = +w.dataset.prijs;
+      if(prijs > saldo){
+        document.getElementById("koopHint").textContent = "Te duur! Je hebt nog maar " + saldo + " knikkers.";
+        return;
+      }
+      saldo -= prijs;
+      portemonnee.textContent = saldo;
+      portemonnee.parentNode.classList.remove("pulse"); void portemonnee.offsetWidth;
+      portemonnee.parentNode.classList.add("pulse");
+      w.dataset.bought = "1";
+      document.getElementById("koopHint").textContent = "Gekocht! Zonder gedoe. Niemand vroeg wat je nog meer had.";
+      ontgrendel(2, "Waar laat je de rest?");
+    });
+  });
+
+  /* ---- 3: kluis ---- */
+  document.getElementById("stortBtn").addEventListener("click", function(){
+    var getal = document.getElementById("kluis3Getal");
+    var n = 0;
+    var tik = setInterval(function(){
+      n += 5;
+      if(n >= 100){ n = 100; clearInterval(tik); }
+      getal.textContent = n;
+    }, 25);
+    document.getElementById("briefje3").hidden = false;
+    document.getElementById("slot3").hidden = false;
+    this.disabled = true;
+    ontgrendel(3, "En nu?");
+  });
+
+  /* ---- 4: sjouwen vs briefje ---- */
+  var gedaan4 = {};
+  var uit4 = document.getElementById("uitkomst4");
+  document.getElementById("sjouwBtn").addEventListener("click", function(){
+    var balk = document.getElementById("sjouwBalk");
+    var p = 0;
+    this.disabled = true;
+    uit4.className = "uitkomst";
+    uit4.textContent = "Je loopt naar de kluis… pff… 30 knikkers wegen best wat…";
+    var tik = setInterval(function(){
+      p += 4;
+      balk.style.width = p + "%";
+      if(p >= 100){
+        clearInterval(tik);
+        uit4.className = "uitkomst let-op";
+        uit4.textContent = "Gelukt! Maar het duurde eeuwen en je armen doen zeer.";
+        check4("sjouw");
+      }
+    }, 90);
+  });
+  document.getElementById("briefBtn").addEventListener("click", function(){
+    uit4.className = "uitkomst goed";
+    uit4.innerHTML = "Oma pakt het briefje aan: <em>“Prima, ik vertrouw Vera ook.”</em> Klaar in één seconde.";
+    this.disabled = true;
+    check4("brief");
+  });
+  function check4(wat){
+    gedaan4[wat] = true;
+    if(gedaan4.brief){
+      document.getElementById("slot4").hidden = false;
+      ontgrendel(4, "Nu de truc");
+    }
+  }
+
+  /* ---- 5: geldschepping ---- */
+  var slider = document.getElementById("leenSlider");
+  var geschoven = false;
+  function teken5(){
+    var uit = +slider.value;
+    var brief = 1000 + uit;
+    document.getElementById("b5brief").textContent = brief;
+    document.getElementById("v5brief").style.width = (brief / 2000 * 100) + "%";
+    document.getElementById("v5kluis").style.width = "50%";
+    var u = document.getElementById("uitkomst5");
+    if(uit === 0){
+      u.className = "uitkomst";
+      u.innerHTML = "Vera leent niets uit. Veilig — maar de boer krijgt geen zaden en het dorp groeit niet.";
+    } else if(uit <= 400){
+      u.className = "uitkomst goed";
+      u.innerHTML = "Er zijn nu <strong>" + brief + " briefjes</strong> en maar 1000 knikkers. Toch veilig: zoveel mensen komen nooit tegelijk langs.";
+    } else if(uit <= 700){
+      u.className = "uitkomst let-op";
+      u.innerHTML = "<strong>" + brief + " briefjes</strong>, 1000 knikkers. Spannend… Vera moet hopen dat het rustig blijft.";
+    } else {
+      u.className = "uitkomst fout";
+      u.innerHTML = "<strong>" + brief + " briefjes</strong> en maar 1000 knikkers! Als één op de twee mensen langskomt, is de kluis leeg.";
+    }
+    if(!geschoven && startGedaan){ geschoven = true; ontgrendel(5, "Waarom doet ze dit?"); }
+  }
+  var startGedaan = false;
+  teken5();
+  startGedaan = true;
+  slider.addEventListener("input", teken5);
+
+  /* ---- 6: rente ---- */
+  document.getElementById("jaarBtn").addEventListener("click", function(){
+    this.disabled = true;
+    document.getElementById("v6a").style.width = "91%";
+    setTimeout(function(){ document.getElementById("v6b").style.width = "100%"; }, 500);
+    setTimeout(function(){
+      document.getElementById("v6c").style.width = "27%";
+      document.getElementById("b6c").textContent = "3";
+      document.getElementById("slot6").hidden = false;
+      ontgrendel(6, "Maar dan gaat het mis");
+    }, 1100);
+  });
+
+  /* ---- 7: bankrun ---- */
+  var rij = document.getElementById("rij7");
+  var gezichten = ["👵","🧑‍🌾","🧒","🧔","👩","👴","🧑‍🍳","👦","👩‍🌾","🧑"];
+  gezichten.forEach(function(g){
+    var m = document.createElement("div");
+    m.className = "mens";
+    m.textContent = g;
+    rij.appendChild(m);
+  });
+  var kluis7 = 1000, beurt = 0;
+  document.getElementById("runBtn").addEventListener("click", function(){
+    var m = rij.children[beurt];
+    var uit = document.getElementById("uitkomst7");
+    var kluisEl = document.getElementById("kluis7");
+    if(kluis7 >= 200){
+      kluis7 -= 200;
+      m.dataset.status = "betaald";
+      uit.className = "uitkomst goed";
+      uit.textContent = "Alsjeblieft, 200 knikkers. Nog " + kluis7 + " over in de kluis.";
+    } else if(kluis7 > 0){
+      m.dataset.status = "niks";
+      uit.className = "uitkomst fout";
+      uit.textContent = "Er zijn er nog maar " + kluis7 + "… en die wil hij ook. Daarna is de kluis léég.";
+      kluis7 = 0;
+    } else {
+      m.dataset.status = "niks";
+      uit.className = "uitkomst fout";
+      uit.textContent = "“Sorry, ik heb niets meer.” De kluis is leeg en er staan nog mensen in de rij.";
+    }
+    document.getElementById("kluis7Getal").textContent = kluis7;
+    if(kluis7 === 0) kluisEl.classList.add("leeg");
+    beurt++;
+    if(beurt >= rij.children.length){
+      this.disabled = true;
+      this.textContent = "De rij is op";
+    }
+    if(beurt >= 6){
+      document.getElementById("slot7").hidden = false;
+      ontgrendel(7, "Wie helpt Vera?");
+    }
+  });
+
+  /* ---- 8: piramide ---- */
+  var geopend = 0;
+  document.querySelectorAll(".laag").forEach(function(l){
+    l.addEventListener("click", function(){
+      document.getElementById("uitkomst8").textContent = l.dataset.uitleg;
+      if(l.dataset.open !== "1"){
+        l.dataset.open = "1";
+        geopend++;
+        if(geopend === 3){
+          document.getElementById("slot8").hidden = false;
+          ontgrendel(8, "Nog één ding");
+        }
+      }
+    });
+  });
+
+  /* ---- 9: quiz ---- */
+  var vragen = [
+    { v: "Wat is geld eigenlijk?",
+      o: ["Papier met mooie plaatjes erop", "Iets wat iedereen van je aanneemt", "Alleen munten van metaal"], g: 1 },
+    { v: "Wat doet een bank met het geld in haar kluis?",
+      o: ["Ze laat het gewoon liggen", "Ze koopt er snoep van", "Ze leent het uit aan mensen die het nu nodig hebben"], g: 2 },
+    { v: "Waarom kan een bank in de problemen komen als iedereen tegelijk z'n geld wil?",
+      o: ["Omdat het geld is uitgeleend en nog niet terug is", "Omdat de bank arm is", "Omdat de kluis kapot gaat"], g: 0 },
+    { v: "Waar is ons geld vandaag op gebouwd?",
+      o: ["Op goud in een kelder", "Op knikkers", "Op vertrouwen"], g: 2 }
+  ];
+  var goed = 0, beantwoord = 0;
+  var quiz = document.getElementById("quiz");
+  vragen.forEach(function(q, i){
+    var blok = document.createElement("div");
+    blok.className = "vraag";
+    var h = document.createElement("h3");
+    h.textContent = (i + 1) + ". " + q.v;
+    blok.appendChild(h);
+    var lijst = document.createElement("div");
+    lijst.className = "opties";
+    q.o.forEach(function(tekst, j){
+      var knop = document.createElement("button");
+      knop.className = "optie";
+      knop.textContent = tekst;
+      knop.addEventListener("click", function(){
+        if(blok.dataset.done === "1") return;
+        blok.dataset.done = "1";
+        beantwoord++;
+        if(j === q.g){ goed++; knop.dataset.mark = "goed"; }
+        else {
+          knop.dataset.mark = "fout";
+          lijst.children[q.g].dataset.mark = "goed";
+        }
+        document.getElementById("quizStand").textContent = goed + " van 4 goed";
+        if(beantwoord === vragen.length && goed >= 3){
+          document.getElementById("trofee").hidden = false;
+        }
+      });
+      lijst.appendChild(knop);
+    });
+    blok.appendChild(lijst);
+    quiz.appendChild(blok);
+  });
+
+  document.getElementById("opnieuwBtn").addEventListener("click", function(){
+    window.location.reload();
+  });
+
+  tekenDots();
+})();
+</script>
+</body>
+</html>
