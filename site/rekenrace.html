@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Tien moeilijke plus- en minsommen tot 100, altijd over het tiental heen. Met splitshulp, sterren en een eigen record.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231E8A5F'/%3E%3Cpath d='M16 9v14M9 16h14' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>Noams Rekenrace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* ---------- reset (standalone) ---------- */
+html{color-scheme:light dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+:root{
+  padding-top:env(safe-area-inset-top, 0px);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+}
+
+/* ---------- tokens ---------- */
+:root{
+  --ground:#EEF3EC;
+  --panel:#FFFFFF;
+  --panel-2:#F7FBF6;
+  --ink:#17261D;
+  --muted:#5F7568;
+  --line:#D5E3D6;
+  --ruit:#CBDDE6;
+  --plus:#1E8A5F;
+  --plus-soft:#DCF0E5;
+  --min:#C9661B;
+  --min-soft:#FAE8D6;
+  --goed:#1E8A5F;
+  --goed-soft:#DCF0E5;
+  --fout:#CE3F58;
+  --fout-soft:#FBE2E6;
+  --goud:#D9991F;
+  --lift:0 5px 0 rgba(23,38,29,.12);
+  --lift-klein:0 2px 0 rgba(23,38,29,.12);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1A14;
+    --panel:#17281F;
+    --panel-2:#1D3126;
+    --ink:#E8F2EA;
+    --muted:#9CB5A6;
+    --line:#2C4536;
+    --ruit:#2A4C58;
+    --plus:#4CC28C;
+    --plus-soft:#153A2B;
+    --min:#EFA05C;
+    --min-soft:#3A2617;
+    --goed:#4CC28C;
+    --goed-soft:#153A2B;
+    --fout:#F0788C;
+    --fout-soft:#3B1F26;
+    --goud:#F0BF5A;
+    --lift:0 5px 0 rgba(0,0,0,.45);
+    --lift-klein:0 2px 0 rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1A14;
+  --panel:#17281F;
+  --panel-2:#1D3126;
+  --ink:#E8F2EA;
+  --muted:#9CB5A6;
+  --line:#2C4536;
+  --ruit:#2A4C58;
+  --plus:#4CC28C;
+  --plus-soft:#153A2B;
+  --min:#EFA05C;
+  --min-soft:#3A2617;
+  --goed:#4CC28C;
+  --goed-soft:#153A2B;
+  --fout:#F0788C;
+  --fout-soft:#3B1F26;
+  --goud:#F0BF5A;
+  --lift:0 5px 0 rgba(0,0,0,.45);
+  --lift-klein:0 2px 0 rgba(0,0,0,.45);
+}
+
+/* ---------- basis ---------- */
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{
+  max-width:560px;
+  margin:0 auto;
+  padding-inline:16px;
+  padding-block:14px 28px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+h1,h2,h3{font-family:"Fredoka", "Nunito", sans-serif;font-weight:600;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.5rem,5.5vw,2rem);line-height:1.15}
+h2{font-size:clamp(1.35rem,5vw,1.7rem);line-height:1.2}
+h3{font-size:1.05rem}
+p{margin:0}
+strong{font-weight:800}
+.eyebrow{
+  font-size:.72rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);
+}
+.lead{color:var(--muted);font-size:1rem}
+.hint{color:var(--muted);font-size:.9rem}
+
+/* ---------- kop ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.merknaam{
+  display:flex;align-items:center;gap:8px;
+  font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.05rem;
+}
+.teken-badge{
+  width:26px;height:26px;border-radius:8px;background:var(--plus);color:#fff;
+  display:grid;place-items:center;font-size:1rem;line-height:1;box-shadow:var(--lift-klein);
+}
+.voortgang{display:flex;align-items:center;gap:10px}
+.dots{display:flex;gap:4px}
+.dot{width:12px;height:12px;border-radius:4px;background:var(--line)}
+.dot.nu{background:var(--panel);box-shadow:inset 0 0 0 3px var(--goud)}
+.dot.goed{background:var(--goed)}
+.dot.fout{background:var(--fout)}
+.streakje{
+  font-size:.78rem;font-weight:800;color:var(--muted);
+  white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+.streakje.vlam{color:var(--goud)}
+
+/* ---------- kaarten ---------- */
+.kaart{
+  background:var(--panel);
+  border:2px solid var(--line);
+  border-radius:20px;
+  padding:clamp(16px,4.5vw,24px);
+  display:flex;flex-direction:column;gap:14px;
+  box-shadow:var(--lift);
+}
+
+/* ---------- knoppen ---------- */
+.btn{
+  font-family:"Nunito",sans-serif;font-weight:800;font-size:1.05rem;
+  border:2px solid transparent;border-radius:14px;padding:13px 20px;min-height:52px;
+  background:var(--plus);color:#fff;box-shadow:var(--lift);cursor:pointer;
+}
+.btn.groot{width:100%;font-size:1.15rem;padding:17px 20px}
+.btn.zacht{background:var(--panel);color:var(--ink);border-color:var(--line)}
+.btn:active{transform:translateY(3px);box-shadow:var(--lift-klein)}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+:where(button):focus-visible{outline:3px solid var(--goud);outline-offset:3px}
+
+.keuze{display:flex;gap:8px;flex-wrap:wrap}
+.kies{
+  flex:1 1 120px;
+  font-family:"Nunito",sans-serif;font-weight:800;font-size:.95rem;
+  padding:12px 10px;min-height:48px;border-radius:14px;cursor:pointer;
+  background:var(--panel);color:var(--muted);border:2px solid var(--line);
+}
+.kies.aan{background:var(--plus-soft);color:var(--plus);border-color:var(--plus)}
+
+/* ---------- somveld ---------- */
+.somveld{
+  position:relative;overflow:hidden;
+  border:2px solid var(--line);border-radius:18px;
+  padding:clamp(20px,6vw,34px) 10px;
+  background:
+    repeating-linear-gradient(to right, var(--ruit) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--ruit) 0 1px, transparent 1px 28px),
+    var(--panel-2);
+}
+.som{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+  gap:.06em .26em;
+  font-family:"Fredoka",sans-serif;font-weight:600;
+  font-size:clamp(1.9rem,9.5vw,3.2rem);line-height:1.1;
+  font-variant-numeric:tabular-nums;
+}
+.teken{color:var(--muted);font-weight:500}
+.som.op-plus .teken.bewerking{color:var(--plus)}
+.som.op-min .teken.bewerking{color:var(--min)}
+.vak{
+  min-width:2.4em;text-align:center;
+  display:inline-flex;align-items:baseline;justify-content:center;gap:.04em;
+  border-bottom:5px solid var(--line);
+  padding:0 .1em;
+}
+.som.op-plus .vak{border-bottom-color:var(--plus)}
+.som.op-min .vak{border-bottom-color:var(--min)}
+.som.is-goed .vak{border-bottom-color:var(--goed);color:var(--goed)}
+.som.is-fout .vak{border-bottom-color:var(--fout);color:var(--fout)}
+.caret{
+  display:inline-block;width:.09em;height:.85em;background:currentColor;opacity:.45;
+  animation:knipper 1.1s steps(1) infinite;
+}
+@keyframes knipper{50%{opacity:0}}
+.schud{animation:schud .35s ease}
+@keyframes schud{
+  20%{transform:translateX(-7px)}
+  50%{transform:translateX(6px)}
+  80%{transform:translateX(-3px)}
+}
+.sterretjes{position:absolute;inset:0;pointer-events:none}
+.ster{
+  position:absolute;bottom:18%;color:var(--goud);font-size:1.3rem;
+  animation:vlieg .95s ease-out forwards;
+}
+@keyframes vlieg{
+  0%{transform:translate(0,0) scale(.4);opacity:0}
+  25%{opacity:1}
+  100%{transform:translate(var(--dx,0), -120px) scale(1.15) rotate(35deg);opacity:0}
+}
+
+/* ---------- melding ---------- */
+.melding{min-height:2.6em;display:flex;flex-direction:column;gap:6px;justify-content:center}
+.melding .kop{font-family:"Fredoka",sans-serif;font-size:1.15rem;font-weight:600}
+.melding.is-goed .kop{color:var(--goed)}
+.melding.is-fout .kop{color:var(--fout)}
+.stappen{
+  font-variant-numeric:tabular-nums;font-size:.98rem;color:var(--muted);
+  background:var(--panel-2);border:2px solid var(--line);border-radius:12px;
+  padding:10px 12px;
+}
+.stappen b{color:var(--ink)}
+
+/* ---------- numpad ---------- */
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.toets{
+  font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.65rem;
+  min-height:58px;border-radius:14px;cursor:pointer;
+  background:var(--panel);color:var(--ink);border:2px solid var(--line);
+  box-shadow:var(--lift);font-variant-numeric:tabular-nums;
+}
+.toets:active{transform:translateY(3px);box-shadow:var(--lift-klein)}
+.toets:disabled{opacity:.4;cursor:default;transform:none}
+.toets.wis{font-family:"Nunito",sans-serif;font-weight:800;font-size:1rem}
+.toets.klaar{
+  font-family:"Nunito",sans-serif;font-weight:800;font-size:1.02rem;
+  background:var(--plus);color:#fff;border-color:transparent;
+}
+.onderbalk{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.tekstknop{
+  background:none;border:0;padding:8px 2px;color:var(--muted);
+  font-family:"Nunito",sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+}
+
+/* ---------- eind ---------- */
+.sterrenrij{font-size:1.5rem;letter-spacing:.08em;color:var(--line);line-height:1.2}
+.sterrenrij .vol{color:var(--goud)}
+.stats{
+  list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+}
+.stats li{
+  background:var(--panel-2);border:2px solid var(--line);border-radius:14px;
+  padding:10px 8px;text-align:center;display:flex;flex-direction:column;gap:2px;
+}
+.stats span{
+  font-family:"Fredoka",sans-serif;font-size:1.35rem;font-weight:600;
+  font-variant-numeric:tabular-nums;
+}
+.stats small{font-size:.72rem;color:var(--muted);font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.foutenlijst{
+  list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;
+  font-variant-numeric:tabular-nums;
+}
+.foutenlijst li{
+  background:var(--fout-soft);color:var(--ink);border-radius:10px;padding:6px 10px;
+  font-family:"Fredoka",sans-serif;font-size:1rem;
+}
+.blok{display:flex;flex-direction:column;gap:10px}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="merknaam"><span class="teken-badge" id="merkTeken">+</span> Noams Rekenrace</div>
+  <div class="voortgang" id="voortgang" hidden>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+    <div class="streakje" id="streakje">0 op rij</div>
+  </div>
+</header>
+
+<main>
+
+<!-- ---------- start ---------- -->
+<section class="kaart" id="startScherm">
+  <p class="eyebrow">10 sommen · tot 100</p>
+  <h1>Hoi Noam, klaar voor de rekenrace?</h1>
+  <p class="lead">Elke som gaat <strong>over het tiental heen</strong>. Dus 24 + 36 en 82 &minus; 37 — even echt nadenken dus. Kom je er niet uit? Druk op <strong>Help me even</strong>.</p>
+  <div class="keuze" role="group" aria-label="Kies wat je wilt oefenen">
+    <button class="kies" data-modus="plus">+ Plussommen</button>
+    <button class="kies aan" data-modus="allebei">± Allebei</button>
+    <button class="kies" data-modus="min">&minus; Minsommen</button>
+  </div>
+  <button class="btn groot" id="startBtn">Start de race →</button>
+  <p class="hint" id="recordRegel"></p>
+</section>
+
+<!-- ---------- spelen ---------- -->
+<section class="kaart" id="speelScherm" hidden>
+  <div class="somveld">
+    <div class="som op-plus" id="som">
+      <span class="getal" id="getalA">24</span>
+      <span class="teken bewerking" id="teken">+</span>
+      <span class="getal" id="getalB">36</span>
+      <span class="teken">=</span>
+      <span class="vak" id="vak"><span id="invoer"></span><span class="caret" id="caret"></span></span>
+    </div>
+    <div class="sterretjes" id="sterretjes" aria-hidden="true"></div>
+  </div>
+
+  <div class="melding" id="melding" role="status" aria-live="polite"></div>
+
+  <div class="numpad" id="numpad">
+    <button class="toets" data-toets="1">1</button>
+    <button class="toets" data-toets="2">2</button>
+    <button class="toets" data-toets="3">3</button>
+    <button class="toets" data-toets="4">4</button>
+    <button class="toets" data-toets="5">5</button>
+    <button class="toets" data-toets="6">6</button>
+    <button class="toets" data-toets="7">7</button>
+    <button class="toets" data-toets="8">8</button>
+    <button class="toets" data-toets="9">9</button>
+    <button class="toets wis" data-toets="wis">← wis</button>
+    <button class="toets" data-toets="0">0</button>
+    <button class="toets klaar" data-toets="klaar">Klaar</button>
+  </div>
+
+  <div class="onderbalk">
+    <button class="btn zacht" id="hintBtn">💡 Help me even</button>
+    <button class="btn" id="volgendeBtn" hidden>Volgende →</button>
+    <button class="tekstknop" id="stopBtn">stoppen</button>
+  </div>
+</section>
+
+<!-- ---------- klaar ---------- -->
+<section class="kaart" id="eindScherm" hidden>
+  <p class="eyebrow" id="eindEyebrow">Ronde klaar</p>
+  <h2 id="eindTitel">Goed bezig!</h2>
+  <div class="sterrenrij" id="sterrenrij" aria-hidden="true"></div>
+  <p class="lead" id="eindRegel"></p>
+  <ul class="stats">
+    <li><span id="statTijd">0:00</span><small>tijd</small></li>
+    <li><span id="statStreak">0</span><small>op rij</small></li>
+    <li><span id="statRecord">—</span><small>record</small></li>
+  </ul>
+  <div class="blok" id="foutenBlok" hidden>
+    <h3>Deze waren lastig</h3>
+    <ul class="foutenlijst" id="foutenlijst"></ul>
+    <button class="btn zacht" id="oefenBtn">Oefen alleen deze →</button>
+  </div>
+  <button class="btn groot" id="opnieuwBtn">Nieuwe ronde →</button>
+</section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var TOTAAL = 10;
+  var SLEUTEL = "noam-rekenrace-v1";
+  var TEKEN = {"+":"+", "-":"−"};
+
+  var el = {};
+  ["voortgang","dots","streakje","merkTeken","startScherm","speelScherm","eindScherm",
+   "som","getalA","getalB","teken","vak","invoer","caret","sterretjes","melding","numpad",
+   "hintBtn","volgendeBtn","stopBtn","startBtn","recordRegel","opnieuwBtn","oefenBtn",
+   "eindEyebrow","eindTitel","sterrenrij","eindRegel","statTijd","statStreak","statRecord",
+   "foutenBlok","foutenlijst"].forEach(function(id){ el[id] = document.getElementById(id); });
+
+  var modus = "allebei";
+  var laatsteFouten = [];
+  var s = null;
+
+  /* ---------- sommen maken ---------- */
+  function rnd(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+
+  function maakPlus(){
+    var a, b;
+    do { a = rnd(12, 79); b = rnd(12, 99 - a); } while ((a % 10) + (b % 10) < 10);
+    return { a:a, b:b, op:"+", uitkomst:a + b };
+  }
+
+  function maakMin(){
+    var a, b;
+    do { a = rnd(23, 99); b = rnd(12, a - 11); } while ((a % 10) >= (b % 10));
+    return { a:a, b:b, op:"-", uitkomst:a - b };
+  }
+
+  function maakRij(aantal){
+    var rij = [], gezien = {}, pogingen = 0, som, sleutel;
+    while (rij.length < aantal && pogingen < 400){
+      pogingen++;
+      if (modus === "plus") som = maakPlus();
+      else if (modus === "min") som = maakMin();
+      else som = Math.random() < 0.5 ? maakPlus() : maakMin();
+      sleutel = som.a + som.op + som.b;
+      if (gezien[sleutel]) continue;
+      gezien[sleutel] = true;
+      rij.push(som);
+    }
+    return rij;
+  }
+
+  function splits(som){
+    var bt = Math.floor(som.b / 10) * 10;
+    var be = som.b % 10;
+    var tussen = som.op === "+" ? som.a + bt : som.a - bt;
+    return { bt:bt, be:be, tussen:tussen, t:TEKEN[som.op] };
+  }
+
+  /* ---------- schermen ---------- */
+  function toon(naam){
+    el.startScherm.hidden = naam !== "start";
+    el.speelScherm.hidden = naam !== "speel";
+    el.eindScherm.hidden  = naam !== "eind";
+    el.voortgang.hidden   = naam !== "speel";
+  }
+
+  function tijdTekst(ms){
+    var t = Math.round(ms / 1000);
+    return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0");
+  }
+
+  /* ---------- opslag ---------- */
+  function leesRecord(){
+    try {
+      var r = JSON.parse(localStorage.getItem(SLEUTEL));
+      return (r && typeof r.goed === "number") ? r : null;
+    } catch (e){ return null; }
+  }
+  function schrijfRecord(r){
+    try { localStorage.setItem(SLEUTEL, JSON.stringify(r)); } catch (e){}
+  }
+  function toonRecordRegel(){
+    var r = leesRecord();
+    el.recordRegel.textContent = r
+      ? "Jouw record: " + r.goed + " van de 10 goed in " + tijdTekst(r.ms) + "."
+      : "Nog geen record — deze ronde telt!";
+  }
+
+  /* ---------- ronde ---------- */
+  function startRonde(rij, telMee){
+    s = {
+      rij: rij, index: 0, goed: 0, sterren: 0, streak: 0, besteStreak: 0,
+      invoer: "", hint: false, fase: "invoer", fouten: [],
+      start: Date.now(), telMee: telMee
+    };
+    bouwDots();
+    toon("speel");
+    laadSom();
+  }
+
+  function bouwDots(){
+    el.dots.innerHTML = "";
+    for (var i = 0; i < s.rij.length; i++){
+      var d = document.createElement("span");
+      d.className = "dot";
+      el.dots.appendChild(d);
+    }
+  }
+
+  function werkDotsBij(){
+    var kinderen = el.dots.children;
+    if (kinderen[s.index] && !kinderen[s.index].classList.contains("goed") &&
+        !kinderen[s.index].classList.contains("fout")){
+      kinderen[s.index].classList.add("nu");
+    }
+  }
+
+  function laadSom(){
+    var som = s.rij[s.index];
+    s.invoer = "";
+    s.hint = false;
+    s.fase = "invoer";
+
+    el.getalA.textContent = som.a;
+    el.getalB.textContent = som.b;
+    el.teken.textContent = TEKEN[som.op];
+    el.merkTeken.textContent = TEKEN[som.op];
+    el.merkTeken.style.background = som.op === "+" ? "var(--plus)" : "var(--min)";
+    el.som.className = "som " + (som.op === "+" ? "op-plus" : "op-min");
+    el.vak.setAttribute("aria-label", "Antwoord op " + som.a + " " + TEKEN[som.op] + " " + som.b);
+
+    el.melding.className = "melding";
+    el.melding.innerHTML = "";
+    el.volgendeBtn.hidden = true;
+    el.hintBtn.hidden = false;
+    el.hintBtn.disabled = false;
+    el.hintBtn.textContent = "💡 Help me even";
+    zetToetsen(false);
+    tekenInvoer();
+    werkStreakBij();
+    werkDotsBij();
+  }
+
+  function tekenInvoer(){
+    el.invoer.textContent = s.invoer;
+    el.caret.hidden = s.fase !== "invoer";
+  }
+
+  function werkStreakBij(){
+    el.streakje.textContent = s.streak + " op rij";
+    el.streakje.classList.toggle("vlam", s.streak >= 3);
+  }
+
+  function zetToetsen(uit){
+    var toetsen = el.numpad.querySelectorAll(".toets");
+    for (var i = 0; i < toetsen.length; i++) toetsen[i].disabled = uit;
+  }
+
+  /* ---------- invoer ---------- */
+  function voegToe(cijfer){
+    if (s.fase !== "invoer") return;
+    if (s.invoer.length >= 3) return;
+    if (s.invoer === "" && cijfer === "0") return;
+    s.invoer += cijfer;
+    tekenInvoer();
+  }
+
+  function wisCijfer(){
+    if (s.fase !== "invoer") return;
+    s.invoer = s.invoer.slice(0, -1);
+    tekenInvoer();
+  }
+
+  function schud(node){
+    node.classList.remove("schud");
+    void node.offsetWidth;
+    node.classList.add("schud");
+  }
+
+  function sterretjesPop(){
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    for (var i = 0; i < 6; i++){
+      (function(i){
+        var sp = document.createElement("span");
+        sp.className = "ster";
+        sp.textContent = "★";
+        sp.style.left = (12 + Math.random() * 72) + "%";
+        sp.style.setProperty("--dx", (Math.random() * 44 - 22) + "px");
+        sp.style.animationDelay = (i * 45) + "ms";
+        el.sterretjes.appendChild(sp);
+        setTimeout(function(){ sp.remove(); }, 1200 + i * 45);
+      })(i);
+    }
+  }
+
+  function nakijken(){
+    if (s.fase !== "invoer") return;
+    if (s.invoer === ""){ schud(el.vak); return; }
+
+    var som = s.rij[s.index];
+    var dot = el.dots.children[s.index];
+    if (dot) dot.classList.remove("nu");
+
+    if (parseInt(s.invoer, 10) === som.uitkomst){
+      s.fase = "goed";
+      s.goed++;
+      if (!s.hint) s.sterren++;
+      s.streak++;
+      if (s.streak > s.besteStreak) s.besteStreak = s.streak;
+      if (dot) dot.classList.add("goed");
+      el.som.classList.add("is-goed");
+      el.melding.className = "melding is-goed";
+      el.melding.innerHTML = '<p class="kop">' + jubel() + (s.hint ? " (met een beetje hulp)" : "") + "</p>";
+      el.hintBtn.hidden = true;
+      zetToetsen(true);
+      tekenInvoer();
+      sterretjesPop();
+      werkStreakBij();
+      setTimeout(volgende, 950);
+    } else {
+      s.fase = "fout";
+      s.streak = 0;
+      if (dot) dot.classList.add("fout");
+      s.fouten.push(som);
+      el.som.classList.add("is-fout");
+      var sp = splits(som);
+      el.melding.className = "melding is-fout";
+      el.melding.innerHTML =
+        '<p class="kop">Bijna! Het antwoord is ' + som.uitkomst + ".</p>" +
+        '<p class="stappen">Splits de ' + som.b + " in " + sp.bt + " en " + sp.be + ": " +
+        "<b>" + som.a + " " + sp.t + " " + sp.bt + " = " + sp.tussen + "</b>, en dan " +
+        "<b>" + sp.tussen + " " + sp.t + " " + sp.be + " = " + som.uitkomst + "</b>.</p>";
+      el.hintBtn.hidden = true;
+      el.volgendeBtn.hidden = false;
+      zetToetsen(true);
+      schud(el.vak);
+      tekenInvoer();
+      werkStreakBij();
+    }
+  }
+
+  var JUBELS = ["Goed zo! 💪", "Yes! ⭐", "Knap gedaan!", "Precies! 🎯", "Top!"];
+  function jubel(){ return JUBELS[Math.floor(Math.random() * JUBELS.length)]; }
+
+  function volgende(){
+    if (!s || s.fase === "invoer" || el.speelScherm.hidden) return;
+    s.index++;
+    if (s.index >= s.rij.length) eindScherm();
+    else laadSom();
+  }
+
+  function geefHint(){
+    if (s.fase !== "invoer") return;
+    var som = s.rij[s.index];
+    var sp = splits(som);
+    s.hint = true;
+    el.melding.className = "melding";
+    el.melding.innerHTML =
+      '<p class="stappen">Splits de ' + som.b + " in " + sp.bt + " en " + sp.be + ". " +
+      "Eerst: <b>" + som.a + " " + sp.t + " " + sp.bt + " = " + sp.tussen + "</b>. " +
+      "En dan nog " + sp.t + " " + sp.be + " erbij… wat wordt het?</p>";
+    el.hintBtn.disabled = true;
+    el.hintBtn.textContent = "💡 Hulp staat hieronder";
+  }
+
+  /* ---------- eind ---------- */
+  function eindScherm(){
+    var ms = Date.now() - s.start;
+    var aantal = s.rij.length;
+    laatsteFouten = s.fouten.slice();
+
+    el.eindEyebrow.textContent = s.telMee ? "Ronde klaar" : "Oefenrondje klaar";
+    el.eindTitel.textContent =
+      s.goed === aantal ? "Alles goed! 🏆" :
+      s.goed >= aantal - 2 ? "Sterk gedaan!" :
+      s.goed >= Math.ceil(aantal / 2) ? "Goed bezig!" : "Lekker geoefend!";
+
+    var sterren = "";
+    for (var i = 0; i < aantal; i++){
+      sterren += i < s.sterren ? '<span class="vol">★</span>' : "<span>☆</span>";
+    }
+    el.sterrenrij.innerHTML = sterren;
+    el.eindRegel.textContent =
+      s.goed + " van de " + aantal + " goed, waarvan " + s.sterren + " in één keer zonder hulp.";
+
+    el.statTijd.textContent = tijdTekst(ms);
+    el.statStreak.textContent = s.besteStreak;
+
+    var record = leesRecord();
+    if (s.telMee && aantal === TOTAAL){
+      if (!record || s.goed > record.goed || (s.goed === record.goed && ms < record.ms)){
+        record = { goed: s.goed, ms: ms };
+        schrijfRecord(record);
+        el.eindEyebrow.textContent = "Nieuw record! 🎉";
+      }
+    }
+    el.statRecord.textContent = record ? record.goed + "/10" : "—";
+
+    if (laatsteFouten.length){
+      el.foutenlijst.innerHTML = laatsteFouten.map(function(f){
+        return "<li>" + f.a + " " + TEKEN[f.op] + " " + f.b + " = " + f.uitkomst + "</li>";
+      }).join("");
+      el.foutenBlok.hidden = false;
+    } else {
+      el.foutenBlok.hidden = true;
+    }
+
+    toon("eind");
+  }
+
+  /* ---------- luisteraars ---------- */
+  var kiesKnoppen = document.querySelectorAll(".kies");
+  for (var k = 0; k < kiesKnoppen.length; k++){
+    kiesKnoppen[k].addEventListener("click", function(){
+      modus = this.getAttribute("data-modus");
+      for (var j = 0; j < kiesKnoppen.length; j++) kiesKnoppen[j].classList.remove("aan");
+      this.classList.add("aan");
+    });
+  }
+
+  el.startBtn.addEventListener("click", function(){ startRonde(maakRij(TOTAAL), true); });
+  el.opnieuwBtn.addEventListener("click", function(){ toonRecordRegel(); toon("start"); });
+  el.oefenBtn.addEventListener("click", function(){ startRonde(laatsteFouten.slice(), false); });
+  el.volgendeBtn.addEventListener("click", volgende);
+  el.hintBtn.addEventListener("click", geefHint);
+  el.stopBtn.addEventListener("click", function(){ toonRecordRegel(); toon("start"); });
+
+  el.numpad.addEventListener("click", function(e){
+    var knop = e.target.closest(".toets");
+    if (!knop || knop.disabled) return;
+    var t = knop.getAttribute("data-toets");
+    if (t === "wis") wisCijfer();
+    else if (t === "klaar") nakijken();
+    else voegToe(t);
+  });
+
+  document.addEventListener("keydown", function(e){
+    if (el.speelScherm.hidden || !s) return;
+    if (e.key >= "0" && e.key <= "9" && e.key.length === 1){ voegToe(e.key); e.preventDefault(); }
+    else if (e.key === "Backspace"){ wisCijfer(); e.preventDefault(); }
+    else if (e.key === "Enter"){
+      if (s.fase === "fout") volgende();
+      else if (s.fase === "invoer") nakijken();
+      e.preventDefault();
+    }
+  });
+
+  toonRecordRegel();
+})();
+</script>
+</body>
+</html>
