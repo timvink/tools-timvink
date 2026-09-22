@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-19",
+  "last_updated": "2026-09-22",
   "companies": [
     {
       "id": "anthropic",
@@ -717,6 +717,13 @@
           "tier": "flagship",
           "description": "Grok 4.6 is SpaceXAI's smartest model with frontier performance on coding, knowledge work, and STEM.",
           "openrouter_id": "x-ai/grok-4.6"
+        },
+        {
+          "name": "Grok 4.7",
+          "date": "2026-09-21",
+          "tier": "flagship",
+          "description": "Grok 4.7 is SpaceXAI's flagship model for coding, agentic tasks, and knowledge work, succeeding Grok 4.6. It is particularly strong at long-running software engineering tasks, verifying its own work, and...",
+          "openrouter_id": "x-ai/grok-4.7"
         }
       ]
     }
