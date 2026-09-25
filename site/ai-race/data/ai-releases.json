@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-22",
+  "last_updated": "2026-09-25",
   "companies": [
     {
       "id": "anthropic",
@@ -195,6 +195,14 @@
           "description": "Claude Fable 5.1 improves on Claude Fable 5 across the board, with the biggest gains in agentic coding, long-running agentic workflows, and knowledge work: long code refactors, front-end and visual...",
           "openrouter_id": "anthropic/claude-fable-5.1",
           "url": "https://www.anthropic.com/news/claude-fable-5-1"
+        },
+        {
+          "name": "Claude Opus 5.5",
+          "date": "2026-09-22",
+          "tier": "flagship",
+          "description": "Claude Opus 5.5 is Anthropic's flagship model for demanding reasoning, coding, and long-horizon agentic work, succeeding Claude Opus 5. It is particularly strong at multi-step changes in large codebases, code...",
+          "openrouter_id": "anthropic/claude-opus-5.5",
+          "url": "https://www.anthropic.com/news/claude-opus-5-5"
         }
       ]
     },
@@ -441,6 +449,34 @@
           "tier": "flagship",
           "description": "GPT-6 Astra is OpenAI's flagship model for demanding end-to-end work. It is suited for advanced analysis, software engineering, deep research, scientific work, and document creation, with particular strengths in long-…",
           "openrouter_id": "openai/gpt-6-astra"
+        },
+        {
+          "name": "GPT-6 Luna Pro",
+          "date": "2026-09-22",
+          "tier": "flagship",
+          "description": "GPT-6 Luna Pro is the same underlying model as GPT-6 Luna, served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks.\n\nLearn more in OpenAI's docs: https://developers.openai.com/api/docs/…",
+          "openrouter_id": "openai/gpt-6-luna-pro"
+        },
+        {
+          "name": "GPT-6 Luna (batch)",
+          "date": "2026-09-22",
+          "tier": "flagship",
+          "description": "GPT-6 Luna is the fast, cost-efficient model in OpenAI's GPT-6 series, positioned below GPT-6 Sol. It is suited for high-volume and latency-sensitive workloads such as chat, classification, and lightweight agentic...",
+          "openrouter_id": "openai/gpt-6-luna:batch"
+        },
+        {
+          "name": "GPT-6 Sol Pro",
+          "date": "2026-09-22",
+          "tier": "flagship",
+          "description": "GPT-6 Sol Pro is the same underlying model as GPT-6 Sol, served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks.\n\nLearn more in OpenAI's docs: https://developers.openai.com/api/docs/gu…",
+          "openrouter_id": "openai/gpt-6-sol-pro"
+        },
+        {
+          "name": "GPT-6 Sol (batch)",
+          "date": "2026-09-22",
+          "tier": "flagship",
+          "description": "GPT-6 Sol is the cost-efficient high-end model in OpenAI's GPT-6 series, positioned below the flagship GPT-6 Astra and above the fast GPT-6 Luna tier. It is suited for demanding professional...",
+          "openrouter_id": "openai/gpt-6-sol:batch"
         }
       ]
     },
