@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-07",
+  "last_updated": "2026-10-10",
   "companies": [
     {
       "id": "anthropic",
@@ -211,6 +211,14 @@
           "description": "Claude Sonnet 5.5 is Anthropic's Sonnet-class model for well-scoped everyday work, succeeding Claude Sonnet 5 as a direct upgrade. It is especially strong at building features, fixing bugs, and producing...",
           "openrouter_id": "anthropic/claude-sonnet-5.5",
           "url": "https://www.anthropic.com/news/claude-sonnet-5-5"
+        },
+        {
+          "name": "Claude Haiku 5.5",
+          "date": "2026-10-07",
+          "tier": "major",
+          "description": "Claude Haiku 5.5 is Anthropic's small, fast model for high-volume, cost-sensitive work such as summarization, subagents, and browser use. It succeeds Claude Haiku 4.5 with stronger coding, computer use, and...",
+          "openrouter_id": "anthropic/claude-haiku-5.5",
+          "url": "https://www.anthropic.com/news/claude-haiku-5-5"
         }
       ]
     },
@@ -492,6 +500,13 @@
           "tier": "flagship",
           "description": "GPT-6.1 Sol Pro is the same underlying model as GPT-6.1 Sol, served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. **Cost note:** pro mode spends far more...",
           "openrouter_id": "openai/gpt-6.1-sol-pro"
+        },
+        {
+          "name": "GPT-6.1 Sol (batch)",
+          "date": "2026-09-29",
+          "tier": "flagship",
+          "description": "GPT-6.1 Sol is an upgrade to GPT-6 Sol from OpenAI, positioned below the flagship GPT-6 Astra in the GPT-6 series. It is suited for agentic coding, computer use, document-heavy professional...",
+          "openrouter_id": "openai/gpt-6.1-sol:batch"
         }
       ]
     },
