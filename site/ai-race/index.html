@@ -167,6 +167,37 @@
 			flex-shrink: 0;
 		}
 
+		/* ── Range toggle ──────────────────────── */
+		.range-toggle {
+			display: inline-flex;
+			gap: 2px;
+			padding: 3px;
+			margin-bottom: 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+		}
+
+		.range-toggle button {
+			padding: 0.3rem 0.75rem;
+			border: 0;
+			border-radius: 5px;
+			background: transparent;
+			color: var(--muted-2);
+			font: inherit;
+			font-size: 0.8rem;
+			font-weight: 500;
+			cursor: pointer;
+		}
+
+		.range-toggle button:hover { color: var(--text); }
+
+		.range-toggle button[aria-pressed="true"] {
+			background: var(--surface-2);
+			color: var(--text);
+			box-shadow: inset 0 0 0 1px var(--border-strong);
+		}
+
 		/* ── Main ──────────────────────────────── */
 		main {
 			flex: 1;
@@ -720,6 +751,13 @@
 		Scroll right to see the full timeline
 	</div>
 
+	<div class="range-toggle" id="range-toggle" role="group" aria-label="Timeline range">
+		<button type="button" data-months="0" aria-pressed="true">All</button>
+		<button type="button" data-months="12" aria-pressed="false">1Y</button>
+		<button type="button" data-months="6" aria-pressed="false">6M</button>
+		<button type="button" data-months="3" aria-pressed="false">3M</button>
+	</div>
+
 	<div class="timeline-scroll">
 		<div class="timeline-inner" id="timeline">
 			<div class="loading">
@@ -767,15 +805,31 @@
 	const TIMELINE_START = new Date('2023-01-01');
 	const PADDING_DAYS = 50;
 
+	// Months of history shown by the range toggle; 0 means everything since TIMELINE_START.
+	let rangeMonths = 0;
+
+	function getViewStart() {
+		if (!rangeMonths) return TIMELINE_START;
+		const d = new Date();
+		d.setMonth(d.getMonth() - rangeMonths);
+		d.setDate(1);
+		return d;
+	}
+
 	function getTimelineEnd() {
 		const d = new Date();
-		d.setDate(d.getDate() + PADDING_DAYS);
+		// Keep the right-hand padding proportional so zoomed views aren't mostly empty future.
+		d.setDate(d.getDate() + (rangeMonths ? Math.round(rangeMonths * 3) : PADDING_DAYS));
 		return d;
+	}
+
+	function isInView(dateStr) {
+		return new Date(dateStr + 'T12:00:00') >= getViewStart();
 	}
 
 	function dateToPercent(dateStr) {
 		const ts = new Date(dateStr + (dateStr.length === 10 ? 'T12:00:00' : '')).getTime();
-		const start = TIMELINE_START.getTime();
+		const start = getViewStart().getTime();
 		const end = getTimelineEnd().getTime();
 		return Math.max(0.5, Math.min(99.5, (ts - start) / (end - start) * 100));
 	}
@@ -928,8 +982,29 @@
 
 	// ── Build axis ticks ──────────────────────────────
 	function buildAxis(container) {
-		const start = TIMELINE_START;
+		const start = getViewStart();
 		const end   = getTimelineEnd();
+
+		if (rangeMonths) {
+			const d = new Date(start.getFullYear(), start.getMonth(), 1);
+			for (; d <= end; d.setMonth(d.getMonth() + 1)) {
+				const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+				const isYear = d.getMonth() === 0;
+				const tick = document.createElement('div');
+				tick.className = 'axis-tick';
+				tick.style.left = dateToPercent(iso) + '%';
+				const line = document.createElement('div');
+				line.className = isYear ? 'axis-line year' : 'axis-line';
+				const label = document.createElement('div');
+				label.className = isYear ? 'axis-label year' : 'axis-label';
+				label.textContent = isYear ? d.getFullYear() : d.toLocaleDateString('en-US', { month: 'short' });
+				tick.appendChild(label);
+				tick.appendChild(line);
+				container.appendChild(tick);
+			}
+			return;
+		}
+
 		const startY = start.getFullYear();
 		const endY   = end.getFullYear();
 
@@ -1065,7 +1140,7 @@
 			track.className = 'lane-track';
 			addTodayMarker(track);
 
-			sorted.forEach((rel, ri) => {
+			sorted.filter(rel => isInView(rel.date)).forEach((rel, ri) => {
 				const delay = ci * 60 + ri * 25;
 				const dot = buildDot(rel, co, rel === latest, delay);
 				track.appendChild(dot);
@@ -1212,7 +1287,17 @@
 			if (!r.ok) throw new Error(`HTTP ${r.status}`);
 			return r.json();
 		})
-		.then(data => renderTimeline(data))
+		.then(data => {
+			renderTimeline(data);
+			document.getElementById('range-toggle').addEventListener('click', e => {
+				const btn = e.target.closest('button[data-months]');
+				if (!btn) return;
+				rangeMonths = Number(btn.dataset.months);
+				btn.parentElement.querySelectorAll('button').forEach(b =>
+					b.setAttribute('aria-pressed', String(b === btn)));
+				renderTimeline(data);
+			});
+		})
 		.catch(err => {
 			document.getElementById('timeline').innerHTML = `
 				<div class="loading" style="flex-direction:column;gap:0.5rem">
