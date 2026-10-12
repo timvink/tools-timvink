@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-10",
+  "last_updated": "2026-10-12",
   "companies": [
     {
       "id": "anthropic",
@@ -460,11 +460,25 @@
           "url": "https://openai.com/index/gpt-5-6"
         },
         {
+          "name": "GPT-5.6-Cyber",
+          "date": "2026-08-10",
+          "tier": "minor",
+          "description": "Cybersecurity-specific model available through Daybreak Red for authorized vulnerability research, exploit validation, and security testing.",
+          "url": "https://openai.com/index/expanding-daybreak-as-the-cyber-defense-window-narrows"
+        },
+        {
           "name": "GPT-6 Astra",
           "date": "2026-09-04",
           "tier": "flagship",
           "description": "GPT-6 Astra is OpenAI's flagship model for demanding end-to-end work. It is suited for advanced analysis, software engineering, deep research, scientific work, and document creation, with particular strengths in long-…",
           "openrouter_id": "openai/gpt-6-astra"
+        },
+        {
+          "name": "ChatGPT Images 2.5",
+          "date": "2026-09-08",
+          "tier": "minor",
+          "description": "Updated ChatGPT image generation model that turns ideas, sketches and reference photos into more personalized, polished images.",
+          "url": "https://openai.com/index/introducing-chatgpt-images-2-5"
         },
         {
           "name": "GPT-6 Luna Pro",
