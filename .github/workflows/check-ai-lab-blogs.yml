@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: write
-  models: read
   actions: write
 
 jobs:
@@ -28,12 +27,18 @@ jobs:
         id: filter
         run: python scripts/filter-new-articles.py
 
-      # Inference runs on GitHub Models, which is free for GITHUB_TOKEN under the
-      # `models: read` permission — no API key and no per-run cost.
+      # Inference runs on the Claude API. GitHub Models was retired 2026-07-30,
+      # so the previous free path no longer exists. Sonnet 5.5 at low effort over a
+      # weekly handful of RSS titles costs a few cents per run, paid from the
+      # monthly API credits on the Max-linked API org.
+      - name: Install Anthropic SDK
+        if: steps.filter.outputs.has_new_articles == 'true'
+        run: pip install 'anthropic>=1.13,<2'
+
       - name: Classify new articles for model releases
         if: steps.filter.outputs.has_new_articles == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python scripts/classify-releases.py
 
       - name: Merge detected releases into ai-releases.json

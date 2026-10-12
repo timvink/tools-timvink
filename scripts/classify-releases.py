@@ -1,32 +1,32 @@
 #!/usr/bin/env python3
-"""Classify new AI lab articles as model releases using GitHub Models.
+"""Classify new AI lab articles as model releases using the Claude API.
 
-Reads new-articles.json + tracked-models.json and writes detected-releases.json
-in the same shape the LLM step used to produce. Inference runs on GitHub Models,
-which is free for the repo's GITHUB_TOKEN (needs `models: read` permission).
+Reads new-articles.json + tracked-models.json and writes detected-releases.json,
+a flat list of detected releases. merge-detected-releases.py does the dedupe and
+merge into ai-releases.json.
 
-Articles are sent in batches so a large backlog can't blow the free tier's
-per-request input limit. merge-detected-releases.py does the dedupe and merge.
+Articles are sent in batches so one oversized backlog can't blow a single
+response; the model is asked for JSON matching SCHEMA via structured outputs, so
+the reply is guaranteed parseable.
 """
 
 import json
 import os
 import re
 import sys
-import urllib.error
-import urllib.request
 from pathlib import Path
+
+import anthropic
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "site" / "ai-race" / "data"
 NEW_ARTICLES_FILE = DATA_DIR / "new-articles.json"
 TRACKED_MODELS_FILE = DATA_DIR / "tracked-models.json"
 DETECTED_FILE = DATA_DIR / "detected-releases.json"
 
-ENDPOINT = "https://models.github.ai/inference/chat/completions"
-MODEL = "openai/gpt-4.1-mini"
+MODEL = "claude-sonnet-5-5"
+MAX_TOKENS = 16000
 
-# Free tier allows 8000 input tokens per request. Batch conservatively.
-ARTICLES_PER_BATCH = 15
+ARTICLES_PER_BATCH = 40
 DESCRIPTION_LIMIT = 300
 
 SYSTEM_PROMPT = """\
@@ -78,7 +78,7 @@ def clean(text: str) -> str:
     return re.sub(r"<[^>]+>", "", text or "").strip()[:DESCRIPTION_LIMIT]
 
 
-def classify(batch: list[dict], tracked: dict, token: str) -> list[dict]:
+def classify(client: anthropic.Anthropic, batch: list[dict], tracked: dict) -> list[dict]:
     user_content = json.dumps(
         {
             "companies": {
@@ -99,42 +99,43 @@ def classify(batch: list[dict], tracked: dict, token: str) -> list[dict]:
         ensure_ascii=False,
     )
 
-    payload = {
-        "model": MODEL,
-        "temperature": 0,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_content},
-        ],
-        "response_format": {
-            "type": "json_schema",
-            "json_schema": {"name": "releases", "strict": True, "schema": SCHEMA},
+    # fallbacks="default" re-runs a safety-classifier decline on Anthropic's
+    # recommended substitute model inside the same call.
+    response = client.beta.messages.create(
+        model=MODEL,
+        betas=["server-side-fallback-2026-07-01"],
+        fallbacks="default",
+        max_tokens=MAX_TOKENS,
+        system=SYSTEM_PROMPT,
+        thinking={"type": "adaptive"},
+        output_config={
+            "effort": "low",
+            "format": {"type": "json_schema", "schema": SCHEMA},
         },
-    }
-
-    request = urllib.request.Request(
-        ENDPOINT,
-        data=json.dumps(payload).encode(),
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-        },
+        messages=[{"role": "user", "content": user_content}],
     )
-    try:
-        with urllib.request.urlopen(request, timeout=120) as response:
-            body = json.load(response)
-    except urllib.error.HTTPError as e:
-        print(f"ERROR: GitHub Models returned {e.code}: {e.read().decode()[:500]}", file=sys.stderr)
-        raise
 
-    return json.loads(body["choices"][0]["message"]["content"])["releases"]
+    if response.stop_reason == "refusal":
+        raise RuntimeError(f"Claude refused to classify this batch: {response.stop_details}")
+    if response.stop_reason == "max_tokens":
+        raise RuntimeError(
+            f"Response hit max_tokens ({MAX_TOKENS}); reduce ARTICLES_PER_BATCH."
+        )
+
+    text = next((b.text for b in response.content if b.type == "text"), None)
+    if text is None:
+        raise RuntimeError(f"No text block in response (stop_reason={response.stop_reason})")
+
+    return json.loads(text)["releases"]
 
 
 def main() -> int:
-    token = os.environ.get("GITHUB_TOKEN")
-    if not token:
-        print("ERROR: GITHUB_TOKEN is not set.", file=sys.stderr)
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        print("ERROR: ANTHROPIC_API_KEY is not set.", file=sys.stderr)
         return 1
+
+    # Unattended weekly run: retry a little harder than the SDK default of 2.
+    client = anthropic.Anthropic(max_retries=4)
 
     with NEW_ARTICLES_FILE.open() as f:
         articles = json.load(f)
@@ -142,11 +143,18 @@ def main() -> int:
         tracked = json.load(f)
 
     detected: list[dict] = []
-    for start in range(0, len(articles), ARTICLES_PER_BATCH):
-        batch = articles[start : start + ARTICLES_PER_BATCH]
-        found = classify(batch, tracked, token)
-        print(f"Batch {start // ARTICLES_PER_BATCH + 1}: {len(batch)} articles -> {len(found)} release(s)")
-        detected.extend(found)
+    try:
+        for start in range(0, len(articles), ARTICLES_PER_BATCH):
+            batch = articles[start : start + ARTICLES_PER_BATCH]
+            found = classify(client, batch, tracked)
+            print(f"Batch {start // ARTICLES_PER_BATCH + 1}: {len(batch)} articles -> {len(found)} release(s)")
+            detected.extend(found)
+    except anthropic.APIStatusError as e:
+        print(f"ERROR: Claude API returned {e.status_code} ({e.type}): {e.message}", file=sys.stderr)
+        return 1
+    except anthropic.APIConnectionError as e:
+        print(f"ERROR: could not reach the Claude API: {e}", file=sys.stderr)
+        return 1
 
     with DETECTED_FILE.open("w") as f:
         json.dump(detected, f, indent=2, ensure_ascii=False)
