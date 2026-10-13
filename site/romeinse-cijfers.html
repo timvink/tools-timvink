@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Romeinse cijfers leren tot 100: eerst de uitleg met een vertaalmachine, daarna spelletjes met een kluis, stenen tabletten en Romeinse sommen. Vijf levels, van heel makkelijk tot 100.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23B4472E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='18' font-weight='700' fill='%23fff' text-anchor='middle'%3EX%3C/text%3E%3C/svg%3E">
+<title>Noams Romeinse Rijk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* ---------- reset (standalone) ---------- */
+html{color-scheme:light dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{
+  padding-top:env(safe-area-inset-top, 0px);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+}
+
+/* ---------- tokens ---------- */
+:root{
+  --zand:#F4EDE1;
+  --panel:#FFFDF8;
+  --panel-2:#F8F1E4;
+  --ink:#2C2118;
+  --muted:#7C6A56;
+  --lijn:#E2D4BD;
+  --plaat-1:#F0E5D2;
+  --plaat-2:#DFCFB2;
+  --rood:#B4472E;
+  --rood-zacht:#FAE4DB;
+  --goud:#BE8C1C;
+  --goud-zacht:#FAEFD3;
+  --goed:#3E7D4F;
+  --goed-zacht:#E0F0E3;
+  --fout:#CE3F58;
+  --fout-zacht:#FBE2E6;
+  --lift:0 5px 0 rgba(44,33,24,.14);
+  --lift-klein:0 2px 0 rgba(44,33,24,.14);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --zand:#18120C;
+    --panel:#241B13;
+    --panel-2:#2C2117;
+    --ink:#F3E9DA;
+    --muted:#B7A288;
+    --lijn:#3E3024;
+    --plaat-1:#3C2F22;
+    --plaat-2:#2B2118;
+    --rood:#E1795C;
+    --rood-zacht:#3E211A;
+    --goud:#E7B94E;
+    --goud-zacht:#3A2C12;
+    --goed:#6BC07F;
+    --goed-zacht:#17301E;
+    --fout:#F0788C;
+    --fout-zacht:#3B1F26;
+    --lift:0 5px 0 rgba(0,0,0,.5);
+    --lift-klein:0 2px 0 rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --zand:#18120C;
+  --panel:#241B13;
+  --panel-2:#2C2117;
+  --ink:#F3E9DA;
+  --muted:#B7A288;
+  --lijn:#3E3024;
+  --plaat-1:#3C2F22;
+  --plaat-2:#2B2118;
+  --rood:#E1795C;
+  --rood-zacht:#3E211A;
+  --goud:#E7B94E;
+  --goud-zacht:#3A2C12;
+  --goed:#6BC07F;
+  --goed-zacht:#17301E;
+  --fout:#F0788C;
+  --fout-zacht:#3B1F26;
+  --lift:0 5px 0 rgba(0,0,0,.5);
+  --lift-klein:0 2px 0 rgba(0,0,0,.5);
+}
+
+/* ---------- basis ---------- */
+body{
+  margin:0;
+  background:var(--zand);
+  color:var(--ink);
+  font-family:"Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{
+  max-width:560px;margin:0 auto;
+  padding-inline:16px;padding-block:14px 28px;
+  display:flex;flex-direction:column;gap:14px;
+}
+h1,h2,h3{font-family:"Fredoka","Nunito",sans-serif;font-weight:600;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.5rem,5.5vw,2rem);line-height:1.15}
+h2{font-size:clamp(1.3rem,4.8vw,1.65rem);line-height:1.2}
+h3{font-size:1.05rem}
+p{margin:0}
+strong{font-weight:800}
+.eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.lead{color:var(--muted);font-size:1rem}
+.hint{color:var(--muted);font-size:.9rem}
+.romeins{font-family:"Cinzel","Georgia",serif;font-weight:700;letter-spacing:.06em}
+
+/* ---------- kop ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.merknaam{display:flex;align-items:center;gap:8px;font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.05rem}
+.merk-badge{
+  width:28px;height:28px;border-radius:9px;background:var(--rood);color:#fff;
+  display:grid;place-items:center;font-size:.95rem;line-height:1;box-shadow:var(--lift-klein);
+}
+.voortgang{display:flex;align-items:center;gap:10px}
+.dots{display:flex;gap:4px}
+.dot{width:12px;height:12px;border-radius:4px;background:var(--lijn)}
+.dot.nu{background:var(--panel);box-shadow:inset 0 0 0 3px var(--goud)}
+.dot.goed{background:var(--goed)}
+.dot.fout{background:var(--fout)}
+.levelje{font-size:.78rem;font-weight:800;color:var(--muted);white-space:nowrap}
+
+/* ---------- kaarten ---------- */
+.kaart{
+  background:var(--panel);border:2px solid var(--lijn);border-radius:20px;
+  padding:clamp(16px,4.5vw,24px);
+  display:flex;flex-direction:column;gap:14px;box-shadow:var(--lift);
+}
+
+/* ---------- knoppen ---------- */
+.btn{
+  font-family:"Nunito",sans-serif;font-weight:800;font-size:1.05rem;
+  border:2px solid transparent;border-radius:14px;padding:13px 20px;min-height:52px;
+  background:var(--rood);color:#fff;box-shadow:var(--lift);cursor:pointer;
+}
+.btn.groot{width:100%;font-size:1.12rem;padding:16px 20px}
+.btn.zacht{background:var(--panel);color:var(--ink);border-color:var(--lijn)}
+.btn.goud{background:var(--goud);color:#fff}
+.btn:active{transform:translateY(3px);box-shadow:var(--lift-klein)}
+.btn:disabled{opacity:.55;cursor:default;transform:none}
+:where(button):focus-visible{outline:3px solid var(--goud);outline-offset:3px}
+.tekstknop{
+  background:none;border:0;padding:8px 2px;color:var(--muted);
+  font-family:"Nunito",sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.knoprij{display:flex;gap:10px;flex-wrap:wrap}
+.knoprij .btn{flex:1 1 150px}
+
+/* ---------- levelkaart ---------- */
+.levels{display:flex;flex-direction:column;gap:9px}
+.levelknop{
+  display:flex;align-items:center;gap:12px;text-align:left;
+  font-family:"Nunito",sans-serif;font-weight:800;font-size:1rem;
+  background:var(--panel-2);color:var(--ink);border:2px solid var(--lijn);
+  border-radius:16px;padding:11px 14px;min-height:60px;cursor:pointer;box-shadow:var(--lift-klein);
+}
+.levelknop:active{transform:translateY(2px);box-shadow:none}
+.levelknop .cijfer{
+  flex:0 0 auto;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+  background:var(--rood);color:#fff;font-family:"Cinzel",serif;font-weight:700;font-size:1.15rem;
+}
+.levelknop .tekst{flex:1;display:flex;flex-direction:column;line-height:1.25}
+.levelknop .tekst small{font-weight:600;color:var(--muted);font-size:.82rem}
+.levelknop .score{font-size:.9rem;color:var(--goud);font-weight:800;white-space:nowrap}
+.levelknop.op-slot{opacity:.55;cursor:default}
+.levelknop.op-slot .cijfer{background:var(--lijn);color:var(--muted)}
+
+/* ---------- uitleg ---------- */
+.tekenrij{display:flex;gap:8px;flex-wrap:wrap}
+.tekenkaart{
+  flex:1 1 84px;display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:linear-gradient(180deg,var(--plaat-1),var(--plaat-2));
+  border:2px solid var(--lijn);border-radius:14px;padding:10px 6px;cursor:pointer;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.45), var(--lift-klein);
+}
+.tekenkaart b{font-family:"Cinzel",serif;font-size:1.7rem;line-height:1.1;color:var(--ink)}
+.tekenkaart span{font-weight:800;color:var(--muted);font-size:.95rem;font-variant-numeric:tabular-nums}
+.tekenkaart.aan{border-color:var(--goud);box-shadow:inset 0 0 0 2px var(--goud-zacht), var(--lift-klein)}
+.regelblok{
+  background:var(--panel-2);border:2px solid var(--lijn);border-radius:16px;
+  padding:13px 14px;display:flex;flex-direction:column;gap:8px;
+}
+.regelblok.let-op{background:var(--goud-zacht);border-color:var(--goud)}
+.voorbeeld{
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  font-variant-numeric:tabular-nums;font-size:1rem;
+}
+.voorbeeld .rom{font-family:"Cinzel",serif;font-weight:700;font-size:1.3rem}
+.chip{
+  display:inline-flex;align-items:baseline;gap:5px;
+  background:var(--panel);border:2px solid var(--lijn);border-radius:10px;padding:3px 9px;
+  font-weight:800;font-variant-numeric:tabular-nums;
+}
+.chip b{font-family:"Cinzel",serif;font-size:1.05rem;color:var(--rood)}
+.chip.totaal{background:var(--goed-zacht);border-color:var(--goed);color:var(--goed)}
+.plus{font-weight:800;color:var(--muted)}
+
+.machine{
+  background:linear-gradient(180deg,var(--plaat-1),var(--plaat-2));
+  border:3px solid var(--lijn);border-radius:18px;padding:14px;
+  display:flex;flex-direction:column;gap:10px;align-items:center;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.45);
+}
+.machine .getalregel{display:flex;align-items:center;gap:12px}
+.machine .getal{
+  font-family:"Fredoka",sans-serif;font-size:2rem;font-weight:600;min-width:2.6em;text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.rondknop{
+  width:46px;height:46px;border-radius:50%;border:2px solid var(--lijn);background:var(--panel);
+  color:var(--ink);font-size:1.5rem;font-weight:800;line-height:1;cursor:pointer;box-shadow:var(--lift-klein);
+}
+.rondknop:active{transform:translateY(2px);box-shadow:none}
+.machine .uitkomst{
+  font-family:"Cinzel",serif;font-weight:700;font-size:clamp(2rem,11vw,3rem);
+  letter-spacing:.08em;color:var(--rood);text-align:center;line-height:1.1;word-break:break-all;
+}
+input[type=range]{width:100%;accent-color:var(--rood);height:34px}
+.tabel{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.tabel button{
+  display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 2px;cursor:pointer;
+  background:var(--panel);border:2px solid var(--lijn);border-radius:11px;color:var(--ink);
+}
+.tabel button b{font-family:"Cinzel",serif;font-size:.98rem;line-height:1.1}
+.tabel button small{color:var(--muted);font-weight:800;font-size:.72rem;font-variant-numeric:tabular-nums}
+
+/* ---------- toneel ---------- */
+.toneel{display:flex;flex-direction:column;gap:12px;align-items:center}
+.opdracht{text-align:center}
+
+.kluis{
+  position:relative;width:100%;height:clamp(130px,38vw,170px);
+  border:3px solid var(--lijn);border-radius:18px;overflow:hidden;background:var(--goud-zacht);
+  box-shadow:var(--lift);
+}
+.kluis .binnen{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font-size:clamp(1.8rem,9vw,2.6rem);letter-spacing:.15em;
+}
+.deuren{position:absolute;inset:0;display:flex;z-index:1}
+.deur{
+  flex:1;background:linear-gradient(180deg,var(--plaat-1),var(--plaat-2));
+  transition:transform .55s cubic-bezier(.4,0,.2,1);
+}
+.deur.l{border-right:3px solid var(--lijn)}
+.kluis .carve{
+  position:absolute;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none;
+  font-family:"Cinzel",serif;font-weight:700;color:var(--ink);
+  font-size:clamp(1.9rem,11vw,3.2rem);line-height:1;letter-spacing:.05em;padding:0 10px;
+  text-shadow:0 1px 0 rgba(255,255,255,.45);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.kluis.open .deur.l{transform:translateX(-101%)}
+.kluis.open .deur.r{transform:translateX(101%)}
+.kluis.open .carve{opacity:0;transform:scale(.75)}
+
+.plaat{
+  width:100%;background:linear-gradient(180deg,var(--plaat-1),var(--plaat-2));
+  border:3px solid var(--lijn);border-radius:16px;padding:16px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.45);
+}
+.plaat .label{font-size:.75rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.plaat .groot{font-family:"Fredoka",sans-serif;font-size:clamp(2.2rem,12vw,3.2rem);font-weight:600;line-height:1.05}
+.plaat .rom{font-family:"Cinzel",serif;font-weight:700;font-size:clamp(1.9rem,10vw,2.8rem);letter-spacing:.08em}
+
+.keuzeplaten{display:flex;gap:10px;width:100%}
+.keuzeplaat{
+  flex:1;cursor:pointer;color:var(--ink);
+  background:linear-gradient(180deg,var(--plaat-1),var(--plaat-2));
+  border:3px solid var(--lijn);border-radius:16px;padding:18px 8px;min-height:96px;
+  font-family:"Cinzel",serif;font-weight:700;font-size:clamp(1.6rem,9vw,2.4rem);letter-spacing:.06em;
+  box-shadow:var(--lift);
+}
+.keuzeplaat:active{transform:translateY(3px);box-shadow:var(--lift-klein)}
+.keuzeplaat.goed-keus{border-color:var(--goed);background:var(--goed-zacht);color:var(--goed)}
+.keuzeplaat.fout-keus{border-color:var(--fout);background:var(--fout-zacht);color:var(--fout)}
+
+.somregel{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.05em .3em;
+  font-family:"Cinzel",serif;font-weight:700;font-size:clamp(1.6rem,8.5vw,2.6rem);line-height:1.15;
+}
+.somregel .teken{font-family:"Fredoka",sans-serif;font-weight:500;color:var(--rood)}
+
+.antwoordveld{display:flex;flex-direction:column;align-items:center;gap:4px}
+.antwoordveld .label{font-size:.75rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.vak{
+  min-width:2.6em;min-height:1.3em;text-align:center;padding:0 .15em;
+  display:inline-flex;align-items:baseline;justify-content:center;
+  border-bottom:5px solid var(--rood);
+  font-family:"Fredoka",sans-serif;font-weight:600;font-size:clamp(2rem,10vw,2.8rem);line-height:1.15;
+  font-variant-numeric:tabular-nums;
+}
+.vak.rom{font-family:"Cinzel",serif;font-weight:700;letter-spacing:.06em;min-width:4em}
+.vak.is-goed{border-bottom-color:var(--goed);color:var(--goed)}
+.vak.is-fout{border-bottom-color:var(--fout);color:var(--fout)}
+.caret{display:inline-block;width:.09em;height:.8em;background:currentColor;opacity:.45;animation:knipper 1.1s steps(1) infinite}
+@keyframes knipper{50%{opacity:0}}
+.schud{animation:schud .35s ease}
+@keyframes schud{20%{transform:translateX(-7px)}50%{transform:translateX(6px)}80%{transform:translateX(-3px)}}
+
+/* ---------- melding ---------- */
+.melding{min-height:2.4em;display:flex;flex-direction:column;gap:6px;justify-content:center}
+.melding .kop{font-family:"Fredoka",sans-serif;font-size:1.12rem;font-weight:600}
+.melding.is-goed .kop{color:var(--goed)}
+.melding.is-fout .kop{color:var(--fout)}
+.stappen{
+  font-variant-numeric:tabular-nums;font-size:.98rem;color:var(--muted);
+  background:var(--panel-2);border:2px solid var(--lijn);border-radius:12px;padding:10px 12px;
+}
+.stappen b{color:var(--ink)}
+.stappen .rom{font-family:"Cinzel",serif;font-weight:700;color:var(--rood)}
+
+/* ---------- pads ---------- */
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.toets{
+  font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.6rem;
+  min-height:56px;border-radius:14px;cursor:pointer;
+  background:var(--panel);color:var(--ink);border:2px solid var(--lijn);
+  box-shadow:var(--lift);font-variant-numeric:tabular-nums;
+}
+.toets:active{transform:translateY(3px);box-shadow:var(--lift-klein)}
+.toets:disabled{opacity:.4;cursor:default;transform:none}
+.toets.rom{font-family:"Cinzel",serif;letter-spacing:.05em;color:var(--rood)}
+.toets.wis{font-family:"Nunito",sans-serif;font-weight:800;font-size:1rem}
+.toets.klaar{font-family:"Nunito",sans-serif;font-weight:800;font-size:1rem;background:var(--rood);color:#fff;border-color:transparent}
+.tekenpad{display:flex;flex-direction:column;gap:9px}
+.tekenpad .rij{display:flex;gap:9px}
+.tekenpad .rij .toets{flex:1}
+
+.onderbalk{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.spiekbrief{
+  display:flex;flex-direction:column;gap:8px;
+  background:var(--goud-zacht);border:2px dashed var(--goud);border-radius:14px;padding:11px 12px;
+}
+.spiekrij{display:flex;gap:6px;flex-wrap:wrap}
+.spiekrij .chip{background:var(--panel)}
+
+/* ---------- eind ---------- */
+.sterrenrij{font-size:1.45rem;letter-spacing:.06em;color:var(--lijn);line-height:1.2;text-align:center}
+.sterrenrij .vol{color:var(--goud)}
+.stats{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stats li{
+  background:var(--panel-2);border:2px solid var(--lijn);border-radius:14px;
+  padding:10px 8px;text-align:center;display:flex;flex-direction:column;gap:2px;
+}
+.stats span{font-family:"Fredoka",sans-serif;font-size:1.3rem;font-weight:600;font-variant-numeric:tabular-nums}
+.stats small{font-size:.7rem;color:var(--muted);font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.foutenlijst{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.foutenlijst li{
+  background:var(--fout-zacht);color:var(--ink);border-radius:10px;padding:6px 10px;
+  font-variant-numeric:tabular-nums;font-size:.98rem;
+}
+.foutenlijst .rom{font-family:"Cinzel",serif;font-weight:700}
+.blok{display:flex;flex-direction:column;gap:10px}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="merknaam"><span class="merk-badge romeins">X</span> Noams Romeinse Rijk</div>
+  <div class="voortgang" id="voortgang" hidden>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+    <div class="levelje" id="levelje">Level I</div>
+  </div>
+</header>
+
+<main>
+
+<!-- ---------- start ---------- -->
+<section class="kaart" id="startScherm">
+  <p class="eyebrow">Romeinse cijfers · tot 100</p>
+  <h1>Hoi Noam! Kun jij dit lezen: <span class="romeins">XLII</span>?</h1>
+  <p class="lead">De Romeinen schreven getallen met letters. Leer eerst hoe het werkt, en kraak daarna de kluizen.</p>
+  <button class="btn groot" id="leerBtn">📜 Leer het eerst uit →</button>
+  <p class="eyebrow">Kies een level</p>
+  <div class="levels" id="levelLijst"></div>
+  <p class="hint">Tip: je hoeft niks te onthouden — de spiekbrief mag altijd open.</p>
+</section>
+
+<!-- ---------- leren ---------- -->
+<section class="kaart" id="leerScherm" hidden>
+  <p class="eyebrow">Uitleg</p>
+  <h2>Vijf letters, meer heb je niet nodig</h2>
+  <p>Tot 100 gebruiken de Romeinen deze vijf. Tik er maar op.</p>
+  <div class="tekenrij" id="tekenrij">
+    <button class="tekenkaart" data-teken="I"><b>I</b><span>1</span></button>
+    <button class="tekenkaart" data-teken="V"><b>V</b><span>5</span></button>
+    <button class="tekenkaart" data-teken="X"><b>X</b><span>10</span></button>
+    <button class="tekenkaart" data-teken="L"><b>L</b><span>50</span></button>
+    <button class="tekenkaart" data-teken="C"><b>C</b><span>100</span></button>
+  </div>
+  <p class="hint" id="tekenUitleg">I is één vinger. V is een hand: 5. X zijn twee handen: 10.</p>
+
+  <div class="regelblok">
+    <h3>Regel 1: grootste eerst, dan optellen</h3>
+    <p class="hint">Je schrijft van groot naar klein en telt alles bij elkaar op.</p>
+    <div class="voorbeeld">
+      <span class="rom">VIII</span><span class="plus">=</span>
+      <span class="chip"><b>V</b>5</span><span class="plus">+</span>
+      <span class="chip"><b>I</b>1</span><span class="plus">+</span>
+      <span class="chip"><b>I</b>1</span><span class="plus">+</span>
+      <span class="chip"><b>I</b>1</span><span class="plus">=</span>
+      <span class="chip totaal">8</span>
+    </div>
+  </div>
+
+  <div class="regelblok let-op">
+    <h3>Regel 2: staat de kleine ervóór? Dan gaat hij eraf</h3>
+    <p class="hint">Vier stokjes achter elkaar is lastig tellen. Daarom zetten de Romeinen de I <em>vóór</em> de V.</p>
+    <div class="voorbeeld"><span class="rom">IV</span><span class="plus">=</span> 5 &minus; 1 <span class="plus">=</span><span class="chip totaal">4</span></div>
+    <div class="voorbeeld"><span class="rom">IX</span><span class="plus">=</span> 10 &minus; 1 <span class="plus">=</span><span class="chip totaal">9</span></div>
+    <div class="voorbeeld"><span class="rom">XL</span><span class="plus">=</span> 50 &minus; 10 <span class="plus">=</span><span class="chip totaal">40</span></div>
+    <div class="voorbeeld"><span class="rom">XC</span><span class="plus">=</span> 100 &minus; 10 <span class="plus">=</span><span class="chip totaal">90</span></div>
+  </div>
+
+  <h3>De vertaalmachine</h3>
+  <p class="hint">Schuif of tik, en kijk wat de Romeinen zouden schrijven.</p>
+  <div class="machine">
+    <div class="getalregel">
+      <button class="rondknop" id="minBtn" aria-label="Eentje minder">&minus;</button>
+      <div class="getal" id="machineGetal">1</div>
+      <button class="rondknop" id="plusBtn" aria-label="Eentje meer">+</button>
+    </div>
+    <input type="range" id="schuif" min="1" max="100" value="1" aria-label="Kies een getal van 1 tot 100">
+    <div class="uitkomst romeins" id="machineRom">I</div>
+    <div class="voorbeeld" id="machineStukken" style="justify-content:center"></div>
+    <p class="hint" id="machineNoot" style="text-align:center"></p>
+  </div>
+
+  <h3>Alle getallen tot tien</h3>
+  <div class="tabel" id="tabelKlein"></div>
+  <h3>En de tientallen</h3>
+  <div class="tabel" id="tabelGroot"></div>
+
+  <button class="btn groot" id="naarSpelBtn">Ik snap het — naar de spelletjes →</button>
+</section>
+
+<!-- ---------- spelen ---------- -->
+<section class="kaart" id="speelScherm" hidden>
+  <p class="eyebrow" id="taakEyebrow">Opdracht 1 van 8</p>
+  <h2 class="opdracht" id="opdrachtTekst">Welk getal staat op de kluis?</h2>
+  <div class="toneel" id="toneel"></div>
+  <div class="melding" id="melding" role="status" aria-live="polite"></div>
+
+  <div class="numpad" id="cijferPad">
+    <button class="toets" data-toets="1">1</button>
+    <button class="toets" data-toets="2">2</button>
+    <button class="toets" data-toets="3">3</button>
+    <button class="toets" data-toets="4">4</button>
+    <button class="toets" data-toets="5">5</button>
+    <button class="toets" data-toets="6">6</button>
+    <button class="toets" data-toets="7">7</button>
+    <button class="toets" data-toets="8">8</button>
+    <button class="toets" data-toets="9">9</button>
+    <button class="toets wis" data-toets="wis">← wis</button>
+    <button class="toets" data-toets="0">0</button>
+    <button class="toets klaar" data-toets="klaar">Klaar</button>
+  </div>
+
+  <div class="tekenpad" id="tekenPad" hidden>
+    <div class="rij" id="tekenRij"></div>
+    <div class="rij">
+      <button class="toets wis" data-toets="wis">← wis</button>
+      <button class="toets klaar" data-toets="klaar">Klaar</button>
+    </div>
+  </div>
+
+  <div class="onderbalk">
+    <button class="btn zacht" id="hulpBtn">💡 Help me</button>
+    <button class="btn" id="volgendeBtn" hidden>Volgende →</button>
+    <button class="tekstknop" id="spiekBtn">📜 spiekbrief</button>
+    <button class="tekstknop" id="stopBtn">stoppen</button>
+  </div>
+
+  <div class="spiekbrief" id="spiekbrief" hidden>
+    <div class="spiekrij">
+      <span class="chip"><b>I</b>1</span><span class="chip"><b>V</b>5</span><span class="chip"><b>X</b>10</span>
+      <span class="chip"><b>L</b>50</span><span class="chip"><b>C</b>100</span>
+    </div>
+    <p class="hint">Klein vóór groot? Dan gaat hij eraf: <span class="romeins">IV</span> = 4, <span class="romeins">IX</span> = 9, <span class="romeins">XL</span> = 40, <span class="romeins">XC</span> = 90.</p>
+  </div>
+</section>
+
+<!-- ---------- klaar ---------- -->
+<section class="kaart" id="eindScherm" hidden>
+  <p class="eyebrow" id="eindEyebrow">Level klaar</p>
+  <h2 id="eindTitel">Goed bezig!</h2>
+  <div class="sterrenrij" id="sterrenrij" aria-hidden="true"></div>
+  <p class="lead" id="eindRegel"></p>
+  <ul class="stats">
+    <li><span id="statGoed">0</span><small>goed</small></li>
+    <li><span id="statSterren">0</span><small>sterren</small></li>
+    <li><span id="statRecord">—</span><small>record</small></li>
+  </ul>
+  <div class="blok" id="foutenBlok" hidden>
+    <h3>Deze waren lastig</h3>
+    <ul class="foutenlijst" id="foutenlijst"></ul>
+  </div>
+  <div class="knoprij">
+    <button class="btn" id="opnieuwBtn">Nog een keer</button>
+    <button class="btn goud" id="volgendLevelBtn" hidden>Volgend level →</button>
+  </div>
+  <button class="btn zacht" id="kaartBtn">← Terug naar de levels</button>
+</section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SLEUTEL = "noam-romeins-v1";
+  var PER_LEVEL = 8;
+
+  var PAREN = [[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]];
+  var WAARDE = {I:1, V:5, X:10, L:50, C:100};
+  var AFTREK = {
+    "IV":"IV is een I vóór de V: 5 &minus; 1 = 4.",
+    "IX":"IX is een I vóór de X: 10 &minus; 1 = 9.",
+    "XL":"XL is een X vóór de L: 50 &minus; 10 = 40.",
+    "XC":"XC is een X vóór de C: 100 &minus; 10 = 90."
+  };
+  var TEKENPRAAT = {
+    "I":"I is één stokje. Twee stokjes is II = 2, drie is III = 3.",
+    "V":"V is een hand met vijf vingers: 5.",
+    "X":"X zijn twee handen op elkaar: 10.",
+    "L":"L is 50. Vijf keer tien.",
+    "C":"C is 100 — van centum, het Latijnse woord voor honderd."
+  };
+
+  var LEVELS = [
+    {rom:"I",   naam:"Tot 5",   omschrijving:"I, II, III, IV, V",      van:1,  tot:5,   focus:[2,5],    tekens:["I","V"],             soorten:["kluis","bouw"]},
+    {rom:"II",  naam:"Tot 10",  omschrijving:"met de V en de X",       van:1,  tot:10,  focus:[6,10],   tekens:["I","V","X"],         soorten:["kluis","bouw","reken"]},
+    {rom:"III", naam:"Tot 20",  omschrijving:"XI tot XX, en IX en XIV",van:4,  tot:20,  focus:[11,20],  tekens:["I","V","X"],         soorten:["kluis","bouw","reken","groter"]},
+    {rom:"IV",  naam:"Tot 50",  omschrijving:"de tientallen en de L",  van:8,  tot:50,  focus:[21,50],  tekens:["I","V","X","L"],     soorten:["kluis","bouw","reken","groter"]},
+    {rom:"V",   naam:"Tot 100", omschrijving:"alles, tot aan de C",    van:20, tot:100, focus:[51,100], tekens:["I","V","X","L","C"], soorten:["kluis","bouw","reken","groter"]}
+  ];
+
+  var el = {};
+  ["voortgang","dots","levelje","startScherm","leerScherm","speelScherm","eindScherm",
+   "levelLijst","leerBtn","naarSpelBtn","tekenrij","tekenUitleg","minBtn","plusBtn","schuif",
+   "machineGetal","machineRom","machineStukken","machineNoot","tabelKlein","tabelGroot",
+   "taakEyebrow","opdrachtTekst","toneel","melding","cijferPad","tekenPad","tekenRij",
+   "hulpBtn","volgendeBtn","spiekBtn","stopBtn","spiekbrief",
+   "eindEyebrow","eindTitel","sterrenrij","eindRegel","statGoed","statSterren","statRecord",
+   "foutenBlok","foutenlijst","opnieuwBtn","volgendLevelBtn","kaartBtn"
+  ].forEach(function(id){ el[id] = document.getElementById(id); });
+
+  var s = null;
+  var vak = null, invoerSpan = null, caret = null;
+
+  /* ---------- romeins rekenen ---------- */
+  function naarRomeins(n){
+    var uit = "";
+    for (var i = 0; i < PAREN.length; i++){
+      while (n >= PAREN[i][0]){ uit += PAREN[i][1]; n -= PAREN[i][0]; }
+    }
+    return uit;
+  }
+
+  function stukken(n){
+    var lijst = [];
+    for (var i = 0; i < PAREN.length; i++){
+      while (n >= PAREN[i][0]){ lijst.push({t:PAREN[i][1], w:PAREN[i][0]}); n -= PAREN[i][0]; }
+    }
+    return lijst;
+  }
+
+  function naarGetal(tekst){
+    var t = 0;
+    tekst = String(tekst).toUpperCase();
+    for (var i = 0; i < tekst.length; i++){
+      var nu = WAARDE[tekst.charAt(i)] || 0;
+      var na = WAARDE[tekst.charAt(i + 1)] || 0;
+      t += (nu < na) ? -nu : nu;
+    }
+    return t;
+  }
+
+  function stukjesHtml(n){
+    var st = stukken(n);
+    var delen = st.map(function(p){ return '<span class="chip"><b>' + p.t + "</b>" + p.w + "</span>"; });
+    return delen.join('<span class="plus">+</span>') +
+      '<span class="plus">=</span><span class="chip totaal">' + n + "</span>";
+  }
+
+  function somRegel(n){
+    var st = stukken(n);
+    var getallen = st.map(function(p){ return p.w; }).join(" + ");
+    return '<span class="rom">' + naarRomeins(n) + "</span> = " + getallen + " = <b>" + n + "</b>";
+  }
+
+  function aftrekNoot(n){
+    var st = stukken(n);
+    for (var i = 0; i < st.length; i++){
+      if (AFTREK[st[i].t]) return AFTREK[st[i].t];
+    }
+    return "";
+  }
+
+  /* ---------- opslag ---------- */
+  function lees(){
+    var leeg = { level:0, sterren:{}, spiek:false };
+    try {
+      var d = JSON.parse(localStorage.getItem(SLEUTEL));
+      if (!d || typeof d.level !== "number") return leeg;
+      if (!d.sterren) d.sterren = {};
+      return d;
+    } catch (e){ return leeg; }
+  }
+  function schrijf(d){
+    try { localStorage.setItem(SLEUTEL, JSON.stringify(d)); } catch (e){}
+  }
+  var data = lees();
+
+  /* ---------- schermen ---------- */
+  function toon(naam){
+    el.startScherm.hidden = naam !== "start";
+    el.leerScherm.hidden  = naam !== "leren";
+    el.speelScherm.hidden = naam !== "speel";
+    el.eindScherm.hidden  = naam !== "eind";
+    el.voortgang.hidden   = naam !== "speel";
+    window.scrollTo(0, 0);
+  }
+
+  function bouwLevelLijst(){
+    el.levelLijst.innerHTML = "";
+    LEVELS.forEach(function(cfg, i){
+      var open = i <= data.level;
+      var best = data.sterren[i] || 0;
+      var knop = document.createElement("button");
+      knop.className = "levelknop" + (open ? "" : " op-slot");
+      knop.disabled = !open;
+      knop.innerHTML =
+        '<span class="cijfer">' + cfg.rom + "</span>" +
+        '<span class="tekst">' + cfg.naam + "<small>" + cfg.omschrijving + "</small></span>" +
+        '<span class="score">' + (open ? (best ? "★ " + best + "/" + PER_LEVEL : "nieuw") : "🔒") + "</span>";
+      knop.addEventListener("click", function(){ startLevel(i); });
+      el.levelLijst.appendChild(knop);
+    });
+  }
+
+  /* ---------- uitleg ---------- */
+  function zetMachine(n){
+    n = Math.max(1, Math.min(100, n));
+    el.machineGetal.textContent = n;
+    el.schuif.value = n;
+    el.machineRom.textContent = naarRomeins(n);
+    el.machineStukken.innerHTML = stukjesHtml(n);
+    el.machineNoot.innerHTML = aftrekNoot(n);
+  }
+
+  function bouwTabellen(){
+    function vul(node, getallen){
+      node.innerHTML = "";
+      getallen.forEach(function(n){
+        var b = document.createElement("button");
+        b.innerHTML = "<b>" + naarRomeins(n) + "</b><small>" + n + "</small>";
+        b.addEventListener("click", function(){ zetMachine(n); });
+        node.appendChild(b);
+      });
+    }
+    vul(el.tabelKlein, [1,2,3,4,5,6,7,8,9,10]);
+    vul(el.tabelGroot, [10,20,30,40,50,60,70,80,90,100]);
+  }
+
+  /* ---------- opdrachten maken ---------- */
+  function rnd(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+
+  function kiesGetal(cfg){
+    if (Math.random() < 0.65) return rnd(cfg.focus[0], cfg.focus[1]);
+    return rnd(cfg.van, cfg.tot);
+  }
+
+  function maakReken(cfg){
+    var probeer = 0, a, b, op, uit;
+    var grootstTiental = Math.floor((cfg.tot - 1) / 10);
+    while (probeer++ < 400){
+      op = (cfg.tot > 5 && Math.random() < 0.35) ? "-" : "+";
+      if (grootstTiental >= 1 && Math.random() < 0.5) b = 10 * rnd(1, grootstTiental);
+      else b = rnd(1, Math.min(5, cfg.tot - 1));
+      if (b < 1) continue;
+      if (op === "+"){
+        a = rnd(1, cfg.tot - 1);
+        uit = a + b;
+        if (uit > cfg.tot || uit < 2) continue;
+        if ((a % 10) + (b % 10) > 9) continue;
+      } else {
+        a = rnd(2, cfg.tot);
+        uit = a - b;
+        if (uit < 1) continue;
+        if ((a % 10) < (b % 10)) continue;
+      }
+      return { soort:"reken", a:a, b:b, op:op, antwoord:uit };
+    }
+    return { soort:"reken", a:2, b:2, op:"+", antwoord:4 };
+  }
+
+  function maakGroter(cfg){
+    var a, b, probeer = 0;
+    do {
+      a = kiesGetal(cfg); b = kiesGetal(cfg);
+    } while (Math.abs(a - b) < 2 && probeer++ < 60);
+    if (a === b) b = Math.min(cfg.tot, a + 2);
+    return { soort:"groter", a:a, b:b, antwoord:(a > b ? "a" : "b") };
+  }
+
+  function husselen(rij){
+    for (var i = rij.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = rij[i]; rij[i] = rij[j]; rij[j] = t;
+    }
+    return rij;
+  }
+
+  function maakTaken(cfg){
+    var soorten = [], i;
+    while (soorten.length < PER_LEVEL){
+      soorten = soorten.concat(cfg.soorten);
+    }
+    soorten = husselen(soorten.slice(0, PER_LEVEL));
+
+    var taken = [], gezien = {};
+    for (i = 0; i < PER_LEVEL; i++){
+      var soort = soorten[i], taak, pogingen = 0, sleutel;
+      do {
+        if (soort === "reken") taak = maakReken(cfg);
+        else if (soort === "groter") taak = maakGroter(cfg);
+        else taak = { soort:soort, getal:kiesGetal(cfg) };
+        sleutel = soort + ":" + (taak.getal !== undefined ? taak.getal : taak.a + (taak.op || "?") + taak.b);
+      } while (gezien[sleutel] && pogingen++ < 40);
+      gezien[sleutel] = true;
+      taken.push(taak);
+    }
+    return taken;
+  }
+
+  /* ---------- level spelen ---------- */
+  function startLevel(index){
+    var cfg = LEVELS[index];
+    s = {
+      level: index, cfg: cfg, taken: maakTaken(cfg), i: 0,
+      goed: 0, sterren: 0, fouten: [], invoer: "", fase: "invoer", hulp: false
+    };
+    el.levelje.textContent = "Level " + cfg.rom;
+    bouwTekenRij(cfg.tekens);
+    bouwDots();
+    toon("speel");
+    laadTaak();
+  }
+
+  function bouwDots(){
+    el.dots.innerHTML = "";
+    for (var i = 0; i < PER_LEVEL; i++){
+      var d = document.createElement("span");
+      d.className = "dot";
+      el.dots.appendChild(d);
+    }
+  }
+
+  function bouwTekenRij(tekens){
+    el.tekenRij.innerHTML = "";
+    tekens.forEach(function(t){
+      var b = document.createElement("button");
+      b.className = "toets rom";
+      b.setAttribute("data-toets", t);
+      b.textContent = t;
+      el.tekenRij.appendChild(b);
+    });
+  }
+
+  function pakVak(){
+    vak = document.getElementById("vak");
+    invoerSpan = document.getElementById("invoer");
+    caret = document.getElementById("caret");
+  }
+
+  function antwoordVeldHtml(label, romeins){
+    return '<div class="antwoordveld"><span class="label">' + label + "</span>" +
+      '<span class="vak' + (romeins ? " rom" : "") + '" id="vak"><span id="invoer"></span><span class="caret" id="caret"></span></span></div>';
+  }
+
+  function laadTaak(){
+    var taak = s.taken[s.i];
+    s.invoer = "";
+    s.fase = "invoer";
+    s.hulp = false;
+
+    el.taakEyebrow.textContent = "Opdracht " + (s.i + 1) + " van " + PER_LEVEL;
+    el.melding.className = "melding";
+    el.melding.innerHTML = "";
+    el.volgendeBtn.hidden = true;
+    el.hulpBtn.hidden = false;
+    el.hulpBtn.disabled = false;
+    el.hulpBtn.textContent = "💡 Help me";
+
+    if (taak.soort === "kluis"){
+      var rom = naarRomeins(taak.getal);
+      el.opdrachtTekst.textContent = "Welk getal staat er op de kluis?";
+      el.toneel.innerHTML =
+        '<div class="kluis" id="kluis"><div class="binnen">🪙 💰 🪙</div>' +
+        '<div class="deuren"><div class="deur l"></div><div class="deur r"></div></div>' +
+        '<div class="carve">' + rom + "</div></div>" +
+        antwoordVeldHtml("typ de code", false);
+      zetPad("cijfer");
+    } else if (taak.soort === "bouw"){
+      el.opdrachtTekst.textContent = "Schrijf dit getal in Romeinse cijfers";
+      el.toneel.innerHTML =
+        '<div class="plaat"><span class="label">hak dit in steen</span>' +
+        '<span class="groot">' + taak.getal + "</span></div>" +
+        antwoordVeldHtml("jouw steen", true);
+      zetPad("teken");
+    } else if (taak.soort === "reken"){
+      el.opdrachtTekst.textContent = "Reken uit — antwoord in gewone cijfers";
+      el.toneel.innerHTML =
+        '<div class="somregel"><span>' + naarRomeins(taak.a) + "</span>" +
+        '<span class="teken">' + (taak.op === "+" ? "+" : "−") + "</span>" +
+        "<span>" + naarRomeins(taak.b) + '</span><span class="teken">=</span></div>' +
+        antwoordVeldHtml("jouw antwoord", false);
+      zetPad("cijfer");
+    } else {
+      el.opdrachtTekst.textContent = "Welke is het grootst?";
+      el.toneel.innerHTML =
+        '<div class="keuzeplaten">' +
+        '<button class="keuzeplaat" data-keus="a">' + naarRomeins(taak.a) + "</button>" +
+        '<button class="keuzeplaat" data-keus="b">' + naarRomeins(taak.b) + "</button></div>";
+      zetPad("geen");
+    }
+
+    pakVak();
+    tekenInvoer();
+    werkDotsBij();
+  }
+
+  function zetPad(welke){
+    el.cijferPad.hidden = welke !== "cijfer";
+    el.tekenPad.hidden = welke !== "teken";
+    zetToetsen(false);
+  }
+
+  function zetToetsen(uit){
+    var toetsen = el.speelScherm.querySelectorAll(".toets");
+    for (var i = 0; i < toetsen.length; i++) toetsen[i].disabled = uit;
+  }
+
+  function werkDotsBij(){
+    var d = el.dots.children[s.i];
+    if (d && !d.classList.contains("goed") && !d.classList.contains("fout")) d.classList.add("nu");
+  }
+
+  function tekenInvoer(){
+    if (!invoerSpan) return;
+    invoerSpan.textContent = s.invoer;
+    if (caret) caret.hidden = s.fase !== "invoer";
+  }
+
+  function voegToe(teken){
+    if (s.fase !== "invoer") return;
+    var taak = s.taken[s.i];
+    if (taak.soort === "bouw"){
+      if (s.invoer.length >= 12) return;
+    } else {
+      if (s.invoer.length >= 3) return;
+      if (s.invoer === "" && teken === "0") return;
+    }
+    s.invoer += teken;
+    tekenInvoer();
+  }
+
+  function wisTeken(){
+    if (s.fase !== "invoer") return;
+    s.invoer = s.invoer.slice(0, -1);
+    tekenInvoer();
+  }
+
+  function schud(node){
+    if (!node) return;
+    node.classList.remove("schud");
+    void node.offsetWidth;
+    node.classList.add("schud");
+  }
+
+  var JUBELS = ["Goed zo! 💪", "Yes! ⭐", "Knap gedaan!", "Precies! 🎯", "Top!", "Caesar zou trots zijn! 🏛️"];
+  function jubel(){ return JUBELS[Math.floor(Math.random() * JUBELS.length)]; }
+
+  function goedGedaan(kopTekst, uitlegHtml, wacht){
+    s.fase = "goed";
+    s.goed++;
+    if (!s.hulp) s.sterren++;
+    var d = el.dots.children[s.i];
+    if (d){ d.classList.remove("nu"); d.classList.add("goed"); }
+    if (vak) vak.classList.add("is-goed");
+    el.melding.className = "melding is-goed";
+    el.melding.innerHTML = '<p class="kop">' + kopTekst + "</p>" +
+      (uitlegHtml ? '<p class="stappen">' + uitlegHtml + "</p>" : "");
+    el.hulpBtn.hidden = true;
+    zetToetsen(true);
+    tekenInvoer();
+    setTimeout(volgende, wacht || 1200);
+  }
+
+  function foutGedaan(kopTekst, uitlegHtml){
+    s.fase = "fout";
+    var taak = s.taken[s.i];
+    var d = el.dots.children[s.i];
+    if (d){ d.classList.remove("nu"); d.classList.add("fout"); }
+    if (vak) vak.classList.add("is-fout");
+    s.fouten.push(taak);
+    el.melding.className = "melding is-fout";
+    el.melding.innerHTML = '<p class="kop">' + kopTekst + "</p>" +
+      (uitlegHtml ? '<p class="stappen">' + uitlegHtml + "</p>" : "");
+    el.hulpBtn.hidden = true;
+    el.volgendeBtn.hidden = false;
+    zetToetsen(true);
+    schud(vak || el.toneel);
+    tekenInvoer();
+  }
+
+  function nakijken(){
+    if (s.fase !== "invoer") return;
+    var taak = s.taken[s.i];
+
+    if (taak.soort === "kluis"){
+      if (s.invoer === ""){ schud(vak); return; }
+      var gok = parseInt(s.invoer, 10);
+      if (gok === taak.getal){
+        var kluis = document.getElementById("kluis");
+        if (kluis) kluis.classList.add("open");
+        goedGedaan("De kluis gaat open! 💰", somRegel(taak.getal), 1700);
+      } else {
+        foutGedaan("Bijna! De kluis blijft dicht.", somRegel(taak.getal) + " " + aftrekNoot(taak.getal));
+      }
+
+    } else if (taak.soort === "bouw"){
+      if (s.invoer === ""){ schud(vak); return; }
+      var juist = naarRomeins(taak.getal);
+      if (s.invoer === juist){
+        goedGedaan(jubel(), somRegel(taak.getal));
+      } else if (naarGetal(s.invoer) === taak.getal){
+        s.hulp = true; // telde goed, maar niet de korte schrijfwijze: geen ster
+        goedGedaan("Je telde goed! ✋ Maar de Romeinen schrijven het korter.",
+          "<b>" + s.invoer + "</b> is samen wel " + taak.getal + ", maar het hoort " +
+          '<span class="rom">' + juist + "</span> te zijn. " + aftrekNoot(taak.getal));
+      } else {
+        foutGedaan("Nog niet. " + taak.getal + ' is <span class="rom">' + juist + "</span>.",
+          somRegel(taak.getal) + " " + aftrekNoot(taak.getal));
+      }
+
+    } else if (taak.soort === "reken"){
+      if (s.invoer === ""){ schud(vak); return; }
+      var uit = parseInt(s.invoer, 10);
+      var tekenOp = taak.op === "+" ? "+" : "−";
+      var uitlegSom =
+        '<span class="rom">' + naarRomeins(taak.a) + "</span> = " + taak.a + " en " +
+        '<span class="rom">' + naarRomeins(taak.b) + "</span> = " + taak.b + ", dus <b>" +
+        taak.a + " " + tekenOp + " " + taak.b + " = " + taak.antwoord + "</b> = " +
+        '<span class="rom">' + naarRomeins(taak.antwoord) + "</span>.";
+      if (uit === taak.antwoord) goedGedaan(jubel(), uitlegSom);
+      else foutGedaan("Bijna! Het antwoord is " + taak.antwoord + ".", uitlegSom);
+    }
+  }
+
+  function kiesGroter(keus){
+    if (s.fase !== "invoer") return;
+    var taak = s.taken[s.i];
+    var platen = el.toneel.querySelectorAll(".keuzeplaat");
+    var groot = Math.max(taak.a, taak.b), klein = Math.min(taak.a, taak.b);
+    var uitleg =
+      '<span class="rom">' + naarRomeins(groot) + "</span> = " + groot + " en " +
+      '<span class="rom">' + naarRomeins(klein) + "</span> = " + klein + ", dus <b>" +
+      naarRomeins(groot) + "</b> is groter.";
+    for (var i = 0; i < platen.length; i++){
+      var k = platen[i].getAttribute("data-keus");
+      platen[i].classList.add(k === taak.antwoord ? "goed-keus" : "fout-keus");
+      platen[i].disabled = true;
+    }
+    if (keus === taak.antwoord) goedGedaan(jubel(), uitleg, 1400);
+    else foutGedaan("Net niet!", uitleg);
+  }
+
+  function geefHulp(){
+    if (s.fase !== "invoer") return;
+    var taak = s.taken[s.i];
+    s.hulp = true;
+    el.spiekbrief.hidden = false;
+    var tekst;
+    if (taak.soort === "kluis"){
+      var st = stukken(taak.getal);
+      tekst = "Lees de letters van links naar rechts: " +
+        st.map(function(p){ return '<span class="rom">' + p.t + "</span> is " + p.w; }).join(", ") +
+        ". Tel ze nu bij elkaar op.";
+    } else if (taak.soort === "bouw"){
+      var st2 = stukken(taak.getal);
+      tekst = "Begin met het grootste stuk: " + taak.getal + " = " +
+        st2.map(function(p){ return p.w; }).join(" + ") + ". Welke letters horen daarbij?";
+    } else if (taak.soort === "reken"){
+      tekst = '<span class="rom">' + naarRomeins(taak.a) + "</span> is <b>" + taak.a + "</b> en " +
+        '<span class="rom">' + naarRomeins(taak.b) + "</span> is <b>" + taak.b + "</b>. Reken die twee nu gewoon uit.";
+    } else {
+      tekst = "Kijk eerst naar de eerste letter: een <span class=\"rom\">X</span> is meer waard dan een <span class=\"rom\">V</span>.";
+    }
+    el.melding.className = "melding";
+    el.melding.innerHTML = '<p class="stappen">' + tekst + "</p>";
+    el.hulpBtn.disabled = true;
+    el.hulpBtn.textContent = "💡 Hulp staat hieronder";
+  }
+
+  function volgende(){
+    if (!s || s.fase === "invoer" || el.speelScherm.hidden) return;
+    s.i++;
+    if (s.i >= s.taken.length) eindScherm();
+    else laadTaak();
+  }
+
+  /* ---------- eind ---------- */
+  function eindScherm(){
+    var cfg = s.cfg;
+    var beste = data.sterren[s.level] || 0;
+    var nieuwRecord = s.sterren > beste;
+    if (nieuwRecord) data.sterren[s.level] = s.sterren;
+    var ontgrendeld = false;
+    if (s.level + 1 < LEVELS.length && data.level < s.level + 1){
+      data.level = s.level + 1;
+      ontgrendeld = true;
+    }
+    schrijf(data);
+
+    el.eindEyebrow.textContent = "Level " + cfg.rom + " klaar";
+    el.eindTitel.textContent =
+      s.goed === PER_LEVEL ? "Alles goed! 🏆" :
+      s.goed >= PER_LEVEL - 2 ? "Sterk gedaan!" :
+      s.goed >= PER_LEVEL / 2 ? "Goed bezig!" : "Lekker geoefend!";
+
+    var sterren = "";
+    for (var i = 0; i < PER_LEVEL; i++){
+      sterren += i < s.sterren ? '<span class="vol">★</span>' : "<span>☆</span>";
+    }
+    el.sterrenrij.innerHTML = sterren;
+
+    el.eindRegel.textContent =
+      s.goed + " van de " + PER_LEVEL + " goed, waarvan " + s.sterren + " in één keer zonder hulp." +
+      (ontgrendeld ? " Level " + LEVELS[s.level + 1].rom + " is nu open!" : "");
+
+    el.statGoed.textContent = s.goed + "/" + PER_LEVEL;
+    el.statSterren.textContent = s.sterren;
+    el.statRecord.textContent = (data.sterren[s.level] || 0) + "/" + PER_LEVEL;
+    if (nieuwRecord) el.eindEyebrow.textContent = "Nieuw record! 🎉";
+
+    if (s.fouten.length){
+      el.foutenlijst.innerHTML = s.fouten.map(function(f){
+        if (f.soort === "reken"){
+          return "<li><span class=\"rom\">" + naarRomeins(f.a) + "</span> " + (f.op === "+" ? "+" : "−") +
+            " <span class=\"rom\">" + naarRomeins(f.b) + "</span> = " + f.antwoord + "</li>";
+        }
+        if (f.soort === "groter"){
+          var g = Math.max(f.a, f.b);
+          return "<li><span class=\"rom\">" + naarRomeins(g) + "</span> = " + g + "</li>";
+        }
+        return "<li><span class=\"rom\">" + naarRomeins(f.getal) + "</span> = " + f.getal + "</li>";
+      }).join("");
+      el.foutenBlok.hidden = false;
+    } else {
+      el.foutenBlok.hidden = true;
+    }
+
+    el.volgendLevelBtn.hidden = !(s.level + 1 < LEVELS.length && data.level >= s.level + 1);
+    bouwLevelLijst();
+    toon("eind");
+  }
+
+  /* ---------- luisteraars ---------- */
+  el.leerBtn.addEventListener("click", function(){ toon("leren"); });
+  el.naarSpelBtn.addEventListener("click", function(){ toon("start"); });
+  el.kaartBtn.addEventListener("click", function(){ toon("start"); });
+  el.stopBtn.addEventListener("click", function(){ bouwLevelLijst(); toon("start"); });
+  el.opnieuwBtn.addEventListener("click", function(){ startLevel(s.level); });
+  el.volgendLevelBtn.addEventListener("click", function(){ startLevel(s.level + 1); });
+  el.volgendeBtn.addEventListener("click", volgende);
+  el.hulpBtn.addEventListener("click", geefHulp);
+
+  el.spiekBtn.addEventListener("click", function(){
+    el.spiekbrief.hidden = !el.spiekbrief.hidden;
+    data.spiek = !el.spiekbrief.hidden;
+    schrijf(data);
+  });
+
+  el.tekenrij.addEventListener("click", function(e){
+    var knop = e.target.closest(".tekenkaart");
+    if (!knop) return;
+    var kaarten = el.tekenrij.querySelectorAll(".tekenkaart");
+    for (var i = 0; i < kaarten.length; i++) kaarten[i].classList.remove("aan");
+    knop.classList.add("aan");
+    el.tekenUitleg.textContent = TEKENPRAAT[knop.getAttribute("data-teken")];
+  });
+
+  el.minBtn.addEventListener("click", function(){ zetMachine(parseInt(el.schuif.value, 10) - 1); });
+  el.plusBtn.addEventListener("click", function(){ zetMachine(parseInt(el.schuif.value, 10) + 1); });
+  el.schuif.addEventListener("input", function(){ zetMachine(parseInt(el.schuif.value, 10)); });
+
+  function padKlik(e){
+    var knop = e.target.closest(".toets");
+    if (!knop || knop.disabled) return;
+    var t = knop.getAttribute("data-toets");
+    if (t === "wis") wisTeken();
+    else if (t === "klaar") nakijken();
+    else voegToe(t);
+  }
+  el.cijferPad.addEventListener("click", padKlik);
+  el.tekenPad.addEventListener("click", padKlik);
+
+  el.toneel.addEventListener("click", function(e){
+    var plaat = e.target.closest(".keuzeplaat");
+    if (!plaat || plaat.disabled) return;
+    kiesGroter(plaat.getAttribute("data-keus"));
+  });
+
+  document.addEventListener("keydown", function(e){
+    if (el.speelScherm.hidden || !s) return;
+    var taak = s.taken[s.i];
+    if (e.key === "Enter"){
+      if (s.fase === "invoer") nakijken(); else volgende();
+      e.preventDefault(); return;
+    }
+    if (e.key === "Backspace"){ wisTeken(); e.preventDefault(); return; }
+    if (taak.soort === "bouw"){
+      var letter = e.key.toUpperCase();
+      if (s.cfg.tekens.indexOf(letter) !== -1){ voegToe(letter); e.preventDefault(); }
+    } else if (taak.soort !== "groter"){
+      if (e.key >= "0" && e.key <= "9" && e.key.length === 1){ voegToe(e.key); e.preventDefault(); }
+    }
+  });
+
+  /* ---------- opstarten ---------- */
+  bouwLevelLijst();
+  bouwTabellen();
+  zetMachine(1);
+  el.spiekbrief.hidden = !data.spiek;
+})();
+</script>
+</body>
+</html>
