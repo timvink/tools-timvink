@@ -358,7 +358,7 @@
 			z-index: 2;
 		}
 
-		.today-marker::before {
+		.today-marker.labelled::before {
 			content: 'Today';
 			position: absolute;
 			top: -18px;
@@ -1069,10 +1069,10 @@
 	}
 
 	// ── Add today marker to a lane track ─────────────
-	function addTodayMarker(track) {
+	function addTodayMarker(track, labelled) {
 		const pct = dateToPercent(new Date().toISOString().split('T')[0]);
 		const marker = document.createElement('div');
-		marker.className = 'today-marker';
+		marker.className = labelled ? 'today-marker labelled' : 'today-marker';
 		marker.style.left = pct + '%';
 		track.appendChild(marker);
 	}
@@ -1144,7 +1144,7 @@
 			// Track
 			const track = document.createElement('div');
 			track.className = 'lane-track';
-			addTodayMarker(track);
+			addTodayMarker(track, ci === 0);
 
 			sorted.filter(rel => isInView(rel.date)).forEach((rel, ri) => {
 				const delay = ci * 60 + ri * 25;
