@@ -69,18 +69,29 @@
 		}
 
 		.back-link {
-			display: inline-flex;
+			display: flex;
+			width: fit-content;
 			align-items: center;
 			gap: 0.4rem;
-			font-size: 0.8rem;
-			color: var(--muted);
+			padding: 0.3rem 0.75rem 0.3rem 0.6rem;
+			border: 1px solid var(--border-strong);
+			border-radius: 999px;
+			font-size: 0.78rem;
+			color: var(--muted-2);
 			text-decoration: none;
-			margin-bottom: 1.5rem;
-			transition: color 0.15s;
-			letter-spacing: 0.02em;
+			margin-bottom: 2rem;
+			transition: color 0.15s, border-color 0.15s, background 0.15s;
 		}
 
-		.back-link:hover { color: var(--text); }
+		.back-link .arrow { transition: transform 0.15s; }
+
+		.back-link:hover {
+			color: var(--text);
+			border-color: var(--muted);
+			background: var(--surface);
+		}
+
+		.back-link:hover .arrow { transform: translateX(-2px); }
 
 		.header-tag {
 			display: inline-flex;
@@ -735,7 +746,7 @@
 
 <header>
 	<div class="header-inner">
-		<a href="/" class="back-link">← tools.timvink.nl</a>
+		<a href="/" class="back-link"><span class="arrow" aria-hidden="true">←</span> All tools</a>
 		<div class="header-tag">Visualization</div>
 		<h1>The AI Race</h1>
 		<p class="subtitle">Every major model release from Anthropic, OpenAI, Google DeepMind, xAI, and Meta — watch the pace accelerate.</p>
@@ -1158,8 +1169,10 @@
 
 		// Last updated
 		const d = new Date(data.last_updated + 'T12:00:00');
+		const daysAgo = Math.round((Date.now() - d) / 86400000);
+		const ago = daysAgo <= 0 ? 'today' : daysAgo === 1 ? 'yesterday' : `${daysAgo} days ago`;
 		document.getElementById('last-updated').textContent =
-			d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+			`${d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} (${ago})`;
 
 		renderCadence(data);
 		renderStats(data);
