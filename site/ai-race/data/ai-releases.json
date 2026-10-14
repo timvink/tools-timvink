@@ -813,6 +813,47 @@
           "openrouter_id": "x-ai/grok-4.7"
         }
       ]
+    },
+    {
+      "id": "meta",
+      "name": "Meta",
+      "color": "#F472B6",
+      "website": "https://ai.meta.com",
+      "releases": [
+        {
+          "name": "Muse Spark",
+          "date": "2026-04-08",
+          "tier": "flagship",
+          "description": "First model from Meta Superintelligence Labs, a lightweight multimodal model powering Meta AI."
+        },
+        {
+          "name": "Muse Spark 1.1",
+          "date": "2026-07-09",
+          "tier": "major",
+          "description": "Updated Muse Spark, opened to developers through the Meta Model API.",
+          "url": "https://ai.meta.com/blog/introducing-muse-spark-meta-model-api/"
+        },
+        {
+          "name": "Muse Spark 1.2",
+          "date": "2026-08-05",
+          "tier": "major",
+          "description": "Muse Spark update, also served through OpenRouter."
+        },
+        {
+          "name": "Muse Spark 1.3",
+          "date": "2026-09-02",
+          "tier": "major",
+          "description": "Multimodal Muse Spark update focused on agentic tasks.",
+          "openrouter_id": "meta/muse-spark-1.3"
+        },
+        {
+          "name": "Muse Wonder",
+          "date": "2026-10-12",
+          "tier": "flagship",
+          "description": "Meta's first frontier models: Muse Wonder (API) and Muse Wonder Full (Muse Code only), with a focus on active memory for agents.",
+          "url": "https://about.fb.com/news/2026/10/introducing-muse-wonder-models/"
+        }
+      ]
     }
   ]
 }

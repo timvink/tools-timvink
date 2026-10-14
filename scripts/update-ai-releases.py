@@ -24,6 +24,7 @@ PROVIDER_MAP = {
     "openai": "openai",
     "google": "google",
     "x-ai": "xai",
+    "meta": "meta",
 }
 
 # Model ID substrings that mark a model as a variant / side-project / non-chat model.
@@ -39,6 +40,7 @@ SKIP_FRAGMENTS = [
     "gemma",       # Google's open weights family
     "gpt-oss",     # OpenAI open-source models
     "grok-code", "grok code",  # xAI coding variant
+    "glimmer",     # Meta's small open-weights on-device model
     # Fine-tune / variant markers
     "fine-tune", "ft:", "ft-",
     # Deployment variants (same model, different config)
@@ -175,8 +177,14 @@ def infer_release_tier(company_id: str, name: str, model_id: str, family_tiers: 
         if norm.startswith("grok"):
             return "flagship"
 
+    if company_id == "meta":
+        if "wonder" in norm:
+            return "flagship"
+        if "spark" in norm:
+            return "major"
+
     slug = model_id.split("/", 1)[-1].lower() if "/" in model_id else model_id.lower()
-    if slug.startswith(("claude", "gpt", "gemini", "grok")):
+    if slug.startswith(("claude", "gpt", "gemini", "grok", "muse")):
         return "major"
     return "minor"
 

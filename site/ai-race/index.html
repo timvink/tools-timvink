@@ -22,6 +22,7 @@
 			--c-openai: #34D399;
 			--c-google: #60A5FA;
 			--c-xai: #FBBF24;
+			--c-meta: #F472B6;
 		}
 
 		* {
@@ -737,7 +738,7 @@
 		<a href="/" class="back-link">← tools.timvink.nl</a>
 		<div class="header-tag">Visualization</div>
 		<h1>The AI Race</h1>
-		<p class="subtitle">Every major model release from Anthropic, OpenAI, Google DeepMind, and xAI — watch the pace accelerate.</p>
+		<p class="subtitle">Every major model release from Anthropic, OpenAI, Google DeepMind, xAI, and Meta — watch the pace accelerate.</p>
 	</div>
 </header>
 
@@ -916,6 +917,11 @@
 		if (company.id === 'xai') {
 			if (norm.includes('mini')) return 'major';
 			if (norm.startsWith('grok')) return 'flagship';
+		}
+
+		if (company.id === 'meta') {
+			if (norm.includes('wonder')) return 'flagship';
+			if (norm.includes('spark')) return 'major';
 		}
 
 		return currentTier;
