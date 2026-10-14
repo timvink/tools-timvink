@@ -224,9 +224,8 @@
 			overflow-x: auto;
 			overflow-y: visible;
 			-webkit-overflow-scrolling: touch;
-			padding-bottom: 0.5rem;
 			margin: 0 -0.5rem;
-			padding: 0 0.5rem;
+			padding: 0 0.5rem 1.6rem; /* room for the Today pill */
 		}
 
 		.timeline-scroll::-webkit-scrollbar {
@@ -369,19 +368,31 @@
 			z-index: 2;
 		}
 
-		.today-marker.labelled::before {
-			content: 'Today';
+		/* Label hangs below the last lane, clear of the axis labels */
+		.today-marker.labelled::after {
+			content: attr(data-label);
 			position: absolute;
-			top: -18px;
-			left: 50%;
+			top: calc(100% + 2px);
+			left: 0;
 			transform: translateX(-50%);
+			padding: 0.15rem 0.5rem;
+			border: 1px solid var(--border-strong);
+			border-radius: 999px;
+			background: var(--bg);
 			font-size: 0.6rem;
 			font-weight: 600;
 			letter-spacing: 0.08em;
-			color: rgba(255, 255, 255, 0.25);
+			color: var(--muted-2);
 			text-transform: uppercase;
 			white-space: nowrap;
 		}
+
+		/* Near the right edge, anchor the pill's right side to the line */
+		.today-marker.labelled.flip::after {
+			transform: translateX(calc(-100% + 0.5px));
+			border-top-right-radius: 0;
+		}
+
 
 		/* ── Release Dot ───────────────────────── */
 		.release-dot {
@@ -1083,8 +1094,14 @@
 	function addTodayMarker(track, labelled) {
 		const pct = dateToPercent(new Date().toISOString().split('T')[0]);
 		const marker = document.createElement('div');
-		marker.className = labelled ? 'today-marker labelled' : 'today-marker';
+		marker.className = 'today-marker';
 		marker.style.left = pct + '%';
+		if (labelled) {
+			marker.classList.add('labelled');
+			if (pct > 90) marker.classList.add('flip');
+			marker.dataset.label = 'Today · ' +
+				new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+		}
 		track.appendChild(marker);
 	}
 
@@ -1155,7 +1172,7 @@
 			// Track
 			const track = document.createElement('div');
 			track.className = 'lane-track';
-			addTodayMarker(track, ci === 0);
+			addTodayMarker(track, ci === data.companies.length - 1);
 
 			sorted.filter(rel => isInView(rel.date)).forEach((rel, ri) => {
 				const delay = ci * 60 + ri * 25;
