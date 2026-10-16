@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-13",
+  "last_updated": "2026-10-16",
   "companies": [
     {
       "id": "anthropic",
@@ -704,6 +704,13 @@
           "tier": "minor",
           "description": "Nano Banana 2.1 (Gemini Nano Banana 2.1) is Google's image generation and editing model on the Flash tier, succeeding Nano Banana 2 and Nano Banana Pro. It improves product recontextualization,...",
           "openrouter_id": "google/gemini-nano-banana-2.1"
+        },
+        {
+          "name": "Gemini 4 Argon",
+          "date": "2026-10-13",
+          "tier": "minor",
+          "description": "Gemini 4 Argon is Google's flagship reasoning model, built for complex software engineering, deep mathematical and scientific problem solving, and autonomous multi-step agents. Google trained it to keep context across...",
+          "openrouter_id": "google/gemini-4-argon"
         }
       ]
     },
