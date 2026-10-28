@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-25",
+  "last_updated": "2026-10-28",
   "companies": [
     {
       "id": "anthropic",
@@ -521,6 +521,20 @@
           "tier": "flagship",
           "description": "GPT-6.1 Sol is an upgrade to GPT-6 Sol from OpenAI, positioned below the flagship GPT-6 Astra in the GPT-6 series. It is suited for agentic coding, computer use, document-heavy professional...",
           "openrouter_id": "openai/gpt-6.1-sol:batch"
+        },
+        {
+          "name": "GPT-6.1 Terra Pro",
+          "date": "2026-10-26",
+          "tier": "flagship",
+          "description": "GPT-6.1 Terra Pro is the same underlying model as GPT-6.1 Terra, served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. **Cost note:** pro mode spends far more...",
+          "openrouter_id": "openai/gpt-6.1-terra-pro"
+        },
+        {
+          "name": "GPT-6.1 Terra (batch)",
+          "date": "2026-10-26",
+          "tier": "flagship",
+          "description": "GPT-6.1 Terra is the mid-tier model in OpenAI's GPT-6.1 series, priced below GPT-6.1 Sol. It is suited for everyday agentic, coding, and writing work, is particularly strong at understanding screenshots...",
+          "openrouter_id": "openai/gpt-6.1-terra:batch"
         }
       ]
     },
