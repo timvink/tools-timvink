@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-07",
+  "last_updated": "2026-11-09",
   "companies": [
     {
       "id": "anthropic",
@@ -535,6 +535,20 @@
           "tier": "flagship",
           "description": "GPT-6.1 Terra is the mid-tier model in OpenAI's GPT-6.1 series, priced below GPT-6.1 Sol. It is suited for everyday agentic, coding, and writing work, is particularly strong at understanding screenshots...",
           "openrouter_id": "openai/gpt-6.1-terra:batch"
+        },
+        {
+          "name": "Images 2.6",
+          "date": "2026-11-04",
+          "tier": "minor",
+          "description": "New image model with faster generation, GIF creation, more precise editing, and new API controls across ChatGPT, Codex, and the API.",
+          "url": "https://openai.com/index/introducing-images-2-6"
+        },
+        {
+          "name": "GPT-6 Cyber",
+          "date": "2026-11-05",
+          "tier": "major",
+          "description": "OpenAI's cybersecurity model for finding exploitable vulnerabilities and developing fixes, trained to stay within authorized scope.",
+          "url": "https://openai.com/index/introducing-gpt-6-cyber"
         }
       ]
     },
