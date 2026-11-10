@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-09",
+  "last_updated": "2026-11-10",
   "companies": [
     {
       "id": "anthropic",
@@ -219,6 +219,14 @@
           "description": "Claude Haiku 5.5 is Anthropic's small, fast model for high-volume, cost-sensitive work such as summarization, subagents, and browser use. It succeeds Claude Haiku 4.5 with stronger coding, computer use, and...",
           "openrouter_id": "anthropic/claude-haiku-5.5",
           "url": "https://www.anthropic.com/news/claude-haiku-5-5"
+        },
+        {
+          "name": "Claude Fable 5.2",
+          "date": "2026-11-09",
+          "tier": "flagship",
+          "description": "Claude Fable 5.2 is Anthropic's most capable model for the most demanding technical work, with gains over Fable 5.1 in coding, reasoning, and vision. In prerelease testing it completed otherwise-infeasible...",
+          "openrouter_id": "anthropic/claude-fable-5.2",
+          "url": "https://www.anthropic.com/news/claude-fable-5-2"
         }
       ]
     },
@@ -901,6 +909,13 @@
           "tier": "flagship",
           "description": "Meta's first frontier models: Muse Wonder (API) and Muse Wonder Full (Muse Code only), with a focus on active memory for agents.",
           "url": "https://about.fb.com/news/2026/10/introducing-muse-wonder-models/"
+        },
+        {
+          "name": "Muse Ember",
+          "date": "2026-11-09",
+          "tier": "major",
+          "description": "Muse Ember is the smallest and most efficient model from Meta that’s designed for complex reasoning execution and the work agents repeat all day: tool calls, coding agent subtasks, routing,...",
+          "openrouter_id": "meta/muse-ember"
         }
       ]
     }
