@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-10",
+  "last_updated": "2026-11-13",
   "companies": [
     {
       "id": "anthropic",
@@ -761,6 +761,20 @@
           "tier": "minor",
           "description": "Gemini Omni 1.2 Flash is Google's native multimodal video generation and editing model, the successor to Gemini Omni 1.1 Flash. It generates clips up to 15 seconds long with native...",
           "openrouter_id": "google/gemini-omni-1.2-flash"
+        },
+        {
+          "name": "Gemini 4 Carbon",
+          "date": "2026-11-10",
+          "tier": "minor",
+          "description": "Gemini 4 Carbon is a frontier Gemini 4 model from Google for coding, agentic and complex reasoning work. It takes text, image, audio, video and file input, supports long decode...",
+          "openrouter_id": "google/gemini-4-carbon"
+        },
+        {
+          "name": "Gemini 4 Hydrogen",
+          "date": "2026-11-12",
+          "tier": "minor",
+          "description": "Gemini 4 Hydrogen is the high-efficiency workhorse model of the Gemini 4 family from Google, built for high-throughput agentic workflows, coding and multi-model routing at lower cost and latency than...",
+          "openrouter_id": "google/gemini-4-hydrogen"
         }
       ]
     },
