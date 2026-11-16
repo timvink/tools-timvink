@@ -770,6 +770,13 @@
           "openrouter_id": "google/gemini-4-carbon"
         },
         {
+          "name": "Gemini Decision",
+          "date": "2026-11-11",
+          "tier": "minor",
+          "description": "Gemini Decision is a new model powering the Gemini Decisions API, built for fast, calibrated multimodal decisions.",
+          "url": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-decisions-api/"
+        },
+        {
           "name": "Gemini 4 Hydrogen",
           "date": "2026-11-12",
           "tier": "minor",
