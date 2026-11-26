@@ -9,3 +9,7 @@ rules:
       # GitHub's Pages starter layout: configure-pages in the build job reads the
       # Pages settings, so pages/id-token stay at the workflow level.
       - pages.yml
+  dependabot-cooldown:
+    config:
+      # Monthly grouped updates; 3 days is enough to catch yanked releases.
+      days: 3
